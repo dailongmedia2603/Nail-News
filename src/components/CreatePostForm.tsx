@@ -140,7 +140,7 @@ export function CreatePostForm() {
                 <FormItem><FormLabel>Loại tin</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Chọn loại tin" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Bán tiệm">Bán tiệm</SelectItem><SelectItem value="Cần thợ">Cần thợ</SelectItem><SelectItem value="Học nail">Học nail</SelectItem></SelectContent></Select><FormMessage /></FormItem>
             )}/>
             <FormField control={form.control} name="location" render={({ field }) => (
-                <FormItem><FormLabel>Địa điểm (Thành phố, Tiểu bang)</FormLabel><FormControl><Input placeholder="VD: Houston, TX" {...field} /></FormControl><FormMessage /></FormItem>
+                <FormItem><FormLabel>Địa điểm (Thành phố, Tiểu bang, ZIP)</FormLabel><FormControl><Input placeholder="VD: Houston, Texas, 77002" {...field} /></FormControl><FormMessage /></FormItem>
             )}/>
         </div>
 

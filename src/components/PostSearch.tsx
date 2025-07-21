@@ -55,7 +55,7 @@ export function PostSearch() {
     <div className="relative w-full">
       <Command shouldFilter={false} className="rounded-lg border shadow-md overflow-visible">
         <CommandInput 
-          placeholder="Tìm theo tiêu đề, địa điểm, SĐT..." 
+          placeholder="Tìm theo tiêu đề, thành phố, tiểu bang, ZIP, SĐT..." 
           value={query}
           onValueChange={setQuery}
           onFocus={() => query.length > 1 && setIsOpen(true)}
