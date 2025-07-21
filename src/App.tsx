@@ -15,6 +15,7 @@ import PostDetailPage from "./pages/PostDetailPage";
 import SignUp from "./pages/SignUp";
 import ForgotPassword from "./pages/ForgotPassword";
 import CreatePostPage from "./pages/CreatePostPage";
+import TutorialsPage from "./pages/TutorialsPage";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/profile/favorites" element={<FavoritesPage />} />
             <Route path="/profile/location" element={<LocationPage />} />
+            <Route path="/tutorials" element={<TutorialsPage />} />
           </Route>
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

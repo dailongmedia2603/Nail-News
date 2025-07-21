@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, User, Sparkles, PlusCircle } from "lucide-react";
+import { LogOut, User, Sparkles, PlusCircle, GraduationCap } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function Header() {
@@ -40,6 +40,11 @@ export default function Header() {
             <Sparkles className="h-6 w-6" />
             <span className="font-bold">NailNews</span>
           </Link>
+          <nav className="flex items-center space-x-6 text-sm font-medium">
+            <Link to="/tutorials" className="transition-colors hover:text-foreground/80 text-foreground/60">
+              Học Nail
+            </Link>
+          </nav>
         </div>
         <div className="flex flex-1 items-center justify-end space-x-2">
           <Button onClick={() => navigate('/create-post')}>
