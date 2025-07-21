@@ -13,7 +13,7 @@ export function PostSearch() {
   const navigate = useNavigate();
 
   const debounce = (func: (...args: any[]) => void, delay: number) => {
-    let timeout: NodeJS.Timeout;
+    let timeout: ReturnType<typeof setTimeout>;
     return (...args: any[]) => {
       clearTimeout(timeout);
       timeout = setTimeout(() => func(...args), delay);
@@ -57,7 +57,7 @@ export function PostSearch() {
 
   return (
     <div className="relative w-full">
-      <Command className="rounded-lg border shadow-md">
+      <Command shouldFilter={false} className="rounded-lg border shadow-md">
         <CommandInput 
           placeholder="Tìm theo tiêu đề tin đăng..." 
           value={query}
