@@ -14,6 +14,7 @@ import LocationPage from "./pages/LocationPage";
 import PostDetailPage from "./pages/PostDetailPage";
 import SignUp from "./pages/SignUp";
 import ForgotPassword from "./pages/ForgotPassword";
+import CreatePostPage from "./pages/CreatePostPage";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
           
           <Route element={<ProtectedLayout><AppLayout /></ProtectedLayout>}>
             <Route path="/" element={<HomePage />} />
+            <Route path="/create-post" element={<CreatePostPage />} />
             <Route path="/posts/:id" element={<PostDetailPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/profile/favorites" element={<FavoritesPage />} />
