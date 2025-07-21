@@ -1,7 +1,6 @@
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -22,9 +21,11 @@ export type Post = {
 
 interface PostCardProps {
   post: Post;
+  isFavorited: boolean;
+  onFavoriteToggle: (postId: string, isCurrentlyFavorited: boolean) => void;
 }
 
-export function PostCard({ post }: PostCardProps) {
+export function PostCard({ post, isFavorited, onFavoriteToggle }: PostCardProps) {
   const getCategoryVariant = (category: string | null) => {
     switch (category) {
       case "Bán tiệm":
@@ -43,8 +44,8 @@ export function PostCard({ post }: PostCardProps) {
       <CardHeader>
         <div className="flex justify-between items-start">
             <CardTitle className="text-lg">{post.title}</CardTitle>
-            <Button variant="ghost" size="icon" className="flex-shrink-0">
-                <Heart className="h-5 w-5 text-gray-400" />
+            <Button variant="ghost" size="icon" className="flex-shrink-0" onClick={() => onFavoriteToggle(post.id, isFavorited)}>
+                <Heart className={`h-5 w-5 transition-colors ${isFavorited ? 'text-red-500 fill-current' : 'text-gray-400'}`} />
             </Button>
         </div>
         {post.category && (

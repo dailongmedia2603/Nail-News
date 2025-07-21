@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { showError } from "@/utils/toast";
 
 const categories = ["Tất cả", "Bán tiệm", "Cần thợ", "Học nail"];
 
@@ -13,28 +14,78 @@ const HomePage = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("Tất cả");
+  const [favoritePostIds, setFavoritePostIds] = useState<Set<string>>(new Set());
+
+  const fetchPostsAndFavorites = async () => {
+    setLoading(true);
+    
+    // Fetch posts
+    let query = supabase.from("posts").select("*").order("created_at", { ascending: false });
+    if (activeCategory !== "Tất cả") {
+      query = query.eq("category", activeCategory);
+    }
+    const { data: postData, error: postError } = await query;
+
+    if (postError) {
+      console.error("Lỗi tải tin đăng:", postError);
+      showError("Không thể tải tin đăng.");
+    } else {
+      setPosts(postData);
+    }
+
+    // Fetch user's favorites
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: favorites, error: favError } = await supabase
+        .from('favorites')
+        .select('post_id')
+        .eq('user_id', user.id);
+      
+      if (favError) {
+        console.error("Lỗi tải danh sách yêu thích:", favError);
+      } else {
+        setFavoritePostIds(new Set(favorites.map(f => f.post_id)));
+      }
+    }
+
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      setLoading(true);
-      let query = supabase.from("posts").select("*").order("created_at", { ascending: false });
-
-      if (activeCategory !== "Tất cả") {
-        query = query.eq("category", activeCategory);
-      }
-
-      const { data, error } = await query;
-
-      if (error) {
-        console.error("Lỗi tải tin đăng:", error);
-      } else {
-        setPosts(data);
-      }
-      setLoading(false);
-    };
-
-    fetchPosts();
+    fetchPostsAndFavorites();
   }, [activeCategory]);
+
+  const handleFavoriteToggle = async (postId: string, isCurrentlyFavorited: boolean) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      showError("Bạn cần đăng nhập để thực hiện hành động này.");
+      return;
+    }
+
+    if (isCurrentlyFavorited) {
+      setFavoritePostIds(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(postId);
+        return newSet;
+      });
+      const { error } = await supabase.from('favorites').delete().match({ user_id: user.id, post_id: postId });
+      if (error) {
+        showError("Bỏ yêu thích thất bại.");
+        setFavoritePostIds(prev => new Set(prev).add(postId));
+      }
+    } else {
+      setFavoritePostIds(prev => new Set(prev).add(postId));
+      const { error } = await supabase.from('favorites').insert({ user_id: user.id, post_id: postId });
+      if (error) {
+        showError("Yêu thích thất bại.");
+        setFavoritePostIds(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(postId);
+          return newSet;
+        });
+      }
+    }
+  };
 
   return (
     <div className="container mx-auto p-4 md:p-6">
@@ -81,7 +132,12 @@ const HomePage = () => {
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {posts.map((post) => (
-                        <PostCard key={post.id} post={post} />
+                        <PostCard 
+                            key={post.id} 
+                            post={post} 
+                            isFavorited={favoritePostIds.has(post.id)}
+                            onFavoriteToggle={handleFavoriteToggle}
+                        />
                     ))}
                 </div>
             )}

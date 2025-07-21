@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { User, Heart, MapPin, History } from "lucide-react";
@@ -13,7 +13,6 @@ const sidebarNavItems = [
     title: "Yêu thích",
     href: "/profile/favorites",
     icon: <Heart className="mr-2 h-4 w-4" />,
-    disabled: true,
   },
   {
     title: "Định vị",
@@ -43,7 +42,7 @@ export default function ProfileLayout({ children }: ProfileLayoutProps) {
               <NavLink
                 key={item.href}
                 to={item.href}
-                end
+                end={item.href === "/profile"}
                 className={({ isActive }) =>
                   cn(
                     buttonVariants({ variant: "ghost" }),
@@ -62,7 +61,7 @@ export default function ProfileLayout({ children }: ProfileLayoutProps) {
             ))}
           </nav>
         </aside>
-        <div className="flex-1 lg:max-w-2xl">{children}</div>
+        <div className="flex-1">{children}</div>
       </div>
     </div>
   );
