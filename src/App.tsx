@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import ProtectedLayout from "./components/ProtectedLayout";
+import ProfilePage from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,14 @@ const App = () => (
             element={
               <ProtectedLayout>
                 <Index />
+              </ProtectedLayout>
+            } 
+          />
+          <Route 
+            path="/profile" 
+            element={
+              <ProtectedLayout>
+                <ProfilePage />
               </ProtectedLayout>
             } 
           />

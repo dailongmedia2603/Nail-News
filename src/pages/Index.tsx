@@ -25,9 +25,14 @@ const Index = () => {
       <div className="text-center p-8 bg-white rounded-lg shadow-md">
         <h1 className="text-4xl font-bold mb-4">Chào mừng bạn đã trở lại!</h1>
         {userEmail && <p className="text-xl text-gray-600 mb-6">Bạn đã đăng nhập với email: {userEmail}</p>}
-        <Button onClick={handleLogout}>
-          Đăng xuất
-        </Button>
+        <div className="flex justify-center gap-4">
+            <Button onClick={() => navigate('/profile')}>
+                Quản lý hồ sơ
+            </Button>
+            <Button onClick={handleLogout} variant="outline">
+                Đăng xuất
+            </Button>
+        </div>
       </div>
     </div>
   );
