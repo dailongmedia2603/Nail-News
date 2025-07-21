@@ -99,15 +99,15 @@ export function AccountForm() {
         return;
     }
 
-    // Update phone in auth.users
+    // Update phone by invoking an Edge Function
     const phoneToUpdate = data.phone ? data.country_code + data.phone : '';
-    const { error: authError } = await supabase.auth.updateUser({
-        phone: phoneToUpdate,
+    const { error: functionError } = await supabase.functions.invoke('update-phone', {
+        body: { phone: phoneToUpdate },
     });
 
-    if (authError) {
+    if (functionError) {
         dismissToast(toastId);
-        showError("Cập nhật số điện thoại thất bại: " + authError.message);
+        showError("Cập nhật số điện thoại thất bại: " + functionError.message);
         return;
     }
 
