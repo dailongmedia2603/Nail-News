@@ -21,9 +21,14 @@ export function CustomLoginForm() {
     setLoading(true);
     const toastId = showLoading('Đang đăng nhập...');
 
+    let phoneValue = emailOrPhone;
+    if (!isEmail(emailOrPhone) && !emailOrPhone.startsWith('+')) {
+      phoneValue = `+${emailOrPhone}`;
+    }
+
     const credentials = {
       password,
-      ...(isEmail(emailOrPhone) ? { email: emailOrPhone } : { phone: emailOrPhone }),
+      ...(isEmail(emailOrPhone) ? { email: emailOrPhone } : { phone: phoneValue }),
     };
 
     const { error } = await supabase.auth.signInWithPassword(credentials);
