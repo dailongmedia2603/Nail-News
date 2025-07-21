@@ -10,6 +10,7 @@ import ProtectedLayout from "./components/ProtectedLayout";
 import ProfilePage from "./pages/Profile";
 import AppLayout from "./components/AppLayout";
 import FavoritesPage from "./pages/FavoritesPage";
+import LocationPage from "./pages/LocationPage";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/" element={<HomePage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/profile/favorites" element={<FavoritesPage />} />
+            <Route path="/profile/location" element={<LocationPage />} />
           </Route>
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

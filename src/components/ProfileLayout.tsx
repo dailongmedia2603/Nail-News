@@ -18,7 +18,6 @@ const sidebarNavItems = [
     title: "Định vị",
     href: "/profile/location",
     icon: <MapPin className="mr-2 h-4 w-4" />,
-    disabled: true,
   },
   {
     title: "Lịch sử đăng nhập",
