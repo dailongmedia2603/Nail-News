@@ -44,10 +44,13 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // 4. Update the user's phone using the Admin client
+    // 4. Update the user's phone and mark it as confirmed
     const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
       user.id,
-      { phone: phone }
+      { 
+        phone: phone,
+        phone_confirm: true // This is the crucial fix
+      }
     )
 
     if (updateError) {
