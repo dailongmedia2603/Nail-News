@@ -11,6 +11,7 @@ import ProfilePage from "./pages/Profile";
 import AppLayout from "./components/AppLayout";
 import FavoritesPage from "./pages/FavoritesPage";
 import LocationPage from "./pages/LocationPage";
+import PostDetailPage from "./pages/PostDetailPage";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
           
           <Route element={<ProtectedLayout><AppLayout /></ProtectedLayout>}>
             <Route path="/" element={<HomePage />} />
+            <Route path="/posts/:id" element={<PostDetailPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/profile/favorites" element={<FavoritesPage />} />
             <Route path="/profile/location" element={<LocationPage />} />
