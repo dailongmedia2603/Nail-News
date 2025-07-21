@@ -34,9 +34,9 @@ const Login = () => {
             localization={{
               variables: {
                 sign_in: {
-                  email_label: 'Địa chỉ email',
+                  email_label: 'Email hoặc Số điện thoại',
                   password_label: 'Mật khẩu',
-                  email_input_placeholder: 'Địa chỉ email của bạn',
+                  email_input_placeholder: 'Email hoặc số điện thoại của bạn',
                   password_input_placeholder: 'Mật khẩu của bạn',
                   button_label: 'Đăng nhập',
                   social_provider_text: 'Đăng nhập với {{provider}}',
