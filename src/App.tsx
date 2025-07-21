@@ -12,6 +12,8 @@ import AppLayout from "./components/AppLayout";
 import FavoritesPage from "./pages/FavoritesPage";
 import LocationPage from "./pages/LocationPage";
 import PostDetailPage from "./pages/PostDetailPage";
+import SignUp from "./pages/SignUp";
+import ForgotPassword from "./pages/ForgotPassword";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +25,8 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           
           <Route element={<ProtectedLayout><AppLayout /></ProtectedLayout>}>
             <Route path="/" element={<HomePage />} />

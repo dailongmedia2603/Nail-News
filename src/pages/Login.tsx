@@ -1,7 +1,6 @@
-import { Auth } from '@supabase/auth-ui-react';
-import { ThemeSupa } from '@supabase/auth-ui-shared';
+import { CustomLoginForm } from '@/components/CustomLoginForm';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useEffect } from 'react';
 
 const Login = () => {
@@ -26,44 +25,13 @@ const Login = () => {
           </h2>
         </div>
         <div className="p-8 rounded-lg shadow-lg bg-white">
-          <Auth
-            supabaseClient={supabase}
-            appearance={{ theme: ThemeSupa }}
-            providers={[]}
-            theme="light"
-            localization={{
-              variables: {
-                sign_in: {
-                  email_label: 'Email hoặc Số điện thoại',
-                  password_label: 'Mật khẩu',
-                  email_input_placeholder: 'Email hoặc số điện thoại của bạn',
-                  password_input_placeholder: 'Mật khẩu của bạn',
-                  button_label: 'Đăng nhập',
-                  social_provider_text: 'Đăng nhập với {{provider}}',
-                  link_text: 'Đã có tài khoản? Đăng nhập',
-                },
-                sign_up: {
-                  email_label: 'Địa chỉ email',
-                  password_label: 'Tạo mật khẩu',
-                  email_input_placeholder: 'Địa chỉ email của bạn',
-                  password_input_placeholder: 'Mật khẩu của bạn',
-                  button_label: 'Đăng ký',
-                  link_text: 'Chưa có tài khoản? Đăng ký',
-                },
-                forgotten_password: {
-                  email_label: 'Địa chỉ email',
-                  email_input_placeholder: 'Địa chỉ email của bạn',
-                  button_label: 'Gửi hướng dẫn đặt lại mật khẩu',
-                  link_text: 'Quên mật khẩu?',
-                },
-                update_password: {
-                    password_label: 'Mật khẩu mới',
-                    password_input_placeholder: 'Mật khẩu mới của bạn',
-                    button_label: 'Cập nhật mật khẩu',
-                }
-              },
-            }}
-          />
+          <CustomLoginForm />
+          <p className="mt-6 text-center text-sm text-gray-600">
+            Chưa có tài khoản?{' '}
+            <Link to="/signup" className="font-medium text-primary hover:underline">
+              Đăng ký
+            </Link>
+          </p>
         </div>
       </div>
     </div>
