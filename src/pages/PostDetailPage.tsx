@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { type Post } from '@/components/PostCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MapPin, Calendar, Square, Armchair, Table, Users, DollarSign, Clock, CheckCircle, Share2, Copy } from 'lucide-react';
+import { MapPin, Calendar, Square, Armchair, Table, Users, DollarSign, Clock, CheckCircle, Share2, Store } from 'lucide-react';
 import { format } from 'date-fns';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { showSuccess } from '@/utils/toast';
@@ -111,33 +110,49 @@ const PostDetailPage = () => {
             </div>
 
             <div className="space-y-6">
-                {/* Basic Info */}
-                <Card>
-                    <CardHeader><CardTitle>Thông tin cơ bản</CardTitle></CardHeader>
-                    <CardContent className="space-y-3 text-sm">
-                        <div className="flex items-center"><Square className="mr-2 h-4 w-4 text-muted-foreground" /> Diện tích: <strong>{post.area || 'N/A'}</strong></div>
-                        <div className="flex items-center"><Armchair className="mr-2 h-4 w-4 text-muted-foreground" /> Số ghế: <strong>{post.chairs || 'N/A'}</strong></div>
-                        <div className="flex items-center"><Table className="mr-2 h-4 w-4 text-muted-foreground" /> Số bàn: <strong>{post.tables || 'N/A'}</strong></div>
-                        <div className="flex items-center"><Users className="mr-2 h-4 w-4 text-muted-foreground" /> Nhân sự: <strong>{post.staff || 'N/A'}</strong></div>
-                    </CardContent>
-                </Card>
+                {/* Conditional Info */}
+                {post.category === 'Bán tiệm' && (
+                    <>
+                        <Card>
+                            <CardHeader><CardTitle>Thông tin cơ bản</CardTitle></CardHeader>
+                            <CardContent className="space-y-3 text-sm">
+                                <div className="flex items-center"><Square className="mr-2 h-4 w-4 text-muted-foreground" /> Diện tích: <strong>{post.area || 'N/A'}</strong></div>
+                                <div className="flex items-center"><Armchair className="mr-2 h-4 w-4 text-muted-foreground" /> Số ghế: <strong>{post.chairs || 'N/A'}</strong></div>
+                                <div className="flex items-center"><Table className="mr-2 h-4 w-4 text-muted-foreground" /> Số bàn: <strong>{post.tables || 'N/A'}</strong></div>
+                                <div className="flex items-center"><Users className="mr-2 h-4 w-4 text-muted-foreground" /> Nhân sự: <strong>{post.staff || 'N/A'}</strong></div>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader><CardTitle>Thông tin quy mô</CardTitle></CardHeader>
+                            <CardContent className="space-y-3 text-sm">
+                                <div className="flex items-center"><DollarSign className="mr-2 h-4 w-4 text-muted-foreground" /> Doanh thu: <strong>{post.revenue || 'N/A'}</strong></div>
+                                <div className="flex items-center"><Clock className="mr-2 h-4 w-4 text-muted-foreground" /> Giờ hoạt động: <strong>{post.operating_hours || 'N/A'}</strong></div>
+                            </CardContent>
+                        </Card>
+                    </>
+                )}
 
-                {/* Scale Info */}
-                <Card>
-                    <CardHeader><CardTitle>Thông tin quy mô</CardTitle></CardHeader>
-                    <CardContent className="space-y-3 text-sm">
-                        <div className="flex items-center"><DollarSign className="mr-2 h-4 w-4 text-muted-foreground" /> Doanh thu: <strong>{post.revenue || 'N/A'}</strong></div>
-                        <div className="flex items-center"><Clock className="mr-2 h-4 w-4 text-muted-foreground" /> Giờ hoạt động: <strong>{post.operating_hours || 'N/A'}</strong></div>
-                        {post.services && post.services.length > 0 && (
-                            <div>
-                                <h4 className="font-semibold mb-2">Dịch vụ:</h4>
-                                <ul className="space-y-2 pl-1">
-                                    {post.services.map(service => <li key={service} className="flex items-center"><CheckCircle className="mr-2 h-4 w-4 text-green-500" /> {service}</li>)}
-                                </ul>
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
+                {post.category === 'Cần thợ' && (
+                    <Card>
+                        <CardHeader><CardTitle>Thông tin công việc</CardTitle></CardHeader>
+                        <CardContent className="space-y-3 text-sm">
+                            <div className="flex items-center"><DollarSign className="mr-2 h-4 w-4 text-muted-foreground" /> Lương: <strong>{post.salary_info || 'N/A'}</strong></div>
+                            <div className="flex items-center"><Clock className="mr-2 h-4 w-4 text-muted-foreground" /> Giờ hoạt động: <strong>{post.operating_hours || 'N/A'}</strong></div>
+                            <div className="flex items-center"><Store className="mr-2 h-4 w-4 text-muted-foreground" /> Trạng thái tiệm: <strong>{post.store_status || 'N/A'}</strong></div>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {post.services && post.services.length > 0 && (
+                    <Card>
+                        <CardHeader><CardTitle>Dịch vụ kinh doanh</CardTitle></CardHeader>
+                        <CardContent>
+                            <ul className="space-y-2 pl-1 text-sm">
+                                {post.services.map(service => <li key={service} className="flex items-center"><CheckCircle className="mr-2 h-4 w-4 text-green-500" /> {service}</li>)}
+                            </ul>
+                        </CardContent>
+                    </Card>
+                )}
             </div>
         </div>
         

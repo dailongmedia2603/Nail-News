@@ -27,6 +27,8 @@ export type Post = {
   services: string[] | null;
   images: string[] | null;
   exact_address: string | null;
+  salary_info: string | null;
+  store_status: string | null;
 };
 
 interface PostCardProps {
