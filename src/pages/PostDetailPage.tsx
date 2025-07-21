@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { type Post } from '@/components/PostCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Calendar } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { MapPin, Calendar, Square, Armchair, Table, Users, DollarSign, Clock, CheckCircle, Share2, Copy } from 'lucide-react';
 import { format } from 'date-fns';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { showSuccess } from '@/utils/toast';
 
 const PostDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -36,21 +39,20 @@ const PostDetailPage = () => {
     fetchPost();
   }, [id]);
 
-  const getCategoryVariant = (category: string | null) => {
-    switch (category) {
-      case "Bán tiệm": return "default";
-      case "Cần thợ": return "destructive";
-      case "Học nail": return "secondary";
-      default: return "outline";
-    }
+  const handleShare = () => {
+    navigator.clipboard.writeText(window.location.href);
+    showSuccess("Đã sao chép liên kết vào bộ nhớ tạm!");
   };
 
   if (loading) {
     return (
-      <div className="container mx-auto p-4 md:p-6 max-w-4xl space-y-4">
-        <Skeleton className="h-8 w-3/4" />
-        <Skeleton className="h-4 w-1/4" />
-        <Skeleton className="h-4 w-1/2" />
+      <div className="container mx-auto p-4 md:p-6 max-w-4xl space-y-6">
+        <Skeleton className="h-10 w-3/4" />
+        <div className="flex gap-4">
+            <Skeleton className="h-6 w-24" />
+            <Skeleton className="h-6 w-32" />
+        </div>
+        <Skeleton className="h-64 w-full" />
         <Skeleton className="h-40 w-full" />
       </div>
     );
@@ -62,19 +64,98 @@ const PostDetailPage = () => {
 
   return (
     <div className="container mx-auto p-4 md:p-6 max-w-4xl">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl md:text-3xl">{post.title}</CardTitle>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground pt-4">
-            {post.category && <Badge variant={getCategoryVariant(post.category)} className="w-fit">{post.category}</Badge>}
-            {post.location && <div className="flex items-center"><MapPin className="mr-1 h-4 w-4" /> {post.location}</div>}
-            <div className="flex items-center"><Calendar className="mr-1 h-4 w-4" /> {format(new Date(post.created_at), 'dd/MM/yyyy')}</div>
-          </div>
-        </CardHeader>
-        <CardContent className="prose dark:prose-invert max-w-none">
-          <p className="whitespace-pre-wrap">{post.description}</p>
-        </CardContent>
-      </Card>
+      <div className="space-y-6">
+        {/* Header */}
+        <div>
+            <div className="flex justify-between items-start">
+                <h1 className="text-3xl md:text-4xl font-bold">{post.title}</h1>
+                <Button onClick={handleShare} variant="outline" size="icon">
+                    <Share2 className="h-5 w-5" />
+                </Button>
+            </div>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground mt-2">
+                {post.location && <div className="flex items-center"><MapPin className="mr-1 h-4 w-4" /> {post.location}</div>}
+                <div className="flex items-center"><Calendar className="mr-1 h-4 w-4" /> Đăng ngày {format(new Date(post.created_at), 'dd/MM/yyyy')}</div>
+            </div>
+        </div>
+
+        {/* Image Gallery */}
+        {post.images && post.images.length > 0 && (
+            <Carousel className="w-full">
+                <CarouselContent>
+                    {post.images.map((img, index) => (
+                        <CarouselItem key={index}>
+                            <Card>
+                                <CardContent className="flex aspect-video items-center justify-center p-0">
+                                    <img src={img} alt={`Hình ảnh tiệm ${index + 1}`} className="rounded-lg object-cover w-full h-full" />
+                                </CardContent>
+                            </Card>
+                        </CarouselItem>
+                    ))}
+                </CarouselContent>
+                <CarouselPrevious />
+                <CarouselNext />
+            </Carousel>
+        )}
+
+        {/* Main Content */}
+        <div className="grid md:grid-cols-3 gap-6">
+            <div className="md:col-span-2 space-y-6">
+                {/* Description */}
+                <Card>
+                    <CardHeader><CardTitle>Mô tả chi tiết</CardTitle></CardHeader>
+                    <CardContent className="prose dark:prose-invert max-w-none whitespace-pre-wrap">
+                        <p>{post.description}</p>
+                    </CardContent>
+                </Card>
+            </div>
+
+            <div className="space-y-6">
+                {/* Basic Info */}
+                <Card>
+                    <CardHeader><CardTitle>Thông tin cơ bản</CardTitle></CardHeader>
+                    <CardContent className="space-y-3 text-sm">
+                        <div className="flex items-center"><Square className="mr-2 h-4 w-4 text-muted-foreground" /> Diện tích: <strong>{post.area || 'N/A'}</strong></div>
+                        <div className="flex items-center"><Armchair className="mr-2 h-4 w-4 text-muted-foreground" /> Số ghế: <strong>{post.chairs || 'N/A'}</strong></div>
+                        <div className="flex items-center"><Table className="mr-2 h-4 w-4 text-muted-foreground" /> Số bàn: <strong>{post.tables || 'N/A'}</strong></div>
+                        <div className="flex items-center"><Users className="mr-2 h-4 w-4 text-muted-foreground" /> Nhân sự: <strong>{post.staff || 'N/A'}</strong></div>
+                    </CardContent>
+                </Card>
+
+                {/* Scale Info */}
+                <Card>
+                    <CardHeader><CardTitle>Thông tin quy mô</CardTitle></CardHeader>
+                    <CardContent className="space-y-3 text-sm">
+                        <div className="flex items-center"><DollarSign className="mr-2 h-4 w-4 text-muted-foreground" /> Doanh thu: <strong>{post.revenue || 'N/A'}</strong></div>
+                        <div className="flex items-center"><Clock className="mr-2 h-4 w-4 text-muted-foreground" /> Giờ hoạt động: <strong>{post.operating_hours || 'N/A'}</strong></div>
+                        {post.services && post.services.length > 0 && (
+                            <div>
+                                <h4 className="font-semibold mb-2">Dịch vụ:</h4>
+                                <ul className="space-y-2 pl-1">
+                                    {post.services.map(service => <li key={service} className="flex items-center"><CheckCircle className="mr-2 h-4 w-4 text-green-500" /> {service}</li>)}
+                                </ul>
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+            </div>
+        </div>
+        
+        {/* Location */}
+        <Card>
+            <CardHeader><CardTitle>Vị trí</CardTitle></CardHeader>
+            <CardContent>
+                <p className="text-sm mb-4"><strong>Địa chỉ:</strong> {post.exact_address || post.location || 'Chưa cung cấp'}</p>
+                <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
+                    <p className="text-muted-foreground text-center p-4">
+                        Bản đồ sẽ sớm được tích hợp.<br/>
+                        (Cần API Key từ Google Maps Platform để hiển thị)
+                    </p>
+                </div>
+            </CardContent>
+        </Card>
+
+      </div>
     </div>
   );
 };
