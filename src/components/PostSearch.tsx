@@ -12,16 +12,8 @@ export function PostSearch() {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
-  const debounce = (func: (...args: any[]) => void, delay: number) => {
-    let timeout: ReturnType<typeof setTimeout>;
-    return (...args: any[]) => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func(...args), delay);
-    };
-  };
-
   const performSearch = useCallback(async (searchQuery: string) => {
-    if (searchQuery.length < 2) {
+    if (searchQuery.trim().length < 2) {
       setResults([]);
       setIsOpen(false);
       return;
@@ -43,11 +35,15 @@ export function PostSearch() {
     setLoading(false);
   }, []);
 
-  const debouncedSearch = useCallback(debounce(performSearch, 300), [performSearch]);
-
   useEffect(() => {
-    debouncedSearch(query);
-  }, [query, debouncedSearch]);
+    const timerId = setTimeout(() => {
+      performSearch(query);
+    }, 300);
+
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [query, performSearch]);
 
   const handleSelect = (postId: string) => {
     setIsOpen(false);
@@ -57,7 +53,7 @@ export function PostSearch() {
 
   return (
     <div className="relative w-full">
-      <Command shouldFilter={false} className="rounded-lg border shadow-md">
+      <Command shouldFilter={false} className="rounded-lg border shadow-md overflow-visible">
         <CommandInput 
           placeholder="Tìm theo tiêu đề tin đăng..." 
           value={query}
@@ -65,10 +61,8 @@ export function PostSearch() {
           onFocus={() => query.length > 1 && setIsOpen(true)}
           onBlur={() => setTimeout(() => setIsOpen(false), 150)}
         />
-      </Command>
-      {isOpen && (
-        <div className="absolute z-10 top-full mt-1 w-full bg-background border rounded-md shadow-lg">
-          <CommandList>
+        {isOpen && (
+          <CommandList className="absolute z-10 top-full mt-1 w-full bg-background border rounded-md shadow-lg">
             {loading && (
               <div className="p-4 flex items-center justify-center text-sm text-muted-foreground">
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -81,8 +75,8 @@ export function PostSearch() {
                 {results.map((post) => (
                   <CommandItem
                     key={post.id}
+                    value={post.id} // Use unique ID for value
                     onSelect={() => handleSelect(post.id)}
-                    value={post.title}
                     className="cursor-pointer"
                   >
                     <FileText className="mr-2 h-4 w-4" />
@@ -92,8 +86,8 @@ export function PostSearch() {
               </CommandGroup>
             )}
           </CommandList>
-        </div>
-      )}
+        )}
+      </Command>
     </div>
   );
 }
