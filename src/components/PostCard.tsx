@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "./ui/button";
-import { Heart, MapPin, Square, Armchair, Table } from "lucide-react";
+import { Heart, MapPin, Square, Armchair, Table, DollarSign, Clock, Store } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export type Post = {
@@ -78,6 +78,13 @@ export function PostCard({ post, isFavorited, onFavoriteToggle }: PostCardProps)
             {post.chairs && <div className="flex items-center"><Armchair className="mr-1 h-4 w-4" />{post.chairs} ghế</div>}
             {post.tables && <div className="flex items-center"><Table className="mr-1 h-4 w-4" />{post.tables} bàn</div>}
           </div>
+        )}
+        {post.category === 'Cần thợ' && (
+            <div className="w-full space-y-1 text-sm text-muted-foreground">
+                {post.salary_info && <div className="flex items-center"><DollarSign className="mr-1 h-4 w-4" />Lương: {post.salary_info}</div>}
+                {post.operating_hours && <div className="flex items-center"><Clock className="mr-1 h-4 w-4" />Giờ: {post.operating_hours}</div>}
+                {post.store_status && <div className="flex items-center"><Store className="mr-1 h-4 w-4" />Tiệm: {post.store_status}</div>}
+            </div>
         )}
         {post.location && (
           <div className="flex items-center text-sm text-muted-foreground pt-1">
