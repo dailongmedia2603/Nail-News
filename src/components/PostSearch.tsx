@@ -20,10 +20,10 @@ export function PostSearch() {
     }
     setLoading(true);
     setIsOpen(true);
+    
+    // Use the new RPC function for powerful searching
     const { data, error } = await supabase
-      .from('posts')
-      .select('*')
-      .ilike('title', `%${searchQuery}%`)
+      .rpc('search_posts', { search_term: searchQuery })
       .limit(10);
     
     if (error) {
@@ -55,7 +55,7 @@ export function PostSearch() {
     <div className="relative w-full">
       <Command shouldFilter={false} className="rounded-lg border shadow-md overflow-visible">
         <CommandInput 
-          placeholder="Tìm theo tiêu đề tin đăng..." 
+          placeholder="Tìm theo tiêu đề, địa điểm, SĐT..." 
           value={query}
           onValueChange={setQuery}
           onFocus={() => query.length > 1 && setIsOpen(true)}
