@@ -175,7 +175,7 @@ export function CreatePostForm() {
                     </div>
                 <FormMessage /></FormItem>
             )}/>
-            <FormField control={form.control} name="images" render={({ field: { onChange, ...rest } }) => (
+            <FormField control={form.control} name="images" render={({ field: { onChange, value, ...rest } }) => (
                 <FormItem><FormLabel>Hình ảnh/Video</FormLabel><FormControl><Input type="file" multiple accept="image/*,video/*" onChange={(e) => onChange(e.target.files)} {...rest} /></FormControl><FormDescription>Bạn có thể chọn nhiều file.</FormDescription><FormMessage /></FormItem>
             )}/>
           </div>
