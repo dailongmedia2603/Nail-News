@@ -34,7 +34,9 @@ const createPostFormSchema = z.object({
   category: z.enum(["Bán tiệm", "Cần thợ", "Học nail"], {
     required_error: "Bạn phải chọn một loại tin.",
   }),
-  location: z.string().min(2, "Địa điểm không được để trống."),
+  city: z.string().min(2, "Thành phố không được để trống."),
+  state: z.string().min(2, "Tiểu bang không được để trống."),
+  zip: z.string().min(5, "Mã ZIP phải có 5 chữ số.").max(5, "Mã ZIP phải có 5 chữ số."),
   exact_address: z.string().optional(),
   area: z.string().optional(),
   chairs: z.coerce.number().optional(),
@@ -56,7 +58,9 @@ export function CreatePostForm() {
     defaultValues: {
       title: "",
       description: "",
-      location: "",
+      city: "",
+      state: "",
+      zip: "",
       services: [],
     },
   });
@@ -102,8 +106,12 @@ export function CreatePostForm() {
       }
     }
 
+    const locationString = `${data.city}, ${data.state}, ${data.zip}`;
+    const { city, state, zip, ...restOfData } = data;
+
     const postData = {
-      ...data,
+      ...restOfData,
+      location: locationString,
       author_id: user.id,
       images: imageUrls,
     };
@@ -135,12 +143,20 @@ export function CreatePostForm() {
         <FormField control={form.control} name="description" render={({ field }) => (
             <FormItem><FormLabel>Mô tả</FormLabel><FormControl><Textarea placeholder="Mô tả chi tiết về tin đăng của bạn..." {...field} rows={5} /></FormControl><FormMessage /></FormItem>
         )}/>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <FormField control={form.control} name="category" render={({ field }) => (
-                <FormItem><FormLabel>Loại tin</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Chọn loại tin" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Bán tiệm">Bán tiệm</SelectItem><SelectItem value="Cần thợ">Cần thợ</SelectItem><SelectItem value="Học nail">Học nail</SelectItem></SelectContent></Select><FormMessage /></FormItem>
+        
+        <FormField control={form.control} name="category" render={({ field }) => (
+            <FormItem><FormLabel>Loại tin</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Chọn loại tin" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Bán tiệm">Bán tiệm</SelectItem><SelectItem value="Cần thợ">Cần thợ</SelectItem><SelectItem value="Học nail">Học nail</SelectItem></SelectContent></Select><FormMessage /></FormItem>
+        )}/>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <FormField control={form.control} name="city" render={({ field }) => (
+                <FormItem><FormLabel>Thành phố</FormLabel><FormControl><Input placeholder="VD: Houston" {...field} /></FormControl><FormMessage /></FormItem>
             )}/>
-            <FormField control={form.control} name="location" render={({ field }) => (
-                <FormItem><FormLabel>Địa điểm (Thành phố, Tiểu bang, ZIP)</FormLabel><FormControl><Input placeholder="VD: Houston, Texas, 77002" {...field} /></FormControl><FormMessage /></FormItem>
+            <FormField control={form.control} name="state" render={({ field }) => (
+                <FormItem><FormLabel>Tiểu bang</FormLabel><FormControl><Input placeholder="VD: Texas" {...field} /></FormControl><FormMessage /></FormItem>
+            )}/>
+            <FormField control={form.control} name="zip" render={({ field }) => (
+                <FormItem><FormLabel>Mã ZIP</FormLabel><FormControl><Input placeholder="VD: 77002" {...field} /></FormControl><FormMessage /></FormItem>
             )}/>
         </div>
 
