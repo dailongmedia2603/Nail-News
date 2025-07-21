@@ -184,6 +184,22 @@ export function CreatePostForm() {
             </div>
             <FormField control={form.control} name="operating_hours" render={({ field }) => (<FormItem><FormLabel>Giờ hoạt động</FormLabel><FormControl><Input placeholder="VD: 10am - 7pm" {...field} /></FormControl><FormMessage /></FormItem>)}/>
             <FormField control={form.control} name="exact_address" render={({ field }) => (<FormItem><FormLabel>Địa chỉ chính xác</FormLabel><FormControl><Input placeholder="123 Main St, Houston, TX 77002" {...field} /></FormControl><FormMessage /></FormItem>)}/>
+            <FormField control={form.control} name="services" render={({ field }) => (
+                <FormItem><FormLabel>Kỹ năng yêu cầu</FormLabel>
+                    <div className="flex items-center space-x-4">
+                    {servicesList.map((item) => (
+                        <FormField key={item.id} control={form.control} name="services" render={({ field }) => (
+                            <FormItem key={item.id} className="flex flex-row items-start space-x-3 space-y-0">
+                                <FormControl><Checkbox checked={field.value?.includes(item.id)} onCheckedChange={(checked) => {
+                                    return checked ? field.onChange([...(field.value || []), item.id]) : field.onChange(field.value?.filter((value) => value !== item.id))
+                                }}/></FormControl>
+                                <FormLabel className="font-normal">{item.label}</FormLabel>
+                            </FormItem>
+                        )}/>
+                    ))}
+                    </div>
+                <FormMessage /></FormItem>
+            )}/>
           </div>
         )}
 
