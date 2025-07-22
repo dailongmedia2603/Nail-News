@@ -18,6 +18,8 @@ import CreatePostPage from "./pages/CreatePostPage";
 import TutorialsPage from "./pages/TutorialsPage";
 import WalletPage from "./pages/WalletPage";
 import MyPostsPage from "./pages/MyPostsPage";
+import AdminLayout from "./components/AdminLayout";
+import AdminDashboardPage from "./pages/admin/DashboardPage";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +44,11 @@ const App = () => (
             <Route path="/profile/wallet" element={<WalletPage />} />
             <Route path="/profile/my-posts" element={<MyPostsPage />} />
             <Route path="/tutorials" element={<TutorialsPage />} />
+
+            {/* Admin Routes */}
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route path="dashboard" element={<AdminDashboardPage />} />
+            </Route>
           </Route>
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

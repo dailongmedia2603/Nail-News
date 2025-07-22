@@ -10,21 +10,30 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, User, Sparkles, PlusCircle, GraduationCap } from "lucide-react";
+import { LogOut, User, Sparkles, PlusCircle, Shield } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function Header() {
   const navigate = useNavigate();
   const [userInitial, setUserInitial] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    const getUser = async () => {
+    const getUserData = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (user?.email) {
-        setUserInitial(user.email.charAt(0).toUpperCase());
+      if (user) {
+        setUserInitial(user.email?.charAt(0).toUpperCase() || "");
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        if (profile?.role === 'admin') {
+          setIsAdmin(true);
+        }
       }
     };
-    getUser();
+    getUserData();
   }, []);
 
   const handleLogout = async () => {
@@ -67,6 +76,12 @@ export default function Header() {
                 </p>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
+              {isAdmin && (
+                <DropdownMenuItem onClick={() => navigate("/admin/dashboard")}>
+                  <Shield className="mr-2 h-4 w-4" />
+                  <span>Trang Admin</span>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem onClick={() => navigate("/profile")}>
                 <User className="mr-2 h-4 w-4" />
                 <span>Hồ sơ</span>
