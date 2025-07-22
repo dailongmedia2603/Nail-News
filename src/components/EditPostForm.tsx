@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -133,6 +134,38 @@ export function EditPostForm({ postId }: { postId: string }) {
                   <FormField control={formMethods.control} name="tables" render={({ field }) => (<FormItem><FormLabel>Số bàn</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)}/>
                   <FormField control={formMethods.control} name="staff" render={({ field }) => (<FormItem><FormLabel>Số nhân sự</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)}/>
               </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <FormField control={formMethods.control} name="revenue" render={({ field }) => (<FormItem><FormLabel>Doanh thu</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)}/>
+                  <FormField control={formMethods.control} name="operating_hours" render={({ field }) => (<FormItem><FormLabel>Giờ hoạt động</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)}/>
+              </div>
+              <FormField control={formMethods.control} name="exact_address" render={({ field }) => (<FormItem><FormLabel>Địa chỉ chính xác</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)}/>
+              <FormItem>
+                <FormLabel>Vị trí trên bản đồ</FormLabel>
+                <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
+                    <p className="text-muted-foreground text-center p-4">Bản đồ sẽ sớm được tích hợp.<br/>(Cần API Key từ Google Maps Platform để hiển thị)</p>
+                </div>
+                <FormDescription>Sau khi nhập địa chỉ chính xác, vị trí sẽ được tự động ghim trên bản đồ.</FormDescription>
+              </FormItem>
+              <FormField control={formMethods.control} name="services" render={({ field }) => (
+                  <FormItem><FormLabel>Các dịch vụ</FormLabel>
+                      <div className="flex items-center space-x-4">
+                      {servicesList.map((item) => (
+                          <FormField key={item.id} control={formMethods.control} name="services" render={({ field }) => (
+                              <FormItem key={item.id} className="flex flex-row items-start space-x-3 space-y-0">
+                                  <FormControl><Checkbox checked={field.value?.includes(item.id)} onCheckedChange={(checked) => {
+                                      return checked ? field.onChange([...(field.value || []), item.id]) : field.onChange(field.value?.filter((value) => value !== item.id))
+                                  }}/></FormControl>
+                                  <FormLabel className="font-normal">{item.label}</FormLabel>
+                              </FormItem>
+                          )}/>
+                      ))}
+                      </div>
+                  <FormMessage /></FormItem>
+              )}/>
+              <FormItem>
+                <FormLabel>Hình ảnh/Video</FormLabel>
+                <p className="text-sm text-muted-foreground">Tính năng chỉnh sửa hình ảnh/video sẽ sớm được cập nhật.</p>
+              </FormItem>
             </div>
           )}
           {formMethods.watch("category") === "Cần thợ" && (
@@ -144,6 +177,31 @@ export function EditPostForm({ postId }: { postId: string }) {
                       <FormItem><FormLabel>Trạng thái tiệm</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Đang hoạt động">Đang hoạt động</SelectItem><SelectItem value="Sắp khai trương">Sắp khai trương</SelectItem><SelectItem value="Đã đóng cửa">Đã đóng cửa</SelectItem></SelectContent></Select><FormMessage /></FormItem>
                   )}/>
               </div>
+              <FormField control={formMethods.control} name="operating_hours" render={({ field }) => (<FormItem><FormLabel>Giờ hoạt động</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)}/>
+              <FormField control={formMethods.control} name="exact_address" render={({ field }) => (<FormItem><FormLabel>Địa chỉ chính xác</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)}/>
+              <FormItem>
+                <FormLabel>Vị trí trên bản đồ</FormLabel>
+                <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
+                    <p className="text-muted-foreground text-center p-4">Bản đồ sẽ sớm được tích hợp.<br/>(Cần API Key từ Google Maps Platform để hiển thị)</p>
+                </div>
+                <FormDescription>Sau khi nhập địa chỉ chính xác, vị trí sẽ được tự động ghim trên bản đồ.</FormDescription>
+              </FormItem>
+              <FormField control={formMethods.control} name="services" render={({ field }) => (
+                  <FormItem><FormLabel>Dịch vụ kinh doanh</FormLabel>
+                      <div className="flex items-center space-x-4">
+                      {servicesList.map((item) => (
+                          <FormField key={item.id} control={formMethods.control} name="services" render={({ field }) => (
+                              <FormItem key={item.id} className="flex flex-row items-start space-x-3 space-y-0">
+                                  <FormControl><Checkbox checked={field.value?.includes(item.id)} onCheckedChange={(checked) => {
+                                      return checked ? field.onChange([...(field.value || []), item.id]) : field.onChange(field.value?.filter((value) => value !== item.id))
+                                  }}/></FormControl>
+                                  <FormLabel className="font-normal">{item.label}</FormLabel>
+                              </FormItem>
+                          )}/>
+                      ))}
+                      </div>
+                  <FormMessage /></FormItem>
+              )}/>
             </div>
           )}
 
