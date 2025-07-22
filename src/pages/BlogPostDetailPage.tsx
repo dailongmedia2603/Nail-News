@@ -9,6 +9,7 @@ type BlogPost = {
   created_at: string;
   title: string;
   content: string | null;
+  cover_image_url: string | null;
 };
 
 const BlogPostDetailPage = () => {
@@ -39,9 +40,10 @@ const BlogPostDetailPage = () => {
   if (loading) {
     return (
       <div className="container mx-auto max-w-3xl p-4 md:p-6 space-y-4">
+        <Skeleton className="h-64 w-full mb-4" />
         <Skeleton className="h-10 w-3/4" />
         <Skeleton className="h-4 w-1/4" />
-        <Skeleton className="h-64 w-full mt-4" />
+        <Skeleton className="h-40 w-full mt-4" />
       </div>
     );
   }
@@ -57,9 +59,10 @@ const BlogPostDetailPage = () => {
         <p className="text-sm text-muted-foreground mt-0">
           Đăng ngày {format(new Date(post.created_at), 'dd/MM/yyyy')}
         </p>
-        <div className="mt-8 whitespace-pre-wrap">
-          {post.content}
-        </div>
+        {post.cover_image_url && (
+          <img src={post.cover_image_url} alt={post.title} className="w-full rounded-lg my-8" />
+        )}
+        <div dangerouslySetInnerHTML={{ __html: post.content || '' }} />
       </article>
     </div>
   );

@@ -11,6 +11,7 @@ type BlogPostSummary = {
   created_at: string;
   title: string;
   content: string | null;
+  cover_image_url: string | null;
 };
 
 const BlogPage = () => {
@@ -22,7 +23,7 @@ const BlogPage = () => {
       setLoading(true);
       const { data, error } = await supabase
         .from('blog_posts')
-        .select('id, created_at, title, content')
+        .select('id, created_at, title, content, cover_image_url')
         .eq('status', 'published')
         .order('created_at', { ascending: false });
 
@@ -44,29 +45,34 @@ const BlogPage = () => {
       </div>
       {loading ? (
         <div className="space-y-6">
-          <Skeleton className="h-32 w-full" />
-          <Skeleton className="h-32 w-full" />
+          <Skeleton className="h-48 w-full" />
+          <Skeleton className="h-48 w-full" />
         </div>
       ) : posts.length > 0 ? (
         <div className="space-y-8">
           {posts.map((post) => (
-            <Card key={post.id}>
-              <CardHeader>
-                <CardTitle>
-                  <Link to={`/blog/${post.id}`} className="hover:underline">{post.title}</Link>
-                </CardTitle>
-                <CardDescription>{format(new Date(post.created_at), 'dd/MM/yyyy')}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="line-clamp-3 text-muted-foreground">
-                  {post.content?.substring(0, 300) || 'Chưa có nội dung...'}
-                </p>
-              </CardContent>
-              <CardFooter>
-                <Link to={`/blog/${post.id}`} className="text-sm font-semibold text-primary flex items-center gap-1">
-                  Đọc tiếp <ArrowRight className="h-4 w-4" />
-                </Link>
-              </CardFooter>
+            <Card key={post.id} className="flex flex-col md:flex-row overflow-hidden">
+              {post.cover_image_url && (
+                <img src={post.cover_image_url} alt={post.title} className="w-full md:w-1/3 h-48 md:h-auto object-cover" />
+              )}
+              <div className="flex flex-col justify-between p-6">
+                <div>
+                  <CardTitle>
+                    <Link to={`/blog/${post.id}`} className="hover:underline">{post.title}</Link>
+                  </CardTitle>
+                  <CardDescription className="mt-2">{format(new Date(post.created_at), 'dd/MM/yyyy')}</CardDescription>
+                  <CardContent className="p-0 mt-4">
+                    <p className="line-clamp-2 text-muted-foreground">
+                      {post.content?.replace(/<[^>]+>/g, '').substring(0, 200) || 'Chưa có nội dung...'}
+                    </p>
+                  </CardContent>
+                </div>
+                <CardFooter className="p-0 mt-4">
+                  <Link to={`/blog/${post.id}`} className="text-sm font-semibold text-primary flex items-center gap-1">
+                    Đọc tiếp <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </CardFooter>
+              </div>
             </Card>
           ))}
         </div>

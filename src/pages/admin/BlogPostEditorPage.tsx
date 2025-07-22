@@ -1,22 +1,24 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { showLoading, showSuccess, showError, dismissToast } from "@/utils/toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, UploadCloud, X } from "lucide-react";
 import { Skeleton } from '@/components/ui/skeleton';
+import ReactQuill from 'react-quill';
+import { v4 as uuidv4 } from 'uuid';
 
 const blogPostSchema = z.object({
   title: z.string().min(3, "Tiêu đề phải có ít nhất 3 ký tự."),
   content: z.string().optional(),
   status: z.enum(['draft', 'published']).default('draft'),
+  cover_image: z.any().optional(),
 });
 
 type BlogPostFormValues = z.infer<typeof blogPostSchema>;
@@ -25,6 +27,7 @@ const BlogPostEditorPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(!!id);
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const isEditing = !!id;
 
   const form = useForm<BlogPostFormValues>({
@@ -42,6 +45,9 @@ const BlogPostEditorPage = () => {
           navigate('/admin/blog');
         } else {
           form.reset(data);
+          if (data.cover_image_url) {
+            setCoverPreview(data.cover_image_url);
+          }
         }
         setLoading(false);
       };
@@ -53,8 +59,30 @@ const BlogPostEditorPage = () => {
     const toastId = showLoading(isEditing ? "Đang cập nhật..." : "Đang tạo...");
     const { data: { user } } = await supabase.auth.getUser();
 
+    let coverImageUrl = coverPreview;
+
+    if (data.cover_image && data.cover_image[0]) {
+      const file = data.cover_image[0];
+      const fileName = `${user?.id}/${uuidv4()}`;
+      const { data: uploadData, error: uploadError } = await supabase.storage.from('blog_images').upload(fileName, file);
+      if (uploadError) {
+        dismissToast(toastId);
+        showError(`Tải ảnh bìa thất bại: ${uploadError.message}`);
+        return;
+      }
+      const { data: urlData } = supabase.storage.from('blog_images').getPublicUrl(uploadData.path);
+      coverImageUrl = urlData.publicUrl;
+    }
+
+    const postData = {
+      title: data.title,
+      content: data.content,
+      status: data.status,
+      cover_image_url: coverImageUrl,
+    };
+
     if (isEditing) {
-      const { error } = await supabase.from('blog_posts').update(data).eq('id', id);
+      const { error } = await supabase.from('blog_posts').update(postData).eq('id', id);
       dismissToast(toastId);
       if (error) showError("Cập nhật thất bại: " + error.message);
       else {
@@ -62,7 +90,7 @@ const BlogPostEditorPage = () => {
         navigate('/admin/blog');
       }
     } else {
-      const { error } = await supabase.from('blog_posts').insert({ ...data, author_id: user?.id });
+      const { error } = await supabase.from('blog_posts').insert({ ...postData, author_id: user?.id });
       dismissToast(toastId);
       if (error) showError("Tạo bài viết thất bại: " + error.message);
       else {
@@ -71,6 +99,16 @@ const BlogPostEditorPage = () => {
       }
     }
   }
+
+  const quillModules = useMemo(() => ({
+    toolbar: [
+      [{ 'header': [1, 2, 3, false] }],
+      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+      [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
+      ['link', 'image'],
+      ['clean']
+    ],
+  }), []);
 
   if (loading) {
     return <div className="container mx-auto p-4 md:p-6 space-y-4"><Skeleton className="h-10 w-full" /><Skeleton className="h-64 w-full" /></div>;
@@ -84,9 +122,40 @@ const BlogPostEditorPage = () => {
           <FormField control={form.control} name="title" render={({ field }) => (
             <FormItem><FormLabel>Tiêu đề</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
           )}/>
-          <FormField control={form.control} name="content" render={({ field }) => (
-            <FormItem><FormLabel>Nội dung</FormLabel><FormControl><Textarea {...field} rows={15} /></FormControl><FormMessage /></FormItem>
+          
+          <FormField control={form.control} name="cover_image" render={({ field }) => (
+            <FormItem>
+              <FormLabel>Ảnh bìa</FormLabel>
+              <FormControl>
+                {coverPreview ? (
+                  <div className="relative w-full h-64">
+                    <img src={coverPreview} alt="Xem trước ảnh bìa" className="w-full h-full object-cover rounded-md" />
+                    <Button variant="destructive" size="icon" className="absolute top-2 right-2 h-8 w-8" onClick={() => { setCoverPreview(null); field.onChange(null); }}>
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <label className="cursor-pointer flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-md">
+                    <UploadCloud className="h-10 w-10 text-muted-foreground" />
+                    <p className="mt-2 text-sm text-muted-foreground">Nhấp để tải lên ảnh bìa</p>
+                    <Input type="file" className="sr-only" accept="image/*" onChange={(e) => { field.onChange(e.target.files); setCoverPreview(URL.createObjectURL(e.target.files![0])); }} />
+                  </label>
+                )}
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}/>
+
+          <FormField control={form.control} name="content" render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nội dung</FormLabel>
+              <FormControl>
+                <ReactQuill theme="snow" value={field.value} onChange={field.onChange} modules={quillModules} className="bg-background" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}/>
+
           <FormField control={form.control} name="status" render={({ field }) => (
             <FormItem className="space-y-3"><FormLabel>Trạng thái</FormLabel>
               <FormControl>
