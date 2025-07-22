@@ -88,6 +88,20 @@ const MyPostsPage = () => {
     return <Badge variant="default">Đang hoạt động</Badge>;
   };
 
+  const getTierLabel = (post: Post) => {
+    if (post.tier === 'free') return 'Miễn phí';
+    
+    let tierName = '';
+    if (post.tier === 'urgent') tierName = 'Tin gấp';
+    else if (post.tier === 'vip') tierName = 'Tin VIP';
+    else tierName = `Gói ${post.tier?.toUpperCase()}`;
+
+    if (post.duration_months) {
+        return `${tierName} - ${post.duration_months} tháng`;
+    }
+    return tierName;
+  };
+
   const formatCurrency = (amount: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
 
   return (
@@ -124,9 +138,7 @@ const MyPostsPage = () => {
                     posts.map((post) => (
                       <TableRow key={post.id}>
                         <TableCell className="font-medium">{post.title}</TableCell>
-                        <TableCell>
-                          {post.tier === 'free' ? 'Miễn phí' : `Gói ${post.tier?.toUpperCase()} - ${post.duration_months} tháng`}
-                        </TableCell>
+                        <TableCell>{getTierLabel(post)}</TableCell>
                         <TableCell>
                           {transactionMap.has(post.id) ? formatCurrency(Math.abs(transactionMap.get(post.id)!)) : 'N/A'}
                         </TableCell>
