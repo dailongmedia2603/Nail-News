@@ -20,6 +20,7 @@ import WalletPage from "./pages/WalletPage";
 import MyPostsPage from "./pages/MyPostsPage";
 import AdminLayout from "./components/AdminLayout";
 import AdminDashboardPage from "./pages/admin/DashboardPage";
+import AdminPostsPage from "./pages/admin/PostsPage";
 import EditPostPage from "./pages/EditPostPage";
 
 const queryClient = new QueryClient();
@@ -50,6 +51,7 @@ const App = () => (
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminLayout />}>
               <Route path="dashboard" element={<AdminDashboardPage />} />
+              <Route path="posts" element={<AdminPostsPage />} />
             </Route>
           </Route>
 
