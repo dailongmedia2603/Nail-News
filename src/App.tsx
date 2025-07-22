@@ -16,6 +16,7 @@ import SignUp from "./pages/SignUp";
 import ForgotPassword from "./pages/ForgotPassword";
 import CreatePostPage from "./pages/CreatePostPage";
 import TutorialsPage from "./pages/TutorialsPage";
+import WalletPage from "./pages/WalletPage";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/profile/favorites" element={<FavoritesPage />} />
             <Route path="/profile/location" element={<LocationPage />} />
+            <Route path="/profile/wallet" element={<WalletPage />} />
             <Route path="/tutorials" element={<TutorialsPage />} />
           </Route>
 

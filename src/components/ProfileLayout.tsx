@@ -1,13 +1,18 @@
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
-import { User, Heart, MapPin, History } from "lucide-react";
+import { User, Heart, MapPin, History, Wallet } from "lucide-react";
 
 const sidebarNavItems = [
   {
     title: "Thông tin tài khoản",
     href: "/profile",
     icon: <User className="mr-2 h-4 w-4" />,
+  },
+  {
+    title: "Ví của tôi",
+    href: "/profile/wallet",
+    icon: <Wallet className="mr-2 h-4 w-4" />,
   },
   {
     title: "Yêu thích",
