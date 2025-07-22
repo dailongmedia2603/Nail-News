@@ -8,7 +8,8 @@ import { Separator } from '@/components/ui/separator';
 import { formatDistanceToNow } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { showError, showSuccess, showLoading, dismissToast } from '@/utils/toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Trash2 } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 type Comment = {
   id: number;
@@ -27,6 +28,20 @@ export function CommentSection({ postId }: CommentSectionProps) {
   const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+        if (profile?.role === 'admin') {
+          setIsAdmin(true);
+        }
+      }
+    };
+    checkAdminStatus();
+  }, []);
 
   const fetchComments = async () => {
     setLoading(true);
@@ -87,6 +102,16 @@ export function CommentSection({ postId }: CommentSectionProps) {
     setIsSubmitting(false);
   };
 
+  const handleDeleteComment = async (commentId: number) => {
+    const { error } = await supabase.from('comments').delete().eq('id', commentId);
+    if (error) {
+      showError("Xóa bình luận thất bại.");
+    } else {
+      showSuccess("Đã xóa bình luận.");
+      setComments(comments.filter(c => c.id !== commentId));
+    }
+  };
+
   const getInitials = (name: string | null) => {
     if (!name) return 'ND';
     const parts = name.split(' ');
@@ -97,17 +122,10 @@ export function CommentSection({ postId }: CommentSectionProps) {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Bình luận</CardTitle>
-      </CardHeader>
+      <CardHeader><CardTitle>Bình luận</CardTitle></CardHeader>
       <CardContent>
         <form onSubmit={handleSubmitComment} className="space-y-4">
-          <Textarea
-            placeholder="Viết bình luận của bạn..."
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            rows={3}
-          />
+          <Textarea placeholder="Viết bình luận của bạn..." value={newComment} onChange={(e) => setNewComment(e.target.value)} rows={3} />
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Gửi bình luận
@@ -115,28 +133,39 @@ export function CommentSection({ postId }: CommentSectionProps) {
         </form>
         <Separator className="my-6" />
         <div className="space-y-6">
-          {loading ? (
-            <p>Đang tải bình luận...</p>
-          ) : comments.length > 0 ? (
+          {loading ? ( <p>Đang tải bình luận...</p> ) : comments.length > 0 ? (
             comments.map((comment) => (
-              <div key={comment.id} className="flex items-start space-x-4">
+              <div key={comment.id} className="flex items-start space-x-4 group">
                 <Avatar>
                   <AvatarImage />
-                  <AvatarFallback>
-                    {getInitials(comment.author_name)}
-                  </AvatarFallback>
+                  <AvatarFallback>{getInitials(comment.author_name)}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <p className="font-semibold">
-                      {comment.author_name || 'Người dùng'}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: vi })}
-                    </p>
+                    <p className="font-semibold">{comment.author_name || 'Người dùng'}</p>
+                    <p className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: vi })}</p>
                   </div>
                   <p className="text-sm whitespace-pre-wrap">{comment.content}</p>
                 </div>
+                {isAdmin && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Bạn có chắc chắn muốn xóa?</AlertDialogTitle>
+                        <AlertDialogDescription>Hành động này không thể hoàn tác. Bình luận này sẽ bị xóa vĩnh viễn.</AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Hủy</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleDeleteComment(comment.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Xóa</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
               </div>
             ))
           ) : (

@@ -10,7 +10,7 @@ import { MoreHorizontal, Trash2, Pencil } from "lucide-react";
 import { format, isPast } from "date-fns";
 import { showError, showSuccess, showLoading, dismissToast } from "@/utils/toast";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 type AdminPost = {
     id: string;
@@ -87,7 +87,11 @@ const AdminPostsPage = () => {
               <TableBody>
                 {posts.map((post) => (
                   <TableRow key={post.id}>
-                    <TableCell className="font-medium">{post.title}</TableCell>
+                    <TableCell className="font-medium">
+                      <Link to={`/posts/${post.id}`} target="_blank" className="hover:underline">
+                        {post.title}
+                      </Link>
+                    </TableCell>
                     <TableCell>{post.author_email || 'N/A'}</TableCell>
                     <TableCell>{post.category}</TableCell>
                     <TableCell>{getStatus(post)}</TableCell>
