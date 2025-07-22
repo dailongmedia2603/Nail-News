@@ -16,38 +16,61 @@ import { showLoading, showSuccess, showError, dismissToast } from "@/utils/toast
 import { useNavigate } from "react-router-dom";
 
 const passwordFormSchema = z.object({
-  password: z.string().min(6, "Mật khẩu phải có ít nhất 6 ký tự."),
+  oldPassword: z.string().min(1, "Mật khẩu cũ không được để trống."),
+  newPassword: z.string().min(6, "Mật khẩu mới phải có ít nhất 6 ký tự."),
   confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Mật khẩu không khớp.",
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: "Mật khẩu mới không khớp.",
   path: ["confirmPassword"],
 });
 
 type PasswordFormValues = z.infer<typeof passwordFormSchema>;
 
-export function PasswordForm() {
+export function PasswordForm({ onFinished }: { onFinished?: () => void }) {
   const navigate = useNavigate();
   const form = useForm<PasswordFormValues>({
     resolver: zodResolver(passwordFormSchema),
     defaultValues: {
-      password: "",
+      oldPassword: "",
+      newPassword: "",
       confirmPassword: "",
     },
   });
 
   async function onSubmit(data: PasswordFormValues) {
-    const toastId = showLoading("Đang cập nhật mật khẩu...");
+    const toastId = showLoading("Đang xử lý...");
 
-    const { error } = await supabase.auth.updateUser({
-      password: data.password,
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user || !user.email) {
+      dismissToast(toastId);
+      showError("Không thể xác định người dùng. Vui lòng đăng nhập lại.");
+      return;
+    }
+
+    // Verify old password by trying to sign in with it
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: data.oldPassword,
+    });
+
+    if (signInError) {
+      dismissToast(toastId);
+      showError("Mật khẩu cũ không chính xác.");
+      return;
+    }
+
+    // If old password is correct, update to the new password
+    const { error: updateError } = await supabase.auth.updateUser({
+      password: data.newPassword,
     });
 
     dismissToast(toastId);
 
-    if (error) {
-      showError("Cập nhật mật khẩu thất bại: " + error.message);
+    if (updateError) {
+      showError("Cập nhật mật khẩu thất bại: " + updateError.message);
     } else {
       showSuccess("Đổi mật khẩu thành công! Vui lòng đăng nhập lại.");
+      onFinished?.();
       await supabase.auth.signOut();
       navigate('/login');
     }
@@ -55,10 +78,23 @@ export function PasswordForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
         <FormField
           control={form.control}
-          name="password"
+          name="oldPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Mật khẩu cũ</FormLabel>
+              <FormControl>
+                <Input type="password" placeholder="••••••••" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="newPassword"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Mật khẩu mới</FormLabel>
@@ -82,8 +118,8 @@ export function PasswordForm() {
             </FormItem>
           )}
         />
-        <Button type="submit" disabled={form.formState.isSubmitting}>
-          Đổi mật khẩu
+        <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+          Lưu thay đổi
         </Button>
       </form>
     </Form>
