@@ -109,7 +109,7 @@ export function EditPostForm({ postId }: { postId: string }) {
 
   useEffect(() => {
     if (selectedStateId) {
-      setFilteredCities(cities.filter(city => city.state_id === selectedStateId));
+      setFilteredCities(cities.filter(city => city.state_id === Number(selectedStateId)));
       if (!isLoading) {
         formMethods.setValue('city_id', undefined as any);
       }
