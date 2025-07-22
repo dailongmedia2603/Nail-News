@@ -31,6 +31,7 @@ export type Post = {
   store_status: string | null;
   tier: string | null;
   expires_at: string | null;
+  duration_months: number | null;
 };
 
 interface PostCardProps {

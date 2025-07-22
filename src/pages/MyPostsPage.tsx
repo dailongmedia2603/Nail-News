@@ -1,26 +1,33 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import ProfileLayout from "@/components/ProfileLayout";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { MoreHorizontal, Trash2 } from "lucide-react";
+import { MoreHorizontal, Trash2, Pencil } from "lucide-react";
 import { format } from "date-fns";
 import { isPast } from "date-fns";
 import { type Post } from "@/components/PostCard";
 import { showSuccess, showError } from "@/utils/toast";
 import { Skeleton } from "@/components/ui/skeleton";
 
+type Transaction = {
+    id: number;
+    post_id: string;
+    amount: number;
+}
+
 const MyPostsPage = () => {
   const [posts, setPosts] = useState<Post[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [postToDelete, setPostToDelete] = useState<Post | null>(null);
 
-  const fetchPosts = async () => {
+  const fetchData = async () => {
     setLoading(true);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -28,23 +35,31 @@ const MyPostsPage = () => {
       return;
     }
 
-    const { data, error } = await supabase
+    const { data: postData, error: postError } = await supabase
       .from("posts")
       .select("*")
       .eq("author_id", user.id)
       .order("created_at", { ascending: false });
 
-    if (error) {
-      showError("Không thể tải danh sách tin đăng.");
-    } else {
-      setPosts(data || []);
-    }
+    if (postError) showError("Không thể tải danh sách tin đăng.");
+    else setPosts(postData || []);
+
+    const { data: transactionData, error: transactionError } = await supabase
+        .from("transactions")
+        .select("id, post_id, amount")
+        .eq("user_id", user.id);
+    
+    if (transactionError) showError("Không thể tải lịch sử giao dịch.");
+    else setTransactions(transactionData || []);
+
     setLoading(false);
   };
 
   useEffect(() => {
-    fetchPosts();
+    fetchData();
   }, []);
+
+  const transactionMap = new Map(transactions.map(tx => [tx.post_id, tx.amount]));
 
   const handleDelete = async () => {
     if (!postToDelete) return;
@@ -71,6 +86,8 @@ const MyPostsPage = () => {
     return <Badge variant="default">Đang hoạt động</Badge>;
   };
 
+  const formatCurrency = (amount: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+
   return (
     <ProfileLayout>
       <div className="space-y-6">
@@ -86,14 +103,14 @@ const MyPostsPage = () => {
               <div className="space-y-2">
                 <Skeleton className="h-10 w-full" />
                 <Skeleton className="h-10 w-full" />
-                <Skeleton className="h-10 w-full" />
               </div>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Tiêu đề</TableHead>
-                    <TableHead>Loại tin</TableHead>
+                    <TableHead>Gói tin</TableHead>
+                    <TableHead>Số tiền</TableHead>
                     <TableHead>Ngày đăng</TableHead>
                     <TableHead>Ngày hết hạn</TableHead>
                     <TableHead>Trạng thái</TableHead>
@@ -105,26 +122,26 @@ const MyPostsPage = () => {
                     posts.map((post) => (
                       <TableRow key={post.id}>
                         <TableCell className="font-medium">{post.title}</TableCell>
-                        <TableCell>{post.category}</TableCell>
+                        <TableCell>
+                          {post.tier === 'free' ? 'Miễn phí' : `Gói ${post.tier?.toUpperCase()} - ${post.duration_months} tháng`}
+                        </TableCell>
+                        <TableCell>
+                          {transactionMap.has(post.id) ? formatCurrency(Math.abs(transactionMap.get(post.id)!)) : 'N/A'}
+                        </TableCell>
                         <TableCell>{format(new Date(post.created_at), 'dd/MM/yyyy')}</TableCell>
                         <TableCell>{post.expires_at ? format(new Date(post.expires_at), 'dd/MM/yyyy') : 'N/A'}</TableCell>
                         <TableCell>{getStatus(post)}</TableCell>
                         <TableCell className="text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Mở menu</span>
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
+                              <Button variant="ghost" className="h-8 w-8 p-0"><MoreHorizontal className="h-4 w-4" /></Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem
-                                className="text-red-600"
-                                onSelect={() => {
-                                  setPostToDelete(post);
-                                  setShowDeleteDialog(true);
-                                }}
-                              >
+                              <DropdownMenuItem disabled>
+                                <Pencil className="mr-2 h-4 w-4" />
+                                Sửa (Sắp ra mắt)
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="text-red-600" onSelect={() => { setPostToDelete(post); setShowDeleteDialog(true); }}>
                                 <Trash2 className="mr-2 h-4 w-4" />
                                 Xóa
                               </DropdownMenuItem>
@@ -134,11 +151,7 @@ const MyPostsPage = () => {
                       </TableRow>
                     ))
                   ) : (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center h-24">
-                        Bạn chưa đăng tin nào.
-                      </TableCell>
-                    </TableRow>
+                    <TableRow><TableCell colSpan={7} className="text-center h-24">Bạn chưa đăng tin nào.</TableCell></TableRow>
                   )}
                 </TableBody>
               </Table>
@@ -146,7 +159,6 @@ const MyPostsPage = () => {
           </CardContent>
         </Card>
       </div>
-
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
