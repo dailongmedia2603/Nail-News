@@ -10,9 +10,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, User, Sparkles, PlusCircle, Shield } from "lucide-react";
+import { LogOut, User, PlusCircle, Shield } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
+
+type Settings = {
+  website_name: string;
+  logo_url: string;
+};
 
 export default function Header() {
   const navigate = useNavigate();
@@ -20,17 +25,25 @@ export default function Header() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [userInitial, setUserInitial] = useState("");
   const [loading, setLoading] = useState(true);
+  const [settings, setSettings] = useState<Settings>({ website_name: 'NailNews', logo_url: '' });
 
   useEffect(() => {
-    const fetchSession = async (session: Session | null) => {
+    const fetchInitialData = async () => {
+      setLoading(true);
+
+      // Fetch settings
+      const { data: settingsData } = await supabase.from('system_settings').select('key, value');
+      if (settingsData) {
+        const newSettings = settingsData.reduce((acc, { key, value }) => ({ ...acc, [key]: value }), {});
+        setSettings(newSettings as Settings);
+      }
+
+      // Fetch session
+      const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
       if (session?.user) {
         setUserInitial(session.user.email?.charAt(0).toUpperCase() || "");
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', session.user.id)
-          .single();
+        const { data: profile } = await supabase.from('profiles').select('role').eq('id', session.user.id).single();
         setIsAdmin(profile?.role === 'admin');
       } else {
         setIsAdmin(false);
@@ -39,12 +52,20 @@ export default function Header() {
       setLoading(false);
     };
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      fetchSession(session);
-    });
+    fetchInitialData();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      fetchSession(session);
+      setSession(session);
+      // Re-fetch user-specific data on auth change
+      if (session?.user) {
+        setUserInitial(session.user.email?.charAt(0).toUpperCase() || "");
+        supabase.from('profiles').select('role').eq('id', session.user.id).single().then(({ data: profile }) => {
+          setIsAdmin(profile?.role === 'admin');
+        });
+      } else {
+        setIsAdmin(false);
+        setUserInitial("");
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -60,8 +81,7 @@ export default function Header() {
       <div className="container flex h-14 items-center">
         <div className="mr-4 flex items-center">
           <Link to="/" className="mr-6 flex items-center space-x-2">
-            <Sparkles className="h-6 w-6" />
-            <span className="font-bold">NailNews</span>
+            {settings.logo_url ? <img src={settings.logo_url} alt="Logo" className="h-8" /> : <span className="font-bold">{settings.website_name}</span>}
           </Link>
           <nav className="flex items-center space-x-6 text-sm font-medium">
             <Link to="/tutorials" className="transition-colors hover:text-foreground/80 text-foreground/60">
