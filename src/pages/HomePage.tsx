@@ -81,8 +81,42 @@ const HomePage = () => {
     fetchPostsAndFavorites();
   }, [activeCategory, filterState, filterCity]);
 
-  const handleFavoriteToggle = async (postId: string, isCurrentlyFavorited: boolean) => { /* ... */ };
-  const handleViewPost = async (postId: string) => { /* ... */ };
+  const handleFavoriteToggle = async (postId: string, isCurrentlyFavorited: boolean) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      showError("Bạn cần đăng nhập để thực hiện hành động này.");
+      return;
+    }
+
+    if (isCurrentlyFavorited) {
+      setFavoritePostIds(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(postId);
+        return newSet;
+      });
+      const { error } = await supabase.from('favorites').delete().match({ user_id: user.id, post_id: postId });
+      if (error) {
+        showError("Bỏ yêu thích thất bại.");
+        setFavoritePostIds(prev => new Set(prev).add(postId));
+      }
+    } else {
+      setFavoritePostIds(prev => new Set(prev).add(postId));
+      const { error } = await supabase.from('favorites').insert({ user_id: user.id, post_id: postId });
+      if (error) {
+        showError("Yêu thích thất bại.");
+        setFavoritePostIds(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(postId);
+          return newSet;
+        });
+      }
+    }
+  };
+
+  const handleViewPost = async (postId: string) => {
+    await supabase.rpc('increment_view_count', { post_id_to_update: postId });
+    navigate(`/posts/${postId}`);
+  };
 
   return (
     <div className="container mx-auto p-4 md:p-6">
@@ -110,7 +144,49 @@ const HomePage = () => {
         </Select>
       </div>
       <Tabs value={activeCategory} onValueChange={setActiveCategory} className="w-full">
-        {/* ... tabs and post list ... */}
+        <TabsList className="grid w-full grid-cols-4">
+          {categories.map((category) => (
+            <TabsTrigger key={category} value={category}>
+              {category}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        
+        <div className="mt-6">
+            {loading ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {[...Array(6)].map((_, i) => (
+                        <div key={i} className="flex flex-col space-y-3">
+                            <Skeleton className="h-[125px] w-full rounded-xl" />
+                            <div className="space-y-2">
+                                <Skeleton className="h-4 w-3/4" />
+                                <Skeleton className="h-4 w-1/2" />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <>
+                    {posts.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {posts.map((post) => (
+                                <PostCard 
+                                    key={post.id} 
+                                    post={post} 
+                                    isFavorited={favoritePostIds.has(post.id)}
+                                    onFavoriteToggle={handleFavoriteToggle}
+                                    onView={handleViewPost}
+                                />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-16">
+                            <p className="text-muted-foreground">Không tìm thấy tin đăng nào trong danh mục này.</p>
+                        </div>
+                    )}
+                </>
+            )}
+        </div>
       </Tabs>
     </div>
   );
