@@ -139,14 +139,14 @@ export function CreatePostForm() {
 
     const locationString = `${data.city}, ${data.state}, ${data.zip}`;
     const expiresAt = data.tier !== 'free' && data.duration ? addMonths(new Date(), data.duration).toISOString() : null;
-    const { city, state, zip, ...restOfData } = data;
+    const { city, state, zip, duration, ...restOfData } = data;
     const postData = { 
         ...restOfData, 
         location: locationString, 
         author_id: user.id, 
         images: imageUrls, 
         expires_at: expiresAt,
-        duration_months: data.duration,
+        duration_months: duration,
     };
 
     const { data: newPost, error: insertError } = await supabase.from("posts").insert(postData).select().single();
