@@ -22,6 +22,8 @@ import AdminLayout from "./components/AdminLayout";
 import AdminDashboardPage from "./pages/admin/DashboardPage";
 import AdminPostsPage from "./pages/admin/PostsPage";
 import EditPostPage from "./pages/EditPostPage";
+import AdminBlogPage from "./pages/admin/BlogPage";
+import BlogPostEditorPage from "./pages/admin/BlogPostEditorPage";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +54,9 @@ const App = () => (
             <Route path="/admin" element={<AdminLayout />}>
               <Route path="dashboard" element={<AdminDashboardPage />} />
               <Route path="posts" element={<AdminPostsPage />} />
+              <Route path="blog" element={<AdminBlogPage />} />
+              <Route path="blog/new" element={<BlogPostEditorPage />} />
+              <Route path="blog/:id/edit" element={<BlogPostEditorPage />} />
             </Route>
           </Route>
 
