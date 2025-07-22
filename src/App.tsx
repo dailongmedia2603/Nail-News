@@ -24,6 +24,8 @@ import AdminPostsPage from "./pages/admin/PostsPage";
 import EditPostPage from "./pages/EditPostPage";
 import AdminBlogPage from "./pages/admin/BlogPage";
 import BlogPostEditorPage from "./pages/admin/BlogPostEditorPage";
+import BlogPage from "./pages/BlogPage";
+import BlogPostDetailPage from "./pages/BlogPostDetailPage";
 
 const queryClient = new QueryClient();
 
@@ -38,29 +40,35 @@ const App = () => (
           <Route path="/signup" element={<SignUp />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           
-          <Route element={<ProtectedLayout><AppLayout /></ProtectedLayout>}>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/create-post" element={<CreatePostPage />} />
-            <Route path="/posts/:id" element={<PostDetailPage />} />
-            <Route path="/posts/:id/edit" element={<EditPostPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/profile/favorites" element={<FavoritesPage />} />
-            <Route path="/profile/location" element={<LocationPage />} />
-            <Route path="/profile/wallet" element={<WalletPage />} />
-            <Route path="/profile/my-posts" element={<MyPostsPage />} />
+          <Route element={<AppLayout />}>
+            {/* Public Routes */}
             <Route path="/tutorials" element={<TutorialsPage />} />
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/blog/:id" element={<BlogPostDetailPage />} />
 
-            {/* Admin Routes */}
-            <Route path="/admin" element={<AdminLayout />}>
-              <Route path="dashboard" element={<AdminDashboardPage />} />
-              <Route path="posts" element={<AdminPostsPage />} />
-              <Route path="blog" element={<AdminBlogPage />} />
-              <Route path="blog/new" element={<BlogPostEditorPage />} />
-              <Route path="blog/:id/edit" element={<BlogPostEditorPage />} />
+            {/* Protected Routes */}
+            <Route element={<ProtectedLayout />}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/create-post" element={<CreatePostPage />} />
+              <Route path="/posts/:id" element={<PostDetailPage />} />
+              <Route path="/posts/:id/edit" element={<EditPostPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/profile/favorites" element={<FavoritesPage />} />
+              <Route path="/profile/location" element={<LocationPage />} />
+              <Route path="/profile/wallet" element={<WalletPage />} />
+              <Route path="/profile/my-posts" element={<MyPostsPage />} />
+
+              {/* Admin Routes */}
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route path="dashboard" element={<AdminDashboardPage />} />
+                <Route path="posts" element={<AdminPostsPage />} />
+                <Route path="blog" element={<AdminBlogPage />} />
+                <Route path="blog/new" element={<BlogPostEditorPage />} />
+                <Route path="blog/:id/edit" element={<BlogPostEditorPage />} />
+              </Route>
             </Route>
           </Route>
 
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
