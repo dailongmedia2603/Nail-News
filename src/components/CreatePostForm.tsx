@@ -239,8 +239,15 @@ export function CreatePostForm() {
               </div>
               <FormField control={formMethods.control} name="operating_hours" render={({ field }) => (<FormItem><FormLabel>Giờ hoạt động</FormLabel><FormControl><Input placeholder="VD: 10am - 7pm" {...field} /></FormControl><FormMessage /></FormItem>)}/>
               <FormField control={formMethods.control} name="exact_address" render={({ field }) => (<FormItem><FormLabel>Địa chỉ chính xác</FormLabel><FormControl><Input placeholder="123 Main St, Houston, TX 77002" {...field} /></FormControl><FormMessage /></FormItem>)}/>
+              <FormItem>
+                <FormLabel>Vị trí trên bản đồ</FormLabel>
+                <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
+                    <p className="text-muted-foreground text-center p-4">Bản đồ sẽ sớm được tích hợp.<br/>(Cần API Key từ Google Maps Platform để hiển thị)</p>
+                </div>
+                <FormDescription>Sau khi nhập địa chỉ chính xác, vị trí sẽ được tự động ghim trên bản đồ.</FormDescription>
+              </FormItem>
               <FormField control={formMethods.control} name="services" render={({ field }) => (
-                  <FormItem><FormLabel>Kỹ năng yêu cầu</FormLabel>
+                  <FormItem><FormLabel>Dịch vụ kinh doanh</FormLabel>
                       <div className="flex items-center space-x-4">
                       {servicesList.map((item) => (
                           <FormField key={item.id} control={formMethods.control} name="services" render={({ field }) => (
