@@ -10,15 +10,12 @@ import { vi } from 'date-fns/locale';
 import { showError, showSuccess, showLoading, dismissToast } from '@/utils/toast';
 import { Loader2 } from 'lucide-react';
 
-type CommentWithAuthor = {
+type Comment = {
   id: number;
   created_at: string;
   content: string;
   author_id: string;
-  profiles: {
-    first_name: string | null;
-    last_name: string | null;
-  } | null;
+  author_name: string | null;
 };
 
 interface CommentSectionProps {
@@ -26,7 +23,7 @@ interface CommentSectionProps {
 }
 
 export function CommentSection({ postId }: CommentSectionProps) {
-  const [comments, setComments] = useState<CommentWithAuthor[]>([]);
+  const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,7 +32,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
     setLoading(true);
     const { data, error } = await supabase
       .from('comments')
-      .select('*, profiles(first_name, last_name)')
+      .select('*')
       .eq('post_id', postId)
       .order('created_at', { ascending: false });
 
@@ -64,12 +61,21 @@ export function CommentSection({ postId }: CommentSectionProps) {
       return;
     }
 
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('first_name, last_name')
+      .eq('id', user.id)
+      .single();
+
+    const authorName = `${profile?.first_name || 'Người dùng'} ${profile?.last_name || ''}`.trim();
+
     const { error } = await supabase
       .from('comments')
       .insert({
         post_id: postId,
         author_id: user.id,
         content: newComment,
+        author_name: authorName,
       });
 
     if (error) {
@@ -81,9 +87,11 @@ export function CommentSection({ postId }: CommentSectionProps) {
     setIsSubmitting(false);
   };
 
-  const getInitials = (firstName: string | null, lastName: string | null) => {
-    const first = firstName?.charAt(0) || '';
-    const last = lastName?.charAt(0) || '';
+  const getInitials = (name: string | null) => {
+    if (!name) return 'ND';
+    const parts = name.split(' ');
+    const first = parts[0]?.charAt(0) || '';
+    const last = parts.length > 1 ? parts[parts.length - 1]?.charAt(0) : '';
     return `${first}${last}`.toUpperCase();
   };
 
@@ -115,13 +123,13 @@ export function CommentSection({ postId }: CommentSectionProps) {
                 <Avatar>
                   <AvatarImage />
                   <AvatarFallback>
-                    {getInitials(comment.profiles?.first_name, comment.profiles?.last_name)}
+                    {getInitials(comment.author_name)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <p className="font-semibold">
-                      {comment.profiles?.first_name || 'Người dùng'} {comment.profiles?.last_name || ''}
+                      {comment.author_name || 'Người dùng'}
                     </p>
                     <p className="text-xs text-muted-foreground">
                       {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: vi })}
