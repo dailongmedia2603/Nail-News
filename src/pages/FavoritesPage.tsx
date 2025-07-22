@@ -4,6 +4,7 @@ import { PostCard, type Post } from "@/components/PostCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { showError } from "@/utils/toast";
 import ProfileLayout from "@/components/ProfileLayout";
+import { useNavigate } from "react-router-dom";
 
 type FavoritePost = {
     id: number;
@@ -16,6 +17,7 @@ type FavoritePost = {
 const FavoritesPage = () => {
   const [favoritePosts, setFavoritePosts] = useState<FavoritePost[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const fetchFavorites = async () => {
     setLoading(true);
@@ -59,6 +61,11 @@ const FavoritesPage = () => {
     }
   };
 
+  const handleViewPost = async (postId: string) => {
+    await supabase.rpc('increment_view_count', { post_id_to_update: postId });
+    navigate(`/posts/${postId}`);
+  };
+
   return (
     <ProfileLayout>
       <div className="space-y-6">
@@ -91,6 +98,7 @@ const FavoritesPage = () => {
                       post={posts}
                       isFavorited={true} // Always true on this page
                       onFavoriteToggle={handleFavoriteToggle}
+                      onView={handleViewPost}
                     />
                   ))}
                 </div>

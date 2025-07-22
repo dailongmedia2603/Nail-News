@@ -5,6 +5,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { showError } from "@/utils/toast";
 import { PostSearch } from "@/components/PostSearch";
+import { useNavigate } from "react-router-dom";
 
 const categories = ["Tất cả", "Bán tiệm", "Cần thợ", "Học nail"];
 
@@ -13,6 +14,7 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("Tất cả");
   const [favoritePostIds, setFavoritePostIds] = useState<Set<string>>(new Set());
+  const navigate = useNavigate();
 
   const fetchPostsAndFavorites = async () => {
     setLoading(true);
@@ -43,7 +45,6 @@ const HomePage = () => {
         setFavoritePostIds(new Set(favorites.map(f => f.post_id)));
       }
     }
-
     setLoading(false);
   };
 
@@ -83,17 +84,20 @@ const HomePage = () => {
     }
   };
 
+  const handleViewPost = async (postId: string) => {
+    await supabase.rpc('increment_view_count', { post_id_to_update: postId });
+    navigate(`/posts/${postId}`);
+  };
+
   return (
     <div className="container mx-auto p-4 md:p-6">
       <div className="text-center my-8">
         <h1 className="text-3xl md:text-4xl font-bold">Tìm kiếm tin tức ngành Nail</h1>
         <p className="text-muted-foreground mt-2">Khám phá các cơ hội bán tiệm, việc làm và đào tạo mới nhất.</p>
       </div>
-
       <div className="max-w-2xl mx-auto mb-8">
         <PostSearch />
       </div>
-
       <Tabs value={activeCategory} onValueChange={setActiveCategory} className="w-full">
         <TabsList className="grid w-full grid-cols-4">
           {categories.map((category) => (
@@ -117,21 +121,25 @@ const HomePage = () => {
                     ))}
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {posts.map((post) => (
-                        <PostCard 
-                            key={post.id} 
-                            post={post} 
-                            isFavorited={favoritePostIds.has(post.id)}
-                            onFavoriteToggle={handleFavoriteToggle}
-                        />
-                    ))}
-                </div>
-            )}
-            {!loading && posts.length === 0 && (
-                <div className="text-center py-16">
-                    <p className="text-muted-foreground">Không tìm thấy tin đăng nào trong danh mục này.</p>
-                </div>
+                <>
+                    {posts.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {posts.map((post) => (
+                                <PostCard 
+                                    key={post.id} 
+                                    post={post} 
+                                    isFavorited={favoritePostIds.has(post.id)}
+                                    onFavoriteToggle={handleFavoriteToggle}
+                                    onView={handleViewPost}
+                                />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-16">
+                            <p className="text-muted-foreground">Không tìm thấy tin đăng nào trong danh mục này.</p>
+                        </div>
+                    )}
+                </>
             )}
         </div>
       </Tabs>

@@ -7,8 +7,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "./ui/button";
-import { Heart, MapPin, Square, Armchair, Table, DollarSign, Clock, Store } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Heart, MapPin, Square, Armchair, Table, DollarSign, Clock, Store, Eye } from "lucide-react";
 
 export type Post = {
   id: string;
@@ -32,15 +31,17 @@ export type Post = {
   tier: string | null;
   expires_at: string | null;
   duration_months: number | null;
+  view_count: number;
 };
 
 interface PostCardProps {
   post: Post;
   isFavorited: boolean;
   onFavoriteToggle: (postId: string, isCurrentlyFavorited: boolean) => void;
+  onView: (postId: string) => void;
 }
 
-export function PostCard({ post, isFavorited, onFavoriteToggle }: PostCardProps) {
+export function PostCard({ post, isFavorited, onFavoriteToggle, onView }: PostCardProps) {
   const getCategoryVariant = (category: string | null) => {
     switch (category) {
       case "Bán tiệm":
@@ -58,18 +59,14 @@ export function PostCard({ post, isFavorited, onFavoriteToggle }: PostCardProps)
     <Card className="flex flex-col h-full">
       <CardHeader>
         <div className="flex justify-between items-start gap-2">
-          <Link to={`/posts/${post.id}`} className="hover:underline">
+          <div className="hover:underline cursor-pointer" onClick={() => onView(post.id)}>
             <CardTitle className="text-lg">{post.title}</CardTitle>
-          </Link>
+          </div>
           <Button variant="ghost" size="icon" className="flex-shrink-0" onClick={() => onFavoriteToggle(post.id, isFavorited)}>
             <Heart className={`h-5 w-5 transition-colors ${isFavorited ? 'text-red-500 fill-current' : 'text-gray-400'}`} />
           </Button>
         </div>
-        {post.category && (
-          <Badge variant={getCategoryVariant(post.category)} className="w-fit mt-1">
-            {post.category}
-          </Badge>
-        )}
+        {post.category && ( <Badge variant={getCategoryVariant(post.category)} className="w-fit mt-1">{post.category}</Badge> )}
       </CardHeader>
       <CardContent className="flex-grow">
         <p className="text-sm text-muted-foreground line-clamp-3">{post.description}</p>
@@ -89,12 +86,18 @@ export function PostCard({ post, isFavorited, onFavoriteToggle }: PostCardProps)
                 {post.store_status && <div className="flex items-center"><Store className="mr-1 h-4 w-4" />Tiệm: {post.store_status}</div>}
             </div>
         )}
-        {post.location && (
-          <div className="flex items-center text-sm text-muted-foreground pt-1">
-            <MapPin className="mr-1 h-4 w-4" />
-            <span>{post.location}</span>
-          </div>
-        )}
+        <div className="flex items-center justify-between w-full text-sm text-muted-foreground pt-1">
+            {post.location && (
+                <div className="flex items-center">
+                    <MapPin className="mr-1 h-4 w-4" />
+                    <span>{post.location}</span>
+                </div>
+            )}
+            <div className="flex items-center">
+                <Eye className="mr-1 h-4 w-4" />
+                <span>{post.view_count}</span>
+            </div>
+        </div>
       </CardFooter>
     </Card>
   );
