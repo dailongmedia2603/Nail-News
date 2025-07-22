@@ -13,6 +13,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LogOut, User, PlusCircle, Shield } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
+import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 type Settings = {
   website_name: string;
@@ -20,6 +22,7 @@ type Settings = {
 };
 
 export default function Header() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -31,14 +34,12 @@ export default function Header() {
     const fetchInitialData = async () => {
       setLoading(true);
 
-      // Fetch settings
       const { data: settingsData } = await supabase.from('system_settings').select('key, value');
       if (settingsData) {
         const newSettings = settingsData.reduce((acc, { key, value }) => ({ ...acc, [key]: value }), {});
         setSettings(newSettings as Settings);
       }
 
-      // Fetch session
       const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
       if (session?.user) {
@@ -56,7 +57,6 @@ export default function Header() {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
-      // Re-fetch user-specific data on auth change
       if (session?.user) {
         setUserInitial(session.user.email?.charAt(0).toUpperCase() || "");
         supabase.from('profiles').select('role').eq('id', session.user.id).single().then(({ data: profile }) => {
@@ -85,19 +85,20 @@ export default function Header() {
           </Link>
           <nav className="flex items-center space-x-6 text-sm font-medium">
             <Link to="/tutorials" className="transition-colors hover:text-foreground/80 text-foreground/60">
-              Học Nail
+              {t('header.tutorials')}
             </Link>
             <Link to="/blog" className="transition-colors hover:text-foreground/80 text-foreground/60">
-              Blog
+              {t('header.blog')}
             </Link>
           </nav>
         </div>
         <div className="flex flex-1 items-center justify-end space-x-2">
+          <LanguageSwitcher />
           {loading ? null : session ? (
             <>
               <Button onClick={() => navigate('/create-post')}>
                 <PlusCircle className="mr-2 h-4 w-4" />
-                Đăng tin
+                {t('header.post_ad')}
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -111,32 +112,32 @@ export default function Header() {
                 <DropdownMenuContent className="w-56" align="end" forceMount>
                   <DropdownMenuLabel className="font-normal">
                     <p className="text-xs leading-none text-muted-foreground">
-                      Đã đăng nhập
+                      {t('header.logged_in_as')}
                     </p>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   {isAdmin && (
                     <DropdownMenuItem onClick={() => navigate("/admin/dashboard")}>
                       <Shield className="mr-2 h-4 w-4" />
-                      <span>Trang Admin</span>
+                      <span>{t('header.admin_dashboard')}</span>
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuItem onClick={() => navigate("/profile")}>
                     <User className="mr-2 h-4 w-4" />
-                    <span>Hồ sơ</span>
+                    <span>{t('header.profile')}</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
-                    <span>Đăng xuất</span>
+                    <span>{t('header.logout')}</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </>
           ) : (
             <div className="flex items-center space-x-2">
-              <Button variant="outline" onClick={() => navigate('/login')}>Đăng nhập</Button>
-              <Button onClick={() => navigate('/signup')}>Đăng ký</Button>
+              <Button variant="outline" onClick={() => navigate('/login')}>{t('header.login')}</Button>
+              <Button onClick={() => navigate('/signup')}>{t('header.signup')}</Button>
             </div>
           )}
         </div>

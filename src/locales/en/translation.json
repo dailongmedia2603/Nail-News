@@ -1,0 +1,13 @@
+{
+  "header": {
+    "tutorials": "Tutorials",
+    "blog": "Blog",
+    "post_ad": "Post Ad",
+    "login": "Log In",
+    "signup": "Sign Up",
+    "logged_in_as": "Logged in as",
+    "admin_dashboard": "Admin Dashboard",
+    "profile": "Profile",
+    "logout": "Log Out"
+  }
+}

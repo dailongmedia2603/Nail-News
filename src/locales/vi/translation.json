@@ -1,0 +1,13 @@
+{
+  "header": {
+    "tutorials": "Học Nail",
+    "blog": "Blog",
+    "post_ad": "Đăng tin",
+    "login": "Đăng nhập",
+    "signup": "Đăng ký",
+    "logged_in_as": "Đã đăng nhập",
+    "admin_dashboard": "Trang Admin",
+    "profile": "Hồ sơ",
+    "logout": "Đăng xuất"
+  }
+}
