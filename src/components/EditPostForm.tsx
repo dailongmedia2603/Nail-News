@@ -18,7 +18,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
 import { showLoading, showSuccess, showError, dismissToast } from "@/utils/toast";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
 import { TagSelector } from './TagSelector';
