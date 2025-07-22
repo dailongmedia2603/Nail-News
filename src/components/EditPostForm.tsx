@@ -119,7 +119,44 @@ export function EditPostForm({ postId }: { postId: string }) {
   }, [selectedStateId, cities, formMethods, isLoading]);
 
   async function onSubmit(data: EditPostFormValues) {
-    // ... onSubmit logic ...
+    const toastId = showLoading("Đang cập nhật tin đăng...");
+    setIsSubmitting(true);
+
+    const selectedState = states.find(s => s.id === data.state_id);
+    const selectedCity = cities.find(c => c.id === data.city_id);
+    const locationString = `${selectedCity?.name}, ${selectedState?.name}, ${data.zip}`;
+    const { city_id, state_id, zip, tags, ...restOfData } = data;
+
+    const { error: updateError } = await supabase
+      .from("posts")
+      .update({ ...restOfData, location: locationString })
+      .eq("id", postId);
+
+    if (updateError) {
+      dismissToast(toastId);
+      showError(`Cập nhật thất bại: ${updateError.message}`);
+      setIsSubmitting(false);
+      return;
+    }
+
+    const { data: existingTags } = await supabase.from('post_tags').select('tag_id').eq('post_id', postId);
+    const existingTagIds = existingTags?.map(t => t.tag_id) || [];
+    const newTagIds = tags || [];
+
+    const tagsToAdd = newTagIds.filter(id => !existingTagIds.includes(id)).map(id => ({ post_id: postId, tag_id: id }));
+    const tagsToRemove = existingTagIds.filter(id => !newTagIds.includes(id));
+
+    if (tagsToRemove.length > 0) {
+      await supabase.from('post_tags').delete().eq('post_id', postId).in('tag_id', tagsToRemove);
+    }
+    if (tagsToAdd.length > 0) {
+      await supabase.from('post_tags').insert(tagsToAdd);
+    }
+
+    dismissToast(toastId);
+    setIsSubmitting(false);
+    showSuccess("Cập nhật tin đăng thành công!");
+    navigate(`/posts/${postId}`);
   }
 
   return (
