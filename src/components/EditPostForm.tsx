@@ -72,6 +72,7 @@ export function EditPostForm({ postId }: { postId: string }) {
         return;
       }
 
+      // **FIX: Split the location string into three parts**
       const [city, state, zip] = data.location?.split(', ').map(s => s.trim()) || ["", "", ""];
       
       formMethods.reset({
@@ -89,6 +90,7 @@ export function EditPostForm({ postId }: { postId: string }) {
     const toastId = showLoading("Đang cập nhật tin đăng...");
     setIsSubmitting(true);
 
+    // **FIX: Combine the three parts back into a single location string**
     const locationString = `${data.city}, ${data.state}, ${data.zip}`;
     const { city, state, zip, ...restOfData } = data;
 
