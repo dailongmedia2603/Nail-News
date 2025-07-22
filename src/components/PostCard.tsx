@@ -29,6 +29,8 @@ export type Post = {
   exact_address: string | null;
   salary_info: string | null;
   store_status: string | null;
+  tier: string | null;
+  expires_at: string | null;
 };
 
 interface PostCardProps {
