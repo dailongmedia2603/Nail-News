@@ -20,6 +20,7 @@ import WalletPage from "./pages/WalletPage";
 import MyPostsPage from "./pages/MyPostsPage";
 import AdminLayout from "./components/AdminLayout";
 import AdminDashboardPage from "./pages/admin/DashboardPage";
+import EditPostPage from "./pages/EditPostPage";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/" element={<HomePage />} />
             <Route path="/create-post" element={<CreatePostPage />} />
             <Route path="/posts/:id" element={<PostDetailPage />} />
+            <Route path="/posts/:id/edit" element={<EditPostPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/profile/favorites" element={<FavoritesPage />} />
             <Route path="/profile/location" element={<LocationPage />} />
