@@ -27,6 +27,7 @@ import BlogPostEditorPage from "./pages/admin/BlogPostEditorPage";
 import BlogPage from "./pages/BlogPage";
 import BlogPostDetailPage from "./pages/BlogPostDetailPage";
 import CategoriesPage from "./pages/admin/CategoriesPage";
+import TagsPage from "./pages/admin/TagsPage";
 
 const queryClient = new QueryClient();
 
@@ -67,6 +68,7 @@ const App = () => (
                 <Route path="blog/new" element={<BlogPostEditorPage />} />
                 <Route path="blog/:id/edit" element={<BlogPostEditorPage />} />
                 <Route path="categories" element={<CategoriesPage />} />
+                <Route path="tags" element={<TagsPage />} />
               </Route>
             </Route>
           </Route>
