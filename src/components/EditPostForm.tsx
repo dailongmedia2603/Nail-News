@@ -21,7 +21,6 @@ import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
 
-// This schema is similar to CreatePostForm, but image handling is excluded for now
 const editPostFormSchema = z.object({
   title: z.string().min(5, "Tiêu đề phải có ít nhất 5 ký tự."),
   description: z.string().min(10, "Mô tả phải có ít nhất 10 ký tự."),
@@ -116,7 +115,6 @@ export function EditPostForm({ postId }: { postId: string }) {
     <FormProvider {...formMethods}>
       <Form {...formMethods}>
         <form onSubmit={formMethods.handleSubmit(onSubmit)} className="space-y-8">
-          {/* Form fields will be similar to CreatePostForm */}
           <FormField control={formMethods.control} name="title" render={({ field }) => ( <FormItem><FormLabel>Tiêu đề</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )}/>
           <FormField control={formMethods.control} name="description" render={({ field }) => ( <FormItem><FormLabel>Mô tả</FormLabel><FormControl><Textarea {...field} rows={5} /></FormControl><FormMessage /></FormItem> )}/>
           <FormField control={formMethods.control} name="category" render={({ field }) => ( <FormItem><FormLabel>Loại tin</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Bán tiệm">Bán tiệm</SelectItem><SelectItem value="Cần thợ">Cần thợ</SelectItem><SelectItem value="Học nail">Học nail</SelectItem></SelectContent></Select><FormMessage /></FormItem> )}/>
@@ -128,12 +126,24 @@ export function EditPostForm({ postId }: { postId: string }) {
 
           {formMethods.watch("category") === "Bán tiệm" && (
             <div className="space-y-8 p-6 border rounded-lg">
-              {/* ... Bán tiệm fields ... */}
+              <h3 className="text-lg font-medium">Thông tin chi tiết (Bán tiệm)</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                  <FormField control={formMethods.control} name="area" render={({ field }) => (<FormItem><FormLabel>Diện tích (sqft)</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)}/>
+                  <FormField control={formMethods.control} name="chairs" render={({ field }) => (<FormItem><FormLabel>Số ghế</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)}/>
+                  <FormField control={formMethods.control} name="tables" render={({ field }) => (<FormItem><FormLabel>Số bàn</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)}/>
+                  <FormField control={formMethods.control} name="staff" render={({ field }) => (<FormItem><FormLabel>Số nhân sự</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)}/>
+              </div>
             </div>
           )}
           {formMethods.watch("category") === "Cần thợ" && (
             <div className="space-y-8 p-6 border rounded-lg">
-              {/* ... Cần thợ fields ... */}
+              <h3 className="text-lg font-medium">Thông tin chi tiết (Cần thợ)</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <FormField control={formMethods.control} name="salary_info" render={({ field }) => (<FormItem><FormLabel>Thông tin lương</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)}/>
+                  <FormField control={formMethods.control} name="store_status" render={({ field }) => (
+                      <FormItem><FormLabel>Trạng thái tiệm</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Đang hoạt động">Đang hoạt động</SelectItem><SelectItem value="Sắp khai trương">Sắp khai trương</SelectItem><SelectItem value="Đã đóng cửa">Đã đóng cửa</SelectItem></SelectContent></Select><FormMessage /></FormItem>
+                  )}/>
+              </div>
             </div>
           )}
 
