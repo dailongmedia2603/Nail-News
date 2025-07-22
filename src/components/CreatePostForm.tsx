@@ -294,6 +294,12 @@ export function CreatePostForm() {
             </div>
           )}
           
+          <FormItem>
+            <FormLabel>Tag & Từ khóa</FormLabel>
+            <TagSelector name="tags" />
+            <FormDescription>Chọn các tag phù hợp để người dùng dễ dàng tìm thấy tin của bạn.</FormDescription>
+          </FormItem>
+
           <FormField
             control={formMethods.control}
             name="tier"
