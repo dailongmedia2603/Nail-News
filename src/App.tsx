@@ -29,6 +29,7 @@ import BlogPostDetailPage from "./pages/BlogPostDetailPage";
 import CategoriesPage from "./pages/admin/CategoriesPage";
 import TagsPage from "./pages/admin/TagsPage";
 import SettingsPage from "./pages/admin/SettingsPage";
+import TranslationsPage from "./pages/admin/TranslationsPage";
 
 const queryClient = new QueryClient();
 
@@ -71,6 +72,7 @@ const App = () => (
                 <Route path="categories" element={<CategoriesPage />} />
                 <Route path="tags" element={<TagsPage />} />
                 <Route path="settings" element={<SettingsPage />} />
+                <Route path="translations" element={<TranslationsPage />} />
               </Route>
             </Route>
           </Route>
