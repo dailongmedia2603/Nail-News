@@ -10,15 +10,27 @@
     "profile": "Profile",
     "logout": "Log Out"
   },
+  "homePage": {
+    "title": "Search for News in the Nail Industry",
+    "subtitle": "Discover the latest opportunities for salon sales, jobs, and training.",
+    "noPosts": "No listings found in this category."
+  },
   "adminSettingsPage": {
     "title": "System Configuration",
     "cardTitle": "Website Settings",
     "cardDescription": "Customize the basic information of the website.",
     "websiteName": "Website Name",
+    "browserTitle": "Browser Title",
     "contactInfo": "Contact Information",
     "websiteLogo": "Website Logo",
-    "browserTitle": "Browser Title",
     "favicon": "Favicon",
     "saveChanges": "Save Changes"
+  },
+  "toasts": {
+    "adminSettingsLoadError": "Could not load settings.",
+    "adminSavingSettings": "Saving settings...",
+    "adminLogoUploadError": "Logo upload failed: {{message}}",
+    "adminSaveSettingsError": "Failed to save settings.",
+    "adminSaveSettingsSuccess": "Settings saved successfully!"
   }
 }

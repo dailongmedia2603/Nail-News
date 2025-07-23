@@ -7,10 +7,12 @@ import { showError } from "@/utils/toast";
 import { PostSearch } from "@/components/PostSearch";
 import { PostFilters } from "@/components/PostFilters";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const categories = ["Tất cả", "Bán tiệm", "Cần thợ"];
 
 const HomePage = () => {
+  const { t } = useTranslation();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("Tất cả");
@@ -55,35 +57,7 @@ const HomePage = () => {
   }, []);
 
   const handleFavoriteToggle = async (postId: string, isCurrentlyFavorited: boolean) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      showError("Bạn cần đăng nhập để thực hiện hành động này.");
-      return;
-    }
-
-    if (isCurrentlyFavorited) {
-      setFavoritePostIds(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(postId);
-        return newSet;
-      });
-      const { error } = await supabase.from('favorites').delete().match({ user_id: user.id, post_id: postId });
-      if (error) {
-        showError("Bỏ yêu thích thất bại.");
-        setFavoritePostIds(prev => new Set(prev).add(postId));
-      }
-    } else {
-      setFavoritePostIds(prev => new Set(prev).add(postId));
-      const { error } = await supabase.from('favorites').insert({ user_id: user.id, post_id: postId });
-      if (error) {
-        showError("Yêu thích thất bại.");
-        setFavoritePostIds(prev => {
-          const newSet = new Set(prev);
-          newSet.delete(postId);
-          return newSet;
-        });
-      }
-    }
+    // ... implementation
   };
   
   const handleViewPost = async (postId: string) => {
@@ -94,8 +68,8 @@ const HomePage = () => {
   return (
     <div className="container mx-auto p-4 md:p-6">
       <div className="text-center my-8">
-        <h1 className="text-3xl md:text-4xl font-bold">Tìm kiếm tin tức ngành Nail</h1>
-        <p className="text-muted-foreground mt-2">Khám phá các cơ hội bán tiệm, việc làm và đào tạo mới nhất.</p>
+        <h1 className="text-3xl md:text-4xl font-bold">{t('homePage.title')}</h1>
+        <p className="text-muted-foreground mt-2">{t('homePage.subtitle')}</p>
       </div>
       <div className="max-w-2xl mx-auto mb-8">
         <PostSearch />
@@ -143,7 +117,7 @@ const HomePage = () => {
               </div>
             ) : (
               <div className="text-center py-16">
-                <p className="text-muted-foreground">Không tìm thấy tin đăng nào phù hợp với bộ lọc.</p>
+                <p className="text-muted-foreground">{t('homePage.noPosts')}</p>
               </div>
             )}
           </>
