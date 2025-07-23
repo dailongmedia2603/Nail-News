@@ -23,17 +23,73 @@ const PostDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // ... useEffect and handleShare ...
+  useEffect(() => {
+    const fetchPost = async () => {
+      if (!id) return;
+      setLoading(true);
+      
+      const { data, error } = await supabase
+        .from('posts')
+        .select('*')
+        .eq('id', id)
+        .single();
 
-  if (loading) { /* ... */ }
-  if (error || !post || !id) { /* ... */ }
+      if (error) {
+        console.error('Lỗi tải tin đăng:', error);
+        setError('Không thể tải tin đăng này.');
+      } else {
+        setPost(data);
+      }
+
+      const { data: tagData, error: tagError } = await supabase
+        .from('post_tags')
+        .select('tags(id, name)')
+        .eq('post_id', id);
+      
+      if (!tagError) {
+        setTags(tagData.map((item: any) => item.tags));
+      }
+
+      setLoading(false);
+    };
+
+    fetchPost();
+  }, [id]);
+
+  const handleShare = () => {
+    navigator.clipboard.writeText(window.location.href);
+    showSuccess(t('toasts.linkCopied'));
+  };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto p-4 md:p-6 max-w-4xl space-y-6">
+        <Skeleton className="h-10 w-3/4" />
+        <div className="flex gap-4">
+            <Skeleton className="h-6 w-24" />
+            <Skeleton className="h-6 w-32" />
+        </div>
+        <Skeleton className="h-64 w-full" />
+        <Skeleton className="h-40 w-full" />
+      </div>
+    );
+  }
+
+  if (error || !post || !id) {
+    return <div className="container mx-auto p-4 md:p-6 text-center text-red-500">{error || t('postDetailPage.postNotFound')}</div>;
+  }
 
   return (
     <div className="container mx-auto p-4 md:p-6 max-w-4xl">
       <div className="space-y-6">
         {/* Header */}
         <div>
-            {/* ... title and share button ... */}
+            <div className="flex justify-between items-start">
+                <h1 className="text-3xl md:text-4xl font-bold">{post.title}</h1>
+                <Button onClick={handleShare} variant="outline" size="icon">
+                    <Share2 className="h-5 w-5" />
+                </Button>
+            </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground mt-2">
                 {post.location && <div className="flex items-center"><MapPin className="mr-1 h-4 w-4" /> {post.location}</div>}
                 <div className="flex items-center"><Calendar className="mr-1 h-4 w-4" /> {t('postDetailPage.postedOn', { date: format(new Date(post.created_at), 'dd/MM/yyyy') })}</div>
@@ -42,7 +98,23 @@ const PostDetailPage = () => {
         </div>
 
         {/* Image Gallery */}
-        {/* ... */}
+        {post.images && post.images.length > 0 && (
+            <Carousel className="w-full">
+                <CarouselContent>
+                    {post.images.map((img, index) => (
+                        <CarouselItem key={index}>
+                            <Card>
+                                <CardContent className="flex aspect-video items-center justify-center p-0">
+                                    <img src={img} alt={`Hình ảnh tiệm ${index + 1}`} className="rounded-lg object-cover w-full h-full" />
+                                </CardContent>
+                            </Card>
+                        </CarouselItem>
+                    ))}
+                </CarouselContent>
+                <CarouselPrevious />
+                <CarouselNext />
+            </Carousel>
+        )}
 
         {/* Main Content */}
         <div className="grid md:grid-cols-3 gap-6">
@@ -61,17 +133,17 @@ const PostDetailPage = () => {
                         <Card>
                             <CardHeader><CardTitle>{t('postDetailPage.basicInfo')}</CardTitle></CardHeader>
                             <CardContent className="space-y-3 text-sm">
-                                <div className="flex items-center"><Square className="mr-2 h-4 w-4 text-muted-foreground" /> {t('postDetailPage.area')} <strong>{post.area || 'N/A'}</strong></div>
-                                <div className="flex items-center"><Armchair className="mr-2 h-4 w-4 text-muted-foreground" /> {t('postDetailPage.chairs')} <strong>{post.chairs || 'N/A'}</strong></div>
-                                <div className="flex items-center"><Table className="mr-2 h-4 w-4 text-muted-foreground" /> {t('postDetailPage.tables')} <strong>{post.tables || 'N/A'}</strong></div>
-                                <div className="flex items-center"><Users className="mr-2 h-4 w-4 text-muted-foreground" /> {t('postDetailPage.staff')} <strong>{post.staff || 'N/A'}</strong></div>
+                                <div className="flex items-center"><Square className="mr-2 h-4 w-4 text-muted-foreground" /> {t('postDetailPage.area')} <strong>{post.area || t('common.na')}</strong></div>
+                                <div className="flex items-center"><Armchair className="mr-2 h-4 w-4 text-muted-foreground" /> {t('postDetailPage.chairs')} <strong>{post.chairs || t('common.na')}</strong></div>
+                                <div className="flex items-center"><Table className="mr-2 h-4 w-4 text-muted-foreground" /> {t('postDetailPage.tables')} <strong>{post.tables || t('common.na')}</strong></div>
+                                <div className="flex items-center"><Users className="mr-2 h-4 w-4 text-muted-foreground" /> {t('postDetailPage.staff')} <strong>{post.staff || t('common.na')}</strong></div>
                             </CardContent>
                         </Card>
                         <Card>
                             <CardHeader><CardTitle>{t('postDetailPage.scaleInfo')}</CardTitle></CardHeader>
                             <CardContent className="space-y-3 text-sm">
-                                <div className="flex items-center"><DollarSign className="mr-2 h-4 w-4 text-muted-foreground" /> {t('postDetailPage.revenue')} <strong>{post.revenue || 'N/A'}</strong></div>
-                                <div className="flex items-center"><Clock className="mr-2 h-4 w-4 text-muted-foreground" /> {t('postDetailPage.hours')} <strong>{post.operating_hours || 'N/A'}</strong></div>
+                                <div className="flex items-center"><DollarSign className="mr-2 h-4 w-4 text-muted-foreground" /> {t('postDetailPage.revenue')} <strong>{post.revenue || t('common.na')}</strong></div>
+                                <div className="flex items-center"><Clock className="mr-2 h-4 w-4 text-muted-foreground" /> {t('postDetailPage.hours')} <strong>{post.operating_hours || t('common.na')}</strong></div>
                             </CardContent>
                         </Card>
                     </>
@@ -81,9 +153,9 @@ const PostDetailPage = () => {
                     <Card>
                         <CardHeader><CardTitle>{t('postDetailPage.jobInfo')}</CardTitle></CardHeader>
                         <CardContent className="space-y-3 text-sm">
-                            <div className="flex items-center"><DollarSign className="mr-2 h-4 w-4 text-muted-foreground" /> {t('postDetailPage.salary')} <strong>{post.salary_info || 'N/A'}</strong></div>
-                            <div className="flex items-center"><Clock className="mr-2 h-4 w-4 text-muted-foreground" /> {t('postDetailPage.hours')} <strong>{post.operating_hours || 'N/A'}</strong></div>
-                            <div className="flex items-center"><Store className="mr-2 h-4 w-4 text-muted-foreground" /> {t('postDetailPage.salonStatus')} <strong>{post.store_status || 'N/A'}</strong></div>
+                            <div className="flex items-center"><DollarSign className="mr-2 h-4 w-4 text-muted-foreground" /> {t('postDetailPage.salary')} <strong>{post.salary_info || t('common.na')}</strong></div>
+                            <div className="flex items-center"><Clock className="mr-2 h-4 w-4 text-muted-foreground" /> {t('postDetailPage.hours')} <strong>{post.operating_hours || t('common.na')}</strong></div>
+                            <div className="flex items-center"><Store className="mr-2 h-4 w-4 text-muted-foreground" /> {t('postDetailPage.salonStatus')} <strong>{post.store_status || t('common.na')}</strong></div>
                         </CardContent>
                     </Card>
                 )}
@@ -115,7 +187,7 @@ const PostDetailPage = () => {
         <Card>
             <CardHeader><CardTitle>{t('postDetailPage.location')}</CardTitle></CardHeader>
             <CardContent>
-                <p className="text-sm mb-4" dangerouslySetInnerHTML={{ __html: t('postDetailPage.address', { address: post.exact_address || post.location || 'Chưa cung cấp' }) }} />
+                <p className="text-sm mb-4" dangerouslySetInnerHTML={{ __html: t('postDetailPage.address', { address: post.exact_address || post.location || t('common.na') }) }} />
                 <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
                     <p className="text-muted-foreground text-center p-4" dangerouslySetInnerHTML={{ __html: t('postDetailPage.mapComingSoon') }} />
                 </div>
