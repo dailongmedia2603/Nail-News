@@ -12,8 +12,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useTranslation } from "react-i18next";
 
 const ProfilePage = () => {
+  const { t } = useTranslation();
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
 
   return (
@@ -21,9 +23,9 @@ const ProfilePage = () => {
       <div className="space-y-10">
         <div className="space-y-6">
             <div>
-                <h3 className="text-lg font-medium">Thông tin tài khoản</h3>
+                <h3 className="text-lg font-medium">{t('profilePage.accountInfoTitle')}</h3>
                 <p className="text-sm text-muted-foreground">
-                Cập nhật thông tin tài khoản của bạn.
+                {t('profilePage.accountInfoSubtitle')}
                 </p>
             </div>
             <AccountForm />
@@ -33,20 +35,20 @@ const ProfilePage = () => {
 
         <div className="space-y-6">
             <div>
-                <h3 className="text-lg font-medium">Đổi mật khẩu</h3>
+                <h3 className="text-lg font-medium">{t('profilePage.changePasswordTitle')}</h3>
                 <p className="text-sm text-muted-foreground">
-                Nhấp vào nút bên dưới để đổi mật khẩu của bạn.
+                {t('profilePage.changePasswordSubtitle')}
                 </p>
             </div>
             <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
                 <DialogTrigger asChild>
-                    <Button variant="outline">Đổi mật khẩu</Button>
+                    <Button variant="outline">{t('profilePage.changePasswordButton')}</Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
-                        <DialogTitle>Đổi mật khẩu</DialogTitle>
+                        <DialogTitle>{t('profilePage.dialogTitle')}</DialogTitle>
                         <DialogDescription>
-                            Để bảo mật, bạn sẽ được đăng xuất sau khi đổi mật khẩu thành công.
+                            {t('profilePage.dialogDescription')}
                         </DialogDescription>
                     </DialogHeader>
                     <PasswordForm onFinished={() => setIsPasswordDialogOpen(false)} />

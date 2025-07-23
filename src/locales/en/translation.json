@@ -48,5 +48,23 @@
     "mapComingSoon": "Map will be integrated soon.<br/>(Requires API Key from Google Maps Platform to display)",
     "tagsKeywords": "Tags & Keywords",
     "postNotFound": "Listing not found."
+  },
+  "adminSettingsPage": {
+    "title": "System Configuration",
+    "cardTitle": "Website Settings",
+    "cardDescription": "Customize the basic information of the website.",
+    "websiteName": "Website Name",
+    "browserTitle": "Browser Title",
+    "contactInfo": "Contact Information",
+    "websiteLogo": "Website Logo",
+    "favicon": "Favicon",
+    "saveChanges": "Save Changes"
+  },
+  "toasts": {
+    "adminSettingsLoadError": "Could not load settings.",
+    "adminSavingSettings": "Saving settings...",
+    "adminLogoUploadError": "Logo upload failed: {{message}}",
+    "adminSaveSettingsError": "Failed to save settings.",
+    "adminSaveSettingsSuccess": "Settings saved successfully!"
   }
 }

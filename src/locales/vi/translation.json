@@ -48,5 +48,23 @@
     "mapComingSoon": "Bản đồ sẽ sớm được tích hợp.<br/>(Cần API Key từ Google Maps Platform để hiển thị)",
     "tagsKeywords": "Tag & Từ khóa",
     "postNotFound": "Không tìm thấy tin đăng."
+  },
+  "adminSettingsPage": {
+    "title": "Cấu hình Hệ thống",
+    "cardTitle": "Cài đặt Website",
+    "cardDescription": "Tùy chỉnh các thông tin cơ bản của website.",
+    "websiteName": "Tên Website",
+    "browserTitle": "Tiêu đề Trình duyệt",
+    "contactInfo": "Thông tin liên hệ",
+    "websiteLogo": "Logo Website",
+    "favicon": "Favicon",
+    "saveChanges": "Lưu thay đổi"
+  },
+  "toasts": {
+    "adminSettingsLoadError": "Không thể tải cài đặt.",
+    "adminSavingSettings": "Đang lưu cài đặt...",
+    "adminLogoUploadError": "Tải logo thất bại: {{message}}",
+    "adminSaveSettingsError": "Lưu cài đặt thất bại.",
+    "adminSaveSettingsSuccess": "Cài đặt đã được lưu thành công!"
   }
 }
