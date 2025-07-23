@@ -49,22 +49,27 @@
     "tagsKeywords": "Tags & Keywords",
     "postNotFound": "Listing not found."
   },
-  "adminSettingsPage": {
-    "title": "System Configuration",
-    "cardTitle": "Website Settings",
-    "cardDescription": "Customize the basic information of the website.",
-    "websiteName": "Website Name",
-    "browserTitle": "Browser Title",
-    "contactInfo": "Contact Information",
-    "websiteLogo": "Website Logo",
-    "favicon": "Favicon",
-    "saveChanges": "Save Changes"
+  "profilePage": {
+    "accountInfoTitle": "Account Information",
+    "accountInfoSubtitle": "Update your account information.",
+    "changePasswordTitle": "Change Password",
+    "changePasswordSubtitle": "Click the button below to change your password.",
+    "changePasswordButton": "Change Password",
+    "dialogTitle": "Change Password",
+    "dialogDescription": "For security, you will be logged out after successfully changing your password."
   },
-  "toasts": {
-    "adminSettingsLoadError": "Could not load settings.",
-    "adminSavingSettings": "Saving settings...",
-    "adminLogoUploadError": "Logo upload failed: {{message}}",
-    "adminSaveSettingsError": "Failed to save settings.",
-    "adminSaveSettingsSuccess": "Settings saved successfully!"
+  "adminDashboardPage": {
+    "title": "Admin Dashboard",
+    "managePosts": "Manage Listings",
+    "managePostsDesc": "View, edit, and delete all listings",
+    "manageBlog": "Manage Blog",
+    "manageBlogDesc": "Create and manage blog articles",
+    "manageCategories": "Manage Categories",
+    "manageCategoriesDesc": "Manage states and cities",
+    "manageTags": "Manage Tags",
+    "manageTagsDesc": "Manage tags and keywords",
+    "systemConfig": "System Configuration",
+    "systemConfigDesc": "Customize logo, website name, and other information",
+    "userList": "User List"
   }
 }
