@@ -9,7 +9,11 @@ import { PostFilters } from "@/components/PostFilters";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-const categories = ["Tất cả", "Bán tiệm", "Cần thợ"];
+const categories = [
+  { value: "Tất cả", key: "postCategories.all" },
+  { value: "Bán tiệm", key: "postCategories.sellSalon" },
+  { value: "Cần thợ", key: "postCategories.needTech" },
+];
 
 const HomePage = () => {
   const { t } = useTranslation();
@@ -57,7 +61,35 @@ const HomePage = () => {
   }, []);
 
   const handleFavoriteToggle = async (postId: string, isCurrentlyFavorited: boolean) => {
-    // ... implementation
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      showError("Bạn cần đăng nhập để thực hiện hành động này.");
+      return;
+    }
+
+    if (isCurrentlyFavorited) {
+      setFavoritePostIds(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(postId);
+        return newSet;
+      });
+      const { error } = await supabase.from('favorites').delete().match({ user_id: user.id, post_id: postId });
+      if (error) {
+        showError("Bỏ yêu thích thất bại.");
+        setFavoritePostIds(prev => new Set(prev).add(postId));
+      }
+    } else {
+      setFavoritePostIds(prev => new Set(prev).add(postId));
+      const { error } = await supabase.from('favorites').insert({ user_id: user.id, post_id: postId });
+      if (error) {
+        showError("Yêu thích thất bại.");
+        setFavoritePostIds(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(postId);
+          return newSet;
+        });
+      }
+    }
   };
   
   const handleViewPost = async (postId: string) => {
@@ -78,8 +110,8 @@ const HomePage = () => {
         <Tabs value={activeCategory} onValueChange={setActiveCategory} className="w-full md:w-auto">
           <TabsList>
             {categories.map((category) => (
-              <TabsTrigger key={category} value={category}>
-                {category}
+              <TabsTrigger key={category.value} value={category.value}>
+                {t(category.key)}
               </TabsTrigger>
             ))}
           </TabsList>

@@ -13,24 +13,40 @@
   "homePage": {
     "title": "Tìm kiếm tin tức ngành Nail",
     "subtitle": "Khám phá các cơ hội bán tiệm, việc làm và đào tạo mới nhất.",
-    "noPosts": "Không tìm thấy tin đăng nào trong danh mục này."
+    "noPosts": "Không tìm thấy tin đăng nào phù hợp với bộ lọc."
   },
-  "adminSettingsPage": {
-    "title": "Cấu hình Hệ thống",
-    "cardTitle": "Cài đặt Website",
-    "cardDescription": "Tùy chỉnh các thông tin cơ bản của website.",
-    "websiteName": "Tên Website",
-    "browserTitle": "Tiêu đề Trình duyệt",
-    "contactInfo": "Thông tin liên hệ",
-    "websiteLogo": "Logo Website",
-    "favicon": "Favicon",
-    "saveChanges": "Lưu thay đổi"
+  "postCategories": {
+    "all": "Tất cả",
+    "sellSalon": "Bán tiệm",
+    "needTech": "Cần thợ"
   },
-  "toasts": {
-    "adminSettingsLoadError": "Không thể tải cài đặt.",
-    "adminSavingSettings": "Đang lưu cài đặt...",
-    "adminLogoUploadError": "Tải logo thất bại: {{message}}",
-    "adminSaveSettingsError": "Lưu cài đặt thất bại.",
-    "adminSaveSettingsSuccess": "Cài đặt đã được lưu thành công!"
+  "postCard": {
+    "chairs": "{{count}} ghế",
+    "tables": "{{count}} bàn",
+    "salary": "Lương: {{salaryInfo}}",
+    "hours": "Giờ: {{hours}}",
+    "status": "Tiệm: {{status}}"
+  },
+  "postDetailPage": {
+    "postedOn": "Đăng ngày {{date}}",
+    "views": "{{count}} lượt xem",
+    "detailedDescription": "Mô tả chi tiết",
+    "basicInfo": "Thông tin cơ bản",
+    "area": "Diện tích:",
+    "chairs": "Số ghế:",
+    "tables": "Số bàn:",
+    "staff": "Nhân sự:",
+    "scaleInfo": "Thông tin quy mô",
+    "revenue": "Doanh thu:",
+    "hours": "Giờ hoạt động:",
+    "jobInfo": "Thông tin công việc",
+    "salary": "Lương:",
+    "salonStatus": "Trạng thái tiệm:",
+    "businessServices": "Dịch vụ kinh doanh",
+    "location": "Vị trí",
+    "address": "Địa chỉ:",
+    "mapComingSoon": "Bản đồ sẽ sớm được tích hợp.<br/>(Cần API Key từ Google Maps Platform để hiển thị)",
+    "tagsKeywords": "Tag & Từ khóa",
+    "postNotFound": "Không tìm thấy tin đăng."
   }
 }
