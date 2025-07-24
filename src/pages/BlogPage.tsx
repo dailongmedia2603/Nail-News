@@ -63,7 +63,7 @@ const BlogPage = () => {
                   <CardDescription className="mt-2">{format(new Date(post.created_at), 'dd/MM/yyyy')}</CardDescription>
                   <CardContent className="p-0 mt-4">
                     <p className="line-clamp-2 text-muted-foreground">
-                      {post.content?.replace(/<[^>]+>/g, '').substring(0, 200) || 'Chưa có nội dung...'}
+                      {(post.content || '').replace(/<[^>]+>/g, '').substring(0, 200) || 'Chưa có nội dung...'}
                     </p>
                   </CardContent>
                 </div>

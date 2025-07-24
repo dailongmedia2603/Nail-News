@@ -1,19 +1,26 @@
 {
   "header": {
-    "tutorials": "Học Nail",
+    "tutorials": "Hướng dẫn",
     "blog": "Blog",
     "post_ad": "Đăng tin",
-    "login": "Đăng nhập",
-    "signup": "Đăng ký",
-    "logged_in_as": "Đã đăng nhập",
-    "admin_dashboard": "Trang Admin",
+    "logged_in_as": "Đăng nhập với tài khoản",
+    "admin_dashboard": "Trang quản trị",
     "profile": "Hồ sơ",
-    "logout": "Đăng xuất"
+    "logout": "Đăng xuất",
+    "login": "Đăng nhập",
+    "signup": "Đăng ký"
   },
   "homePage": {
     "title": "Tìm kiếm tin tức ngành Nail",
     "subtitle": "Khám phá các cơ hội bán tiệm, việc làm và đào tạo mới nhất.",
-    "noPosts": "Không tìm thấy tin đăng nào phù hợp với bộ lọc."
+    "noPosts": "Không tìm thấy tin đăng nào phù hợp.",
+    "featuredPosts": "Tin nổi bật",
+    "viewAll": "Xem tất cả"
+  },
+  "featuredPostsPage": {
+    "title": "Tin đăng nổi bật",
+    "subtitle": "Các tin đăng được ưu tiên hiển thị hàng đầu.",
+    "noPosts": "Hiện không có tin đăng nổi bật nào."
   },
   "postCategories": {
     "all": "Tất cả",
@@ -38,38 +45,69 @@
     "staff": "Nhân sự:",
     "scaleInfo": "Thông tin quy mô",
     "revenue": "Doanh thu:",
-    "hours": "Giờ hoạt động:",
+    "hours": "Giờ làm việc:",
     "jobInfo": "Thông tin công việc",
     "salary": "Lương:",
     "salonStatus": "Trạng thái tiệm:",
     "businessServices": "Dịch vụ kinh doanh",
+    "tagsKeywords": "Tags & Từ khóa",
     "location": "Vị trí",
-    "address": "Địa chỉ:",
+    "address": "Địa chỉ: <strong>{{address}}</strong>",
     "mapComingSoon": "Bản đồ sẽ sớm được tích hợp.<br/>(Cần API Key từ Google Maps Platform để hiển thị)",
-    "tagsKeywords": "Tag & Từ khóa",
-    "postNotFound": "Không tìm thấy tin đăng."
+    "postNotFound": "Không tìm thấy tin đăng này."
+  },
+  "createPostPage": {
+    "title": "Tạo tin đăng mới",
+    "subtitle": "Điền thông tin chi tiết dưới đây để đăng tin của bạn."
   },
   "profilePage": {
     "accountInfoTitle": "Thông tin tài khoản",
     "accountInfoSubtitle": "Cập nhật thông tin tài khoản của bạn.",
     "changePasswordTitle": "Đổi mật khẩu",
-    "changePasswordSubtitle": "Nhấp vào nút bên dưới để đổi mật khẩu của bạn.",
+    "changePasswordSubtitle": "Thay đổi mật khẩu của bạn tại đây.",
     "changePasswordButton": "Đổi mật khẩu",
     "dialogTitle": "Đổi mật khẩu",
-    "dialogDescription": "Để bảo mật, bạn sẽ được đăng xuất sau khi đổi mật khẩu thành công."
+    "dialogDescription": "Sau khi đổi mật khẩu thành công, bạn sẽ được yêu cầu đăng nhập lại."
   },
   "adminDashboardPage": {
-    "title": "Trang quản trị",
+    "title": "Bảng điều khiển Quản trị viên",
     "managePosts": "Quản lý Tin đăng",
-    "managePostsDesc": "Xem, sửa và xóa tất cả tin đăng",
+    "managePostsDesc": "Xem, sửa, xóa tất cả tin đăng.",
     "manageBlog": "Quản lý Blog",
-    "manageBlogDesc": "Tạo và quản lý các bài viết blog",
+    "manageBlogDesc": "Tạo và quản lý bài viết blog.",
     "manageCategories": "Quản lý Danh mục",
-    "manageCategoriesDesc": "Quản lý tiểu bang và thành phố",
+    "manageCategoriesDesc": "Quản lý tiểu bang và thành phố.",
     "manageTags": "Quản lý Tag",
-    "manageTagsDesc": "Quản lý tag và từ khóa",
+    "manageTagsDesc": "Quản lý các tag và từ khóa.",
     "systemConfig": "Cấu hình Hệ thống",
-    "systemConfigDesc": "Tùy chỉnh logo, tên website và các thông tin khác",
+    "systemConfigDesc": "Thay đổi cài đặt toàn trang web.",
     "userList": "Danh sách người dùng"
+  },
+  "adminPostsPage": {
+    "title": "Quản lý Tin đăng",
+    "allPosts": "Tất cả tin đăng"
+  },
+  "adminSettingsPage": {
+    "title": "Cài đặt Hệ thống",
+    "cardTitle": "Cài đặt chung",
+    "cardDescription": "Quản lý các cài đặt cơ bản cho toàn bộ trang web.",
+    "websiteName": "Tên Website",
+    "browserTitle": "Tiêu đề Trình duyệt",
+    "contactInfo": "Thông tin Liên hệ",
+    "websiteLogo": "Logo Website",
+    "favicon": "Favicon",
+    "saveChanges": "Lưu thay đổi"
+  },
+  "toasts": {
+    "linkCopied": "Đã sao chép liên kết!",
+    "adminSettingsLoadError": "Không thể tải cài đặt.",
+    "adminSavingSettings": "Đang lưu cài đặt...",
+    "adminLogoUploadError": "Tải logo thất bại: {{message}}",
+    "adminFaviconUploadError": "Tải favicon thất bại: {{message}}",
+    "adminSaveSettingsError": "Lưu cài đặt thất bại.",
+    "adminSaveSettingsSuccess": "Đã lưu cài đặt thành công."
+  },
+  "common": {
+    "na": "Chưa cập nhật"
   }
 }

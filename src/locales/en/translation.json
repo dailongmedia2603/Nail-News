@@ -3,17 +3,24 @@
     "tutorials": "Tutorials",
     "blog": "Blog",
     "post_ad": "Post Ad",
-    "login": "Log In",
-    "signup": "Sign Up",
     "logged_in_as": "Logged in as",
     "admin_dashboard": "Admin Dashboard",
     "profile": "Profile",
-    "logout": "Log Out"
+    "logout": "Logout",
+    "login": "Login",
+    "signup": "Sign Up"
   },
   "homePage": {
-    "title": "Search for News in the Nail Industry",
+    "title": "Search for Nail Industry News",
     "subtitle": "Discover the latest opportunities for salon sales, jobs, and training.",
-    "noPosts": "No listings found that match the filters."
+    "noPosts": "No matching posts found.",
+    "featuredPosts": "Featured Posts",
+    "viewAll": "View All"
+  },
+  "featuredPostsPage": {
+    "title": "Featured Posts",
+    "subtitle": "Posts with top display priority.",
+    "noPosts": "There are currently no featured posts."
   },
   "postCategories": {
     "all": "All",
@@ -43,33 +50,64 @@
     "salary": "Salary:",
     "salonStatus": "Salon Status:",
     "businessServices": "Business Services",
-    "location": "Location",
-    "address": "Address:",
-    "mapComingSoon": "Map will be integrated soon.<br/>(Requires API Key from Google Maps Platform to display)",
     "tagsKeywords": "Tags & Keywords",
-    "postNotFound": "Listing not found."
+    "location": "Location",
+    "address": "Address: <strong>{{address}}</strong>",
+    "mapComingSoon": "Map will be integrated soon.<br/>(Requires API Key from Google Maps Platform to display)",
+    "postNotFound": "This post could not be found."
+  },
+  "createPostPage": {
+    "title": "Create a New Post",
+    "subtitle": "Fill in the details below to post your ad."
   },
   "profilePage": {
     "accountInfoTitle": "Account Information",
     "accountInfoSubtitle": "Update your account information.",
     "changePasswordTitle": "Change Password",
-    "changePasswordSubtitle": "Click the button below to change your password.",
+    "changePasswordSubtitle": "Change your password here.",
     "changePasswordButton": "Change Password",
     "dialogTitle": "Change Password",
-    "dialogDescription": "For security, you will be logged out after successfully changing your password."
+    "dialogDescription": "After a successful password change, you will be asked to log in again."
   },
   "adminDashboardPage": {
     "title": "Admin Dashboard",
-    "managePosts": "Manage Listings",
-    "managePostsDesc": "View, edit, and delete all listings",
+    "managePosts": "Manage Posts",
+    "managePostsDesc": "View, edit, and delete all posts.",
     "manageBlog": "Manage Blog",
-    "manageBlogDesc": "Create and manage blog articles",
+    "manageBlogDesc": "Create and manage blog articles.",
     "manageCategories": "Manage Categories",
-    "manageCategoriesDesc": "Manage states and cities",
+    "manageCategoriesDesc": "Manage states and cities.",
     "manageTags": "Manage Tags",
-    "manageTagsDesc": "Manage tags and keywords",
+    "manageTagsDesc": "Manage tags and keywords.",
     "systemConfig": "System Configuration",
-    "systemConfigDesc": "Customize logo, website name, and other information",
+    "systemConfigDesc": "Change site-wide settings.",
     "userList": "User List"
+  },
+  "adminPostsPage": {
+    "title": "Manage Posts",
+    "allPosts": "All Posts"
+  },
+  "adminSettingsPage": {
+    "title": "System Settings",
+    "cardTitle": "General Settings",
+    "cardDescription": "Manage basic settings for the entire website.",
+    "websiteName": "Website Name",
+    "browserTitle": "Browser Title",
+    "contactInfo": "Contact Information",
+    "websiteLogo": "Website Logo",
+    "favicon": "Favicon",
+    "saveChanges": "Save Changes"
+  },
+  "toasts": {
+    "linkCopied": "Link copied!",
+    "adminSettingsLoadError": "Could not load settings.",
+    "adminSavingSettings": "Saving settings...",
+    "adminLogoUploadError": "Logo upload failed: {{message}}",
+    "adminFaviconUploadError": "Favicon upload failed: {{message}}",
+    "adminSaveSettingsError": "Failed to save settings.",
+    "adminSaveSettingsSuccess": "Settings saved successfully."
+  },
+  "common": {
+    "na": "N/A"
   }
 }

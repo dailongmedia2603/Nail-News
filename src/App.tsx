@@ -32,7 +32,8 @@ import CategoriesPage from "./pages/admin/CategoriesPage";
 import TagsPage from "./pages/admin/TagsPage";
 import SettingsPage from "./pages/admin/SettingsPage";
 import LoginHistoryPage from "./pages/LoginHistoryPage";
-import UpdatePasswordPage from "./pages/UpdatePasswordPage"; // Import trang mới
+import UpdatePasswordPage from "./pages/UpdatePasswordPage";
+import FeaturedPostsPage from "./pages/FeaturedPostsPage"; // Import trang mới
 
 const queryClient = new QueryClient();
 
@@ -65,6 +66,7 @@ const AppContent = () => {
         {/* Protected Routes */}
         <Route element={<ProtectedLayout />}>
           <Route path="/" element={<HomePage />} />
+          <Route path="/featured" element={<FeaturedPostsPage />} />
           <Route path="/create-post" element={<CreatePostPage />} />
           <Route path="/posts/:id" element={<PostDetailPage />} />
           <Route path="/posts/:id/edit" element={<EditPostPage />} />

@@ -6,9 +6,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { showError } from "@/utils/toast";
 import { PostSearch } from "@/components/PostSearch";
 import { PostFilters } from "@/components/PostFilters";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { saveActiveCategory, loadActiveCategory, saveFilters, loadFilters } from '@/lib/search-storage';
+import { Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const categories = [
   { value: "Tất cả", key: "postCategories.all" },
@@ -18,7 +20,8 @@ const categories = [
 
 const HomePage = () => {
   const { t } = useTranslation();
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [paidPosts, setPaidPosts] = useState<Post[]>([]);
+  const [regularPosts, setRegularPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<string>(loadActiveCategory);
   const [filters, setFilters] = useState<{ stateId: number | null; cityId: number | null; tagIds: number[] }>(loadFilters);
@@ -38,8 +41,27 @@ const HomePage = () => {
     if (error) {
       console.error("Lỗi lọc tin đăng:", error);
       showError("Không thể tải tin đăng.");
+      setPaidPosts([]);
+      setRegularPosts([]);
     } else {
-      setPosts(data || []);
+      const fetchedPosts = data || [];
+      const now = new Date();
+
+      const allPaidPosts = fetchedPosts.filter(p => 
+          (p.tier === 'vip' || p.tier === 'urgent') && 
+          p.expires_at && 
+          new Date(p.expires_at) > now
+      ).sort((a, b) => {
+          if (a.tier === 'vip' && b.tier !== 'vip') return -1;
+          if (a.tier !== 'vip' && b.tier === 'vip') return 1;
+          return 0;
+      });
+
+      const paidPostIds = new Set(allPaidPosts.map(p => p.id));
+      const allRegularPosts = fetchedPosts.filter(p => !paidPostIds.has(p.id));
+
+      setPaidPosts(allPaidPosts);
+      setRegularPosts(allRegularPosts);
     }
     setLoading(false);
   };
@@ -130,7 +152,7 @@ const HomePage = () => {
       <div className="mt-6">
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
+            {[...Array(9)].map((_, i) => (
               <div key={i} className="flex flex-col space-y-3">
                 <Skeleton className="h-[220px] w-full rounded-xl" />
               </div>
@@ -138,9 +160,36 @@ const HomePage = () => {
           </div>
         ) : (
           <>
-            {posts.length > 0 ? (
+            {paidPosts.length > 0 && (
+              <section className="mb-12">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-2xl font-bold flex items-center">
+                    <Star className="mr-2 h-6 w-6 text-yellow-500" />
+                    {t('homePage.featuredPosts')}
+                  </h2>
+                  {paidPosts.length > 6 && (
+                    <Button asChild variant="link">
+                      <Link to="/featured">{t('homePage.viewAll')}</Link>
+                    </Button>
+                  )}
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {paidPosts.slice(0, 6).map((post) => (
+                    <PostCard 
+                      key={post.id} 
+                      post={post} 
+                      isFavorited={favoritePostIds.has(post.id)}
+                      onFavoriteToggle={handleFavoriteToggle}
+                      onView={handleViewPost}
+                    />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {regularPosts.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {posts.map((post) => (
+                {regularPosts.map((post) => (
                   <PostCard 
                     key={post.id} 
                     post={post} 
@@ -154,6 +203,12 @@ const HomePage = () => {
               <div className="text-center py-16">
                 <p className="text-muted-foreground">{t('homePage.noPosts')}</p>
               </div>
+            )}
+
+            {paidPosts.length === 0 && regularPosts.length === 0 && (
+                 <div className="text-center py-16">
+                    <p className="text-muted-foreground">{t('homePage.noPosts')}</p>
+                </div>
             )}
           </>
         )}
