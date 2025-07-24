@@ -35,6 +35,8 @@ import LoginHistoryPage from "./pages/LoginHistoryPage";
 import UpdatePasswordPage from "./pages/UpdatePasswordPage";
 import FeaturedPostsPage from "./pages/FeaturedPostsPage";
 import DirectoryPage from "./pages/DirectoryPage";
+import PhotoGalleryPage from "./pages/PhotoGalleryPage";
+import AlbumDetailPage from "./pages/AlbumDetailPage";
 
 const queryClient = new QueryClient();
 
@@ -66,6 +68,8 @@ const AppContent = () => {
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/blog/:id" element={<BlogPostDetailPage />} />
         <Route path="/directory" element={<DirectoryPage />} />
+        <Route path="/photo-video" element={<PhotoGalleryPage />} />
+        <Route path="/photo-video/:id" element={<AlbumDetailPage />} />
 
         {/* Protected Routes - Must be logged in */}
         <Route element={<ProtectedLayout />}>

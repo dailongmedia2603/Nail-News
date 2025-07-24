@@ -21,7 +21,7 @@ const categories = [
   { value: "Tiệm nail", key: "postCategories.nailSalons", slug: "nail-salons", isDirectory: true },
   { value: "Nail supply", key: "postCategories.nailSupply", slug: "nail-supply", isDirectory: true },
   { value: "Renew license", key: "postCategories.renewLicense" },
-  { value: "Photo, video", key: "postCategories.photoVideo" },
+  { value: "Photo, video", key: "postCategories.photoVideo", slug: "/photo-video", isDirectory: true },
   { value: "Beauty school", key: "postCategories.beautySchool", slug: "beauty-school", isDirectory: true },
 ];
 
@@ -110,7 +110,11 @@ const HomePage = () => {
   const handleCategoryChange = (value: string) => {
     const category = categories.find(c => c.value === value);
     if (category?.isDirectory) {
-      navigate(`/directory?tab=${category.slug}`);
+      if (category.slug?.startsWith('/')) {
+        navigate(category.slug);
+      } else {
+        navigate(`/directory?tab=${category.slug}`);
+      }
     } else {
       setActiveCategory(value);
     }
