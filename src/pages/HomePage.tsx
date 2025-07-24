@@ -8,6 +8,7 @@ import { PostSearch } from "@/components/PostSearch";
 import { PostFilters } from "@/components/PostFilters";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { saveActiveCategory, loadActiveCategory, saveFilters, loadFilters } from '@/lib/search-storage';
 
 const categories = [
   { value: "Tất cả", key: "postCategories.all" },
@@ -19,8 +20,8 @@ const HomePage = () => {
   const { t } = useTranslation();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeCategory, setActiveCategory] = useState("Tất cả");
-  const [filters, setFilters] = useState<{ stateId: number | null; cityId: number | null; tagIds: number[] }>({ stateId: null, cityId: null, tagIds: [] });
+  const [activeCategory, setActiveCategory] = useState<string>(loadActiveCategory);
+  const [filters, setFilters] = useState<{ stateId: number | null; cityId: number | null; tagIds: number[] }>(loadFilters);
   const [favoritePostIds, setFavoritePostIds] = useState<Set<string>>(new Set());
   const navigate = useNavigate();
 
@@ -44,6 +45,8 @@ const HomePage = () => {
   };
 
   useEffect(() => {
+    saveActiveCategory(activeCategory);
+    saveFilters(filters);
     fetchPosts();
   }, [activeCategory, filters]);
 

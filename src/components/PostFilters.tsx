@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { SlidersHorizontal } from 'lucide-react';
+import { clearFilters } from '@/lib/search-storage';
 
 type State = { id: number; name: string; };
 type City = { id: number; name: string; state_id: number; };
@@ -66,6 +67,7 @@ export function PostFilters({ onFiltersApply }: PostFiltersProps) {
     setSelectedState(null);
     setSelectedCity(null);
     setSelectedTags([]);
+    clearFilters(); // Clear from localStorage
     onFiltersApply({ stateId: null, cityId: null, tagIds: [] });
     setIsOpen(false);
   };

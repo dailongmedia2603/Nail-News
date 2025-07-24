@@ -4,9 +4,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from '@/components/ui/command';
 import { type Post } from './PostCard';
 import { FileText, Loader2 } from 'lucide-react';
+import { saveSearchQuery, loadSearchQuery } from '@/lib/search-storage';
 
 export function PostSearch() {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState(loadSearchQuery);
   const [results, setResults] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -21,7 +22,6 @@ export function PostSearch() {
     setLoading(true);
     setIsOpen(true);
     
-    // Use the new RPC function for powerful searching
     const { data, error } = await supabase
       .rpc('search_posts', { search_term: searchQuery })
       .limit(10);
@@ -37,6 +37,7 @@ export function PostSearch() {
 
   useEffect(() => {
     const timerId = setTimeout(() => {
+      saveSearchQuery(query);
       performSearch(query);
     }, 300);
 
@@ -75,7 +76,7 @@ export function PostSearch() {
                 {results.map((post) => (
                   <CommandItem
                     key={post.id}
-                    value={post.id} // Use unique ID for value
+                    value={post.id}
                     onSelect={() => handleSelect(post.id)}
                     className="cursor-pointer"
                   >
