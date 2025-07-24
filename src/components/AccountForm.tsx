@@ -17,24 +17,26 @@ import { useEffect, useState } from "react";
 import { showLoading, showSuccess, showError, dismissToast } from "@/utils/toast";
 import { Skeleton } from "./ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useTranslation } from "react-i18next";
 
 const countryCodes = [
     { label: "USA (+1)", value: "+1" },
     { label: "Việt Nam (+84)", value: "+84" },
 ];
 
-const accountFormSchema = z.object({
-  first_name: z.string().min(1, "Họ không được để trống."),
-  last_name: z.string().min(1, "Tên không được để trống."),
-  email: z.string().email(),
-  country_code: z.string(),
-  phone: z.string().regex(/^\d*$/, "Số điện thoại chỉ được chứa số.").optional().or(z.literal('')),
-});
-
-type AccountFormValues = z.infer<typeof accountFormSchema>;
-
 export function AccountForm() {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
+
+  const accountFormSchema = z.object({
+    first_name: z.string().min(1, t('accountForm.validation.firstNameRequired')),
+    last_name: z.string().min(1, t('accountForm.validation.lastNameRequired')),
+    email: z.string().email(),
+    country_code: z.string(),
+    phone: z.string().regex(/^\d*$/, t('accountForm.validation.phoneInvalid')).optional().or(z.literal('')),
+  });
+
+  type AccountFormValues = z.infer<typeof accountFormSchema>;
 
   const form = useForm<AccountFormValues>({
     resolver: zodResolver(accountFormSchema),
@@ -60,7 +62,7 @@ export function AccountForm() {
 
         if (error && error.code !== 'PGRST116') {
           console.error("Lỗi tải hồ sơ:", error);
-          showError("Không thể tải thông tin hồ sơ.");
+          showError(t('toasts.profileLoadError'));
         } else {
             const phone = user.phone || '';
             let countryCode = '+84';
@@ -87,19 +89,18 @@ export function AccountForm() {
     };
 
     fetchProfile();
-  }, [form]);
+  }, [form, t]);
 
   async function onSubmit(data: AccountFormValues) {
-    const toastId = showLoading("Đang cập nhật thông tin...");
+    const toastId = showLoading(t('toasts.updatingInfo'));
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
         dismissToast(toastId);
-        showError("Không tìm thấy người dùng. Vui lòng đăng nhập lại.");
+        showError(t('toasts.userNotFound'));
         return;
     }
 
-    // Update phone by invoking an Edge Function
     const phoneToUpdate = data.phone ? data.country_code + data.phone : '';
     const { error: functionError } = await supabase.functions.invoke('update-phone', {
         body: { phone: phoneToUpdate },
@@ -107,11 +108,10 @@ export function AccountForm() {
 
     if (functionError) {
         dismissToast(toastId);
-        showError("Cập nhật số điện thoại thất bại: " + functionError.message);
+        showError(t('toasts.phoneUpdateError', { message: functionError.message }));
         return;
     }
 
-    // Update profile in public.profiles
     const { error: profileError } = await supabase
       .from("profiles")
       .update({
@@ -122,9 +122,9 @@ export function AccountForm() {
 
     dismissToast(toastId);
     if (profileError) {
-      showError("Cập nhật họ tên thất bại: " + profileError.message);
+      showError(t('toasts.profileUpdateError', { message: profileError.message }));
     } else {
-      showSuccess("Cập nhật thông tin thành công!");
+      showSuccess(t('toasts.profileUpdateSuccess'));
     }
   }
 
@@ -147,12 +147,12 @@ export function AccountForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>{t('accountForm.email')}</FormLabel>
               <FormControl>
                 <Input {...field} readOnly disabled />
               </FormControl>
               <FormDescription>
-                Bạn không thể thay đổi email của mình.
+                {t('accountForm.emailDescription')}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -164,9 +164,9 @@ export function AccountForm() {
             name="first_name"
             render={({ field }) => (
                 <FormItem>
-                <FormLabel>Họ</FormLabel>
+                <FormLabel>{t('accountForm.firstName')}</FormLabel>
                 <FormControl>
-                    <Input placeholder="Họ của bạn" {...field} />
+                    <Input placeholder={t('accountForm.firstNamePlaceholder')} {...field} />
                 </FormControl>
                 <FormMessage />
                 </FormItem>
@@ -177,9 +177,9 @@ export function AccountForm() {
             name="last_name"
             render={({ field }) => (
                 <FormItem>
-                <FormLabel>Tên</FormLabel>
+                <FormLabel>{t('accountForm.lastName')}</FormLabel>
                 <FormControl>
-                    <Input placeholder="Tên của bạn" {...field} />
+                    <Input placeholder={t('accountForm.lastNamePlaceholder')} {...field} />
                 </FormControl>
                 <FormMessage />
                 </FormItem>
@@ -187,7 +187,7 @@ export function AccountForm() {
             />
         </div>
         <FormItem>
-            <FormLabel>Số điện thoại</FormLabel>
+            <FormLabel>{t('accountForm.phone')}</FormLabel>
             <div className="flex gap-2">
                 <FormField
                     control={form.control}
@@ -196,7 +196,7 @@ export function AccountForm() {
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl className="w-[140px]">
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Mã vùng" />
+                                    <SelectValue placeholder={t('accountForm.countryCode')} />
                                 </SelectTrigger>
                             </FormControl>
                             <SelectContent>
@@ -210,14 +210,14 @@ export function AccountForm() {
                     name="phone"
                     render={({ field }) => (
                         <FormControl>
-                            <Input placeholder="Số điện thoại" {...field} />
+                            <Input placeholder={t('accountForm.phonePlaceholder')} {...field} />
                         </FormControl>
                     )}
                 />
             </div>
             <FormMessage>{form.formState.errors.phone?.message}</FormMessage>
         </FormItem>
-        <Button type="submit" disabled={form.formState.isSubmitting}>Cập nhật hồ sơ</Button>
+        <Button type="submit" disabled={form.formState.isSubmitting}>{t('accountForm.updateProfile')}</Button>
       </form>
     </Form>
   );
