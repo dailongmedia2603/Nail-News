@@ -22,6 +22,14 @@ import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
 import { TagSelector } from './TagSelector';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 type State = { id: number; name: string; };
 type City = { id: number; name: string; state_id: number; };
@@ -57,6 +65,7 @@ const servicesList = [
 export function EditPostForm({ postId }: { postId: string }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [lastError, setLastError] = useState<string | null>(null);
   const navigate = useNavigate();
   const [states, setStates] = useState<State[]>([]);
   const [cities, setCities] = useState<City[]>([]);
@@ -120,6 +129,7 @@ export function EditPostForm({ postId }: { postId: string }) {
   }, [selectedStateId, cities, formMethods, isLoading]);
 
   async function onSubmit(data: EditPostFormValues) {
+    setLastError(null);
     const toastId = showLoading("Đang cập nhật tin đăng...");
     setIsSubmitting(true);
 
@@ -138,7 +148,9 @@ export function EditPostForm({ postId }: { postId: string }) {
 
     if (updateError) {
       dismissToast(toastId);
-      showError(`Cập nhật thất bại: ${updateError.message}`);
+      const errorMessage = `Cập nhật thất bại. Nhấp vào 'Xem Log Lỗi' để biết chi tiết.`;
+      showError(errorMessage);
+      setLastError(JSON.stringify(updateError, null, 2));
       setIsSubmitting(false);
       return;
     }
@@ -258,10 +270,36 @@ export function EditPostForm({ postId }: { postId: string }) {
             <TagSelector name="tags" />
             <FormDescription>Chọn các tag phù hợp để người dùng dễ dàng tìm thấy tin của bạn.</FormDescription>
           </FormItem>
-          <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Lưu thay đổi
-          </Button>
+          
+          <div className="flex items-center gap-4">
+            <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Lưu thay đổi
+            </Button>
+
+            {lastError && (
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button type="button" variant="outline" className="text-destructive border-destructive hover:bg-destructive/10 hover:text-destructive">
+                            Xem Log Lỗi
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl">
+                        <DialogHeader>
+                            <DialogTitle>Chi Tiết Lỗi Gửi Lên Server</DialogTitle>
+                            <DialogDescription>
+                                Đây là thông tin lỗi chi tiết được trả về từ máy chủ Supabase. Vui lòng sao chép và gửi cho bộ phận kỹ thuật nếu cần.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="mt-4 bg-muted p-4 rounded-md max-h-[60vh] overflow-auto">
+                            <pre className="text-sm whitespace-pre-wrap break-words">
+                                <code>{lastError}</code>
+                            </pre>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+            )}
+          </div>
         </form>
       </Form>
     </FormProvider>
