@@ -33,7 +33,7 @@ import TagsPage from "./pages/admin/TagsPage";
 import SettingsPage from "./pages/admin/SettingsPage";
 import LoginHistoryPage from "./pages/LoginHistoryPage";
 import UpdatePasswordPage from "./pages/UpdatePasswordPage";
-import FeaturedPostsPage from "./pages/FeaturedPostsPage"; // Import trang mới
+import FeaturedPostsPage from "./pages/FeaturedPostsPage";
 
 const queryClient = new QueryClient();
 
@@ -58,17 +58,17 @@ const AppContent = () => {
       <Route path="/update-password" element={<UpdatePasswordPage />} />
       
       <Route element={<AppLayout />}>
-        {/* Public Routes */}
+        {/* Public Routes - Everyone can see these */}
+        <Route path="/" element={<HomePage />} />
+        <Route path="/posts/:id" element={<PostDetailPage />} />
         <Route path="/tutorials" element={<TutorialsPage />} />
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/blog/:id" element={<BlogPostDetailPage />} />
 
-        {/* Protected Routes */}
+        {/* Protected Routes - Must be logged in */}
         <Route element={<ProtectedLayout />}>
-          <Route path="/" element={<HomePage />} />
           <Route path="/featured" element={<FeaturedPostsPage />} />
           <Route path="/create-post" element={<CreatePostPage />} />
-          <Route path="/posts/:id" element={<PostDetailPage />} />
           <Route path="/posts/:id/edit" element={<EditPostPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/profile/favorites" element={<FavoritesPage />} />
@@ -77,7 +77,7 @@ const AppContent = () => {
           <Route path="/profile/my-posts" element={<MyPostsPage />} />
           <Route path="/profile/history" element={<LoginHistoryPage />} />
 
-          {/* Admin Routes */}
+          {/* Admin Routes - Must be logged in as admin */}
           <Route path="/admin" element={<AdminLayout />}>
             <Route path="dashboard" element={<AdminDashboardPage />} />
             <Route path="posts" element={<AdminPostsPage />} />
