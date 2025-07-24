@@ -7,8 +7,9 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "./ui/button";
-import { Heart, MapPin, Square, Armchair, Table, DollarSign, Clock, Store, Eye } from "lucide-react";
+import { Heart, MapPin, Square, Armchair, Table, DollarSign, Clock, Store, Eye, Star, Zap } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { cn } from "@/lib/utils";
 
 export type Post = {
   id: string;
@@ -40,9 +41,10 @@ interface PostCardProps {
   isFavorited: boolean;
   onFavoriteToggle: (postId: string, isCurrentlyFavorited: boolean) => void;
   onView: (postId: string) => void;
+  isFeatured?: boolean;
 }
 
-export function PostCard({ post, isFavorited, onFavoriteToggle, onView }: PostCardProps) {
+export function PostCard({ post, isFavorited, onFavoriteToggle, onView, isFeatured = false }: PostCardProps) {
   const { t } = useTranslation();
 
   const getCategoryTranslationKey = (category: string | null) => {
@@ -65,7 +67,13 @@ export function PostCard({ post, isFavorited, onFavoriteToggle, onView }: PostCa
   };
 
   return (
-    <Card className="flex flex-col h-full cursor-pointer" onClick={() => onView(post.id)}>
+    <Card 
+      className={cn(
+        "flex flex-col h-full cursor-pointer transition-all",
+        isFeatured && "border-primary/50 bg-primary/5"
+      )} 
+      onClick={() => onView(post.id)}
+    >
       <CardHeader>
         <div className="flex justify-between items-start gap-2">
             <CardTitle className="text-lg hover:underline">{post.title}</CardTitle>
@@ -73,7 +81,19 @@ export function PostCard({ post, isFavorited, onFavoriteToggle, onView }: PostCa
             <Heart className={`h-5 w-5 transition-colors ${isFavorited ? 'text-red-500 fill-current' : 'text-gray-400'}`} />
           </Button>
         </div>
-        {post.category && ( <Badge variant={getCategoryVariant(post.category)} className="w-fit mt-1">{t(getCategoryTranslationKey(post.category))}</Badge> )}
+        <div className="flex items-center gap-2 flex-wrap mt-1">
+            {post.category && ( <Badge variant={getCategoryVariant(post.category)} className="w-fit">{t(getCategoryTranslationKey(post.category))}</Badge> )}
+            {isFeatured && post.tier === 'vip' && (
+                <Badge variant="default" className="bg-yellow-500 text-black hover:bg-yellow-600">
+                <Star className="mr-1 h-3 w-3" /> VIP
+                </Badge>
+            )}
+            {isFeatured && post.tier === 'urgent' && (
+                <Badge variant="default" className="bg-orange-500 text-white hover:bg-orange-600">
+                <Zap className="mr-1 h-3 w-3" /> Gấp
+                </Badge>
+            )}
+        </div>
       </CardHeader>
       <CardContent className="flex-grow">
         <p className="text-sm text-muted-foreground line-clamp-3">{post.description}</p>

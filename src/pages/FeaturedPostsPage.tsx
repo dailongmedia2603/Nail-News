@@ -114,6 +114,7 @@ const FeaturedPostsPage = () => {
                     isFavorited={favoritePostIds.has(post.id)}
                     onFavoriteToggle={handleFavoriteToggle}
                     onView={handleViewPost}
+                    isFeatured={true}
                   />
                 ))}
               </div>

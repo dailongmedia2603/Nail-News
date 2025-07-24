@@ -181,28 +181,30 @@ const HomePage = () => {
                       isFavorited={favoritePostIds.has(post.id)}
                       onFavoriteToggle={handleFavoriteToggle}
                       onView={handleViewPost}
+                      isFeatured={true}
                     />
                   ))}
                 </div>
               </section>
             )}
 
-            {regularPosts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {regularPosts.map((post) => (
-                  <PostCard 
-                    key={post.id} 
-                    post={post} 
-                    isFavorited={favoritePostIds.has(post.id)}
-                    onFavoriteToggle={handleFavoriteToggle}
-                    onView={handleViewPost}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-16">
-                <p className="text-muted-foreground">{t('homePage.noPosts')}</p>
-              </div>
+            {regularPosts.length > 0 && (
+              <section>
+                <h2 className="text-2xl font-bold mb-4">
+                  {t('homePage.latestPosts')}
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {regularPosts.map((post) => (
+                    <PostCard 
+                      key={post.id} 
+                      post={post} 
+                      isFavorited={favoritePostIds.has(post.id)}
+                      onFavoriteToggle={handleFavoriteToggle}
+                      onView={handleViewPost}
+                    />
+                  ))}
+                </div>
+              </section>
             )}
 
             {paidPosts.length === 0 && regularPosts.length === 0 && (
