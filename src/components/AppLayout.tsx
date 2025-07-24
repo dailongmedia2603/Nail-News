@@ -2,12 +2,8 @@ import { Outlet } from "react-router-dom";
 import Header from "./Header";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useTranslation } from "react-i18next";
-import { transformTranslations } from "@/utils/translation-transformer";
 
 const AppLayout = () => {
-  const { i18n } = useTranslation();
-
   useEffect(() => {
     const fetchAndApplyBranding = async () => {
       const { data, error } = await supabase

@@ -27,15 +27,68 @@
     "hours": "Hours: {{hours}}",
     "status": "Salon: {{status}}"
   },
-  "postFilters": {
-    "title": "Filter Listings",
+  "postDetailPage": {
+    "postedOn": "Posted on {{date}}",
+    "views": "{{count}} views",
+    "detailedDescription": "Detailed Description",
+    "basicInfo": "Basic Information",
+    "area": "Area:",
+    "chairs": "Chairs:",
+    "tables": "Tables:",
+    "staff": "Staff:",
+    "scaleInfo": "Scale Information",
+    "revenue": "Revenue:",
+    "hours": "Operating Hours:",
+    "jobInfo": "Job Information",
+    "salary": "Salary:",
+    "salonStatus": "Salon Status:",
+    "businessServices": "Business Services",
     "location": "Location",
-    "selectState": "Select state",
-    "selectCity": "Select city",
-    "tagsKeywords": "Tags & Keywords"
+    "address": "Address:",
+    "mapComingSoon": "Map will be integrated soon.<br/>(Requires API Key from Google Maps Platform to display)",
+    "tagsKeywords": "Tags & Keywords",
+    "postNotFound": "Listing not found."
+  },
+  "profileLayout": {
+    "accountInfo": "Account Information",
+    "myWallet": "My Wallet",
+    "myPosts": "Manage Listings",
+    "favorites": "Favorites",
+    "location": "Location",
+    "loginHistory": "Login History"
+  },
+  "myPostsPage": {
+    "title": "Manage Listings",
+    "subtitle": "View, edit, or delete the listings you have posted.",
+    "headerTitle": "Title"
+  },
+  "adminDashboardPage": {
+    "title": "Admin Dashboard",
+    "managePosts": "Manage Listings",
+    "managePostsDesc": "View, edit, and delete all listings",
+    "manageBlog": "Manage Blog",
+    "manageBlogDesc": "Create and manage blog articles",
+    "manageCategories": "Manage Categories",
+    "manageCategoriesDesc": "Manage states and cities",
+    "manageTags": "Manage Tags",
+    "manageTagsDesc": "Manage tags and keywords",
+    "systemConfig": "System Configuration",
+    "systemConfigDesc": "Customize logo, website name, and other information",
+    "userList": "User List",
+    "headerName": "Name",
+    "headerEmail": "Email",
+    "headerPhone": "Phone",
+    "headerRole": "Role",
+    "headerBalance": "Balance",
+    "headerJoined": "Date Joined",
+    "headerActions": "Actions",
+    "changeRole": "Change Role",
+    "changeRoleDialogTitle": "Change role for {{name}}",
+    "changeRoleDialogDesc": "Select a new role for this user."
   },
   "common": {
-    "apply": "Apply",
-    "resetFilters": "Reset Filters"
+    "na": "N/A",
+    "save": "Save",
+    "cancel": "Cancel"
   }
 }
