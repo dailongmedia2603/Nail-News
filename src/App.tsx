@@ -2,7 +2,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import HomePage from "./pages/HomePage";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
@@ -29,9 +31,68 @@ import BlogPostDetailPage from "./pages/BlogPostDetailPage";
 import CategoriesPage from "./pages/admin/CategoriesPage";
 import TagsPage from "./pages/admin/TagsPage";
 import SettingsPage from "./pages/admin/SettingsPage";
-import LoginHistoryPage from "./pages/LoginHistoryPage"; // Import trang mới
+import LoginHistoryPage from "./pages/LoginHistoryPage";
+import UpdatePasswordPage from "./pages/UpdatePasswordPage"; // Import trang mới
 
 const queryClient = new QueryClient();
+
+const AppContent = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        navigate('/update-password');
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
+  return (
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<SignUp />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/update-password" element={<UpdatePasswordPage />} />
+      
+      <Route element={<AppLayout />}>
+        {/* Public Routes */}
+        <Route path="/tutorials" element={<TutorialsPage />} />
+        <Route path="/blog" element={<BlogPage />} />
+        <Route path="/blog/:id" element={<BlogPostDetailPage />} />
+
+        {/* Protected Routes */}
+        <Route element={<ProtectedLayout />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/create-post" element={<CreatePostPage />} />
+          <Route path="/posts/:id" element={<PostDetailPage />} />
+          <Route path="/posts/:id/edit" element={<EditPostPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/profile/favorites" element={<FavoritesPage />} />
+          <Route path="/profile/location" element={<LocationPage />} />
+          <Route path="/profile/wallet" element={<WalletPage />} />
+          <Route path="/profile/my-posts" element={<MyPostsPage />} />
+          <Route path="/profile/history" element={<LoginHistoryPage />} />
+
+          {/* Admin Routes */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route path="dashboard" element={<AdminDashboardPage />} />
+            <Route path="posts" element={<AdminPostsPage />} />
+            <Route path="blog" element={<AdminBlogPage />} />
+            <Route path="blog/new" element={<BlogPostEditorPage />} />
+            <Route path="blog/:id/edit" element={<BlogPostEditorPage />} />
+            <Route path="categories" element={<CategoriesPage />} />
+            <Route path="tags" element={<TagsPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+          </Route>
+        </Route>
+      </Route>
+
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -39,46 +100,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          
-          <Route element={<AppLayout />}>
-            {/* Public Routes */}
-            <Route path="/tutorials" element={<TutorialsPage />} />
-            <Route path="/blog" element={<BlogPage />} />
-            <Route path="/blog/:id" element={<BlogPostDetailPage />} />
-
-            {/* Protected Routes */}
-            <Route element={<ProtectedLayout />}>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/create-post" element={<CreatePostPage />} />
-              <Route path="/posts/:id" element={<PostDetailPage />} />
-              <Route path="/posts/:id/edit" element={<EditPostPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/profile/favorites" element={<FavoritesPage />} />
-              <Route path="/profile/location" element={<LocationPage />} />
-              <Route path="/profile/wallet" element={<WalletPage />} />
-              <Route path="/profile/my-posts" element={<MyPostsPage />} />
-              <Route path="/profile/history" element={<LoginHistoryPage />} /> {/* Thêm route mới */}
-
-              {/* Admin Routes */}
-              <Route path="/admin" element={<AdminLayout />}>
-                <Route path="dashboard" element={<AdminDashboardPage />} />
-                <Route path="posts" element={<AdminPostsPage />} />
-                <Route path="blog" element={<AdminBlogPage />} />
-                <Route path="blog/new" element={<BlogPostEditorPage />} />
-                <Route path="blog/:id/edit" element={<BlogPostEditorPage />} />
-                <Route path="categories" element={<CategoriesPage />} />
-                <Route path="tags" element={<TagsPage />} />
-                <Route path="settings" element={<SettingsPage />} />
-              </Route>
-            </Route>
-          </Route>
-
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AppContent />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
