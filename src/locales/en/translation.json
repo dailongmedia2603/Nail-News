@@ -49,18 +49,14 @@
     "tagsKeywords": "Tags & Keywords",
     "postNotFound": "Listing not found."
   },
-  "profileLayout": {
-    "accountInfo": "Account Information",
-    "myWallet": "My Wallet",
-    "myPosts": "Manage Listings",
-    "favorites": "Favorites",
-    "location": "Location",
-    "loginHistory": "Login History"
-  },
-  "myPostsPage": {
-    "title": "Manage Listings",
-    "subtitle": "View, edit, or delete the listings you have posted.",
-    "headerTitle": "Title"
+  "profilePage": {
+    "accountInfoTitle": "Account Information",
+    "accountInfoSubtitle": "Update your account information.",
+    "changePasswordTitle": "Change Password",
+    "changePasswordSubtitle": "Click the button below to change your password.",
+    "changePasswordButton": "Change Password",
+    "dialogTitle": "Change Password",
+    "dialogDescription": "For security, you will be logged out after successfully changing your password."
   },
   "adminDashboardPage": {
     "title": "Admin Dashboard",
@@ -74,21 +70,6 @@
     "manageTagsDesc": "Manage tags and keywords",
     "systemConfig": "System Configuration",
     "systemConfigDesc": "Customize logo, website name, and other information",
-    "userList": "User List",
-    "headerName": "Name",
-    "headerEmail": "Email",
-    "headerPhone": "Phone",
-    "headerRole": "Role",
-    "headerBalance": "Balance",
-    "headerJoined": "Date Joined",
-    "headerActions": "Actions",
-    "changeRole": "Change Role",
-    "changeRoleDialogTitle": "Change role for {{name}}",
-    "changeRoleDialogDesc": "Select a new role for this user."
-  },
-  "common": {
-    "na": "N/A",
-    "save": "Save",
-    "cancel": "Cancel"
+    "userList": "User List"
   }
 }

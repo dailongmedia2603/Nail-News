@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MoreHorizontal, UserCog, List, Newspaper, FolderKanban, Tags, Settings, Languages } from "lucide-react";
+import { MoreHorizontal, UserCog, List, Newspaper, FolderKanban, Tags, Settings } from "lucide-react";
 import { format } from "date-fns";
 import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
 import { Label } from "@/components/ui/label";
@@ -39,7 +39,7 @@ const AdminDashboardPage = () => {
     setLoading(true);
     const { data, error } = await supabase.rpc('get_all_users');
     if (error) {
-      showError(t('toasts.adminUserLoadError', { message: error.message }));
+      showError("Không thể tải danh sách người dùng: " + error.message);
     } else {
       setUsers(data || []);
     }
@@ -52,7 +52,7 @@ const AdminDashboardPage = () => {
 
   const handleRoleChange = async () => {
     if (!selectedUser) return;
-    const toastId = showLoading(t('toasts.adminUpdatingRole'));
+    const toastId = showLoading("Đang cập nhật vai trò...");
 
     const { error } = await supabase.functions.invoke('set-user-role', {
       body: { user_id: selectedUser.id, new_role: newRole },
@@ -60,9 +60,9 @@ const AdminDashboardPage = () => {
 
     dismissToast(toastId);
     if (error) {
-      showError(t('toasts.adminUpdateRoleError', { message: error.message }));
+      showError("Cập nhật vai trò thất bại: " + error.message);
     } else {
-      showSuccess(t('toasts.adminUpdateRoleSuccess'));
+      showSuccess("Cập nhật vai trò thành công!");
       setUsers(users.map(u => u.id === selectedUser.id ? { ...u, role: newRole } : u));
       setIsRoleDialogOpen(false);
     }
@@ -94,10 +94,6 @@ const AdminDashboardPage = () => {
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">{t('adminDashboardPage.systemConfig')}</CardTitle><Settings className="h-4 w-4 text-muted-foreground" /></CardHeader>
             <CardContent><p className="text-xs text-muted-foreground">{t('adminDashboardPage.systemConfigDesc')}</p></CardContent>
         </Card>
-        <Card className="cursor-pointer hover:bg-muted" onClick={() => navigate('/admin/translations')}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Quản lý Dịch thuật</CardTitle><Languages className="h-4 w-4 text-muted-foreground" /></CardHeader>
-            <CardContent><p className="text-xs text-muted-foreground">Chỉnh sửa nội dung đa ngôn ngữ</p></CardContent>
-        </Card>
       </div>
       <Card>
         <CardHeader><CardTitle>{t('adminDashboardPage.userList')}</CardTitle></CardHeader>
@@ -106,13 +102,13 @@ const AdminDashboardPage = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t('adminDashboardPage.headerName')}</TableHead>
-                  <TableHead>{t('adminDashboardPage.headerEmail')}</TableHead>
-                  <TableHead>{t('adminDashboardPage.headerPhone')}</TableHead>
-                  <TableHead>{t('adminDashboardPage.headerRole')}</TableHead>
-                  <TableHead>{t('adminDashboardPage.headerBalance')}</TableHead>
-                  <TableHead>{t('adminDashboardPage.headerJoined')}</TableHead>
-                  <TableHead className="text-right">{t('adminDashboardPage.headerActions')}</TableHead>
+                  <TableHead>Họ và Tên</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Số điện thoại</TableHead>
+                  <TableHead>Vai trò</TableHead>
+                  <TableHead>Số dư</TableHead>
+                  <TableHead>Ngày tham gia</TableHead>
+                  <TableHead className="text-right">Hành động</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -120,7 +116,7 @@ const AdminDashboardPage = () => {
                   <TableRow key={user.id}>
                     <TableCell>{user.first_name} {user.last_name}</TableCell>
                     <TableCell>{user.email}</TableCell>
-                    <TableCell>{user.phone || t('common.na')}</TableCell>
+                    <TableCell>{user.phone || 'N/A'}</TableCell>
                     <TableCell><Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>{user.role}</Badge></TableCell>
                     <TableCell>{formatCurrency(user.balance)}</TableCell>
                     <TableCell>{format(new Date(user.created_at), 'dd/MM/yyyy')}</TableCell>
@@ -130,7 +126,7 @@ const AdminDashboardPage = () => {
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onSelect={() => { setSelectedUser(user); setNewRole(user.role as any); setIsRoleDialogOpen(true); }}>
                             <UserCog className="mr-2 h-4 w-4" />
-                            {t('adminDashboardPage.changeRole')}
+                            Thay đổi vai trò
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -146,11 +142,11 @@ const AdminDashboardPage = () => {
       <AlertDialog open={isRoleDialogOpen} onOpenChange={setIsRoleDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('adminDashboardPage.changeRoleDialogTitle', { name: `${selectedUser?.first_name} ${selectedUser?.last_name}` })}</AlertDialogTitle>
-            <AlertDialogDescription>{t('adminDashboardPage.changeRoleDialogDesc')}</AlertDialogDescription>
+            <AlertDialogTitle>Thay đổi vai trò cho {selectedUser?.first_name} {selectedUser?.last_name}</AlertDialogTitle>
+            <AlertDialogDescription>Chọn vai trò mới cho người dùng này.</AlertDialogDescription>
           </AlertDialogHeader>
           <div className="py-4">
-            <Label htmlFor="role-select">{t('adminDashboardPage.headerRole')}</Label>
+            <Label htmlFor="role-select">Vai trò</Label>
             <Select value={newRole} onValueChange={(value) => setNewRole(value as any)}>
               <SelectTrigger id="role-select" className="w-full mt-2">
                 <SelectValue />
@@ -162,8 +158,8 @@ const AdminDashboardPage = () => {
             </Select>
           </div>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleRoleChange}>{t('common.save')}</AlertDialogAction>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
+            <AlertDialogAction onClick={handleRoleChange}>Lưu thay đổi</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

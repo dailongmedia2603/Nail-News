@@ -16,6 +16,7 @@ const AppLayout = () => {
         return;
       }
 
+      // Define the type for the settings object to fix the TypeScript errors
       type BrandingSettings = { [key: string]: string };
       const settings: BrandingSettings = data.reduce((acc, { key, value }) => ({ ...acc, [key]: value }), {});
 

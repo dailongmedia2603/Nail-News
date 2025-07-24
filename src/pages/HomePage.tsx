@@ -61,7 +61,35 @@ const HomePage = () => {
   }, []);
 
   const handleFavoriteToggle = async (postId: string, isCurrentlyFavorited: boolean) => {
-    // ... implementation
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      showError("Bạn cần đăng nhập để thực hiện hành động này.");
+      return;
+    }
+
+    if (isCurrentlyFavorited) {
+      setFavoritePostIds(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(postId);
+        return newSet;
+      });
+      const { error } = await supabase.from('favorites').delete().match({ user_id: user.id, post_id: postId });
+      if (error) {
+        showError("Bỏ yêu thích thất bại.");
+        setFavoritePostIds(prev => new Set(prev).add(postId));
+      }
+    } else {
+      setFavoritePostIds(prev => new Set(prev).add(postId));
+      const { error } = await supabase.from('favorites').insert({ user_id: user.id, post_id: postId });
+      if (error) {
+        showError("Yêu thích thất bại.");
+        setFavoritePostIds(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(postId);
+          return newSet;
+        });
+      }
+    }
   };
   
   const handleViewPost = async (postId: string) => {

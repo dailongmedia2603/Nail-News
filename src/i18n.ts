@@ -20,8 +20,6 @@ i18n
     interpolation: {
       escapeValue: false, // React already safes from xss
     },
-    // Add this option to handle nested keys like 'header.title'
-    keySeparator: '.', 
   });
 
 export default i18n;
