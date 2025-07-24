@@ -40,6 +40,8 @@ const MyPostsPage = () => {
   const [renewalTier, setRenewalTier] = useState<'urgent' | 'vip'>('urgent');
   const [renewalDuration, setRenewalDuration] = useState<number>(3);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [renewalPaymentMethod, setRenewalPaymentMethod] = useState<'wallet' | 'stripe'>('wallet');
+  const [userBalance, setUserBalance] = useState<number | null>(null);
   const navigate = useNavigate();
 
   const totalCost = useMemo(() => {
@@ -71,6 +73,9 @@ const MyPostsPage = () => {
     
     if (transactionError) showError("Không thể tải lịch sử giao dịch.");
     else setTransactions(transactionData || []);
+
+    const { data: profile } = await supabase.from('profiles').select('balance').eq('id', user.id).single();
+    setUserBalance(profile?.balance ?? 0);
 
     setLoading(false);
   };
@@ -107,25 +112,34 @@ const MyPostsPage = () => {
 
   const handleRenew = async () => {
     if (!dialogState.post) return;
-    const { data: intentData, error } = await supabase.functions.invoke('create-payment-intent', {
-      body: { amount: totalCost },
-    });
-    if (error) {
-      let errorMessage = error.message;
-      try {
-        const errorBody = await error.context.json();
-        if (errorBody.error) {
-          errorMessage = errorBody.error;
-        }
-      } catch (e) { /* Ignore parsing errors */ }
-      showError(`Không thể tạo phiên thanh toán: ${errorMessage}`);
-      return;
+
+    if (renewalPaymentMethod === 'wallet') {
+      if (userBalance === null || userBalance < totalCost) {
+        showError("Số dư trong ví không đủ.");
+        return;
+      }
+      await handlePaymentSuccess();
+    } else { // Stripe payment
+      const { data: intentData, error } = await supabase.functions.invoke('create-payment-intent', {
+        body: { amount: totalCost },
+      });
+      if (error) {
+        let errorMessage = error.message;
+        try {
+          const errorBody = await error.context.json();
+          if (errorBody.error) {
+            errorMessage = errorBody.error;
+          }
+        } catch (e) { /* Ignore parsing errors */ }
+        showError(`Không thể tạo phiên thanh toán: ${errorMessage}`);
+        return;
+      }
+      if (!intentData.clientSecret) {
+        showError("Không nhận được mã thanh toán từ máy chủ. Vui lòng thử lại.");
+        return;
+      }
+      setClientSecret(intentData.clientSecret);
     }
-    if (!intentData.clientSecret) {
-      showError("Không nhận được mã thanh toán từ máy chủ. Vui lòng thử lại.");
-      return;
-    }
-    setClientSecret(intentData.clientSecret);
   };
 
   const handlePaymentSuccess = async () => {
@@ -149,6 +163,11 @@ const MyPostsPage = () => {
       dismissToast(toastId);
       showError("Gia hạn thất bại: " + postUpdateError.message);
       return;
+    }
+
+    if (renewalPaymentMethod === 'wallet') {
+        const newBalance = (userBalance ?? 0) - totalCost;
+        await supabase.from('profiles').update({ balance: newBalance }).eq('id', user.id);
     }
 
     await supabase.from('transactions').insert({
@@ -189,7 +208,10 @@ const MyPostsPage = () => {
     return tierName;
   };
 
-  const formatCurrency = (amount: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+  const formatCurrency = (amount: number | null) => {
+    if (amount === null) return 'Đang tải...';
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+  };
 
   return (
     <ProfileLayout>
@@ -325,9 +347,23 @@ const MyPostsPage = () => {
                     <p className="text-2xl font-bold">{formatCurrency(totalCost)}</p>
                   </div>
                 </div>
+                <RadioGroup onValueChange={(value) => setRenewalPaymentMethod(value as any)} defaultValue={renewalPaymentMethod} className="space-y-2">
+                  <Label>Phương thức thanh toán</Label>
+                  <div className="flex items-center space-x-3 space-y-0 rounded-md border bg-background p-4 has-[:checked]:border-primary">
+                    <RadioGroupItem value="wallet" />
+                    <Label htmlFor="r-wallet" className="font-normal w-full">
+                      Thanh toán từ ví
+                      <span className="block text-sm text-muted-foreground">Số dư: {formatCurrency(userBalance)}</span>
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-3 space-y-0 rounded-md border bg-background p-4 has-[:checked]:border-primary">
+                    <RadioGroupItem value="stripe" />
+                    <Label htmlFor="r-stripe" className="font-normal">Thanh toán trực tiếp (Stripe)</Label>
+                  </div>
+                </RadioGroup>
               </div>
               <DialogFooter>
-                <Button type="submit" onClick={handleRenew}>Tiếp tục thanh toán</Button>
+                <Button type="submit" onClick={handleRenew}>Tiếp tục</Button>
               </DialogFooter>
             </>
           ) : (

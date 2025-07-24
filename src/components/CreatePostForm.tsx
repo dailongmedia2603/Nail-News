@@ -81,6 +81,8 @@ export function CreatePostForm() {
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [pendingPostData, setPendingPostData] = useState<CreatePostFormValues | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<'wallet' | 'stripe'>('wallet');
+  const [userBalance, setUserBalance] = useState<number | null>(null);
 
   const formMethods = useForm<CreatePostFormValues>({
     resolver: zodResolver(createPostFormSchema),
@@ -96,13 +98,19 @@ export function CreatePostForm() {
   const selectedDuration = formMethods.watch("duration");
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchInitialData = async () => {
       const { data: statesData } = await supabase.from('states').select('*').order('name');
       const { data: citiesData } = await supabase.from('cities').select('*').order('name');
       setStates(statesData || []);
       setCities(citiesData || []);
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase.from('profiles').select('balance').eq('id', user.id).single();
+        setUserBalance(profile?.balance ?? 0);
+      }
     };
-    fetchCategories();
+    fetchInitialData();
   }, []);
 
   useEffect(() => {
@@ -116,7 +124,7 @@ export function CreatePostForm() {
 
   const totalCost = useMemo(() => {
     if (selectedTier === 'free' || !selectedDuration) return 0;
-    return PRICING[selectedTier] * selectedDuration;
+    return PRICING[selectedTier as 'urgent' | 'vip'] * selectedDuration;
   }, [selectedTier, selectedDuration]);
 
   const handlePaymentSuccess = async () => {
@@ -183,6 +191,11 @@ export function CreatePostForm() {
       await supabase.from('post_tags').insert(postTags);
     }
 
+    if (totalCost > 0 && paymentMethod === 'wallet') {
+        const newBalance = (userBalance ?? 0) - totalCost;
+        await supabase.from('profiles').update({ balance: newBalance }).eq('id', user.id);
+    }
+
     if (totalCost > 0) {
         await supabase.from('transactions').insert({
             user_id: user.id,
@@ -199,32 +212,46 @@ export function CreatePostForm() {
 
   async function onSubmit(data: CreatePostFormValues) {
     if (totalCost > 0) {
-      setPendingPostData(data);
-      const { data: intentData, error } = await supabase.functions.invoke('create-payment-intent', {
-        body: { amount: totalCost },
-      });
-      if (error) {
-        let errorMessage = error.message;
-        try {
-          const errorBody = await error.context.json();
-          if (errorBody.error) {
-            errorMessage = errorBody.error;
-          }
-        } catch (e) { /* Ignore parsing errors */ }
-        showError(`Không thể tạo phiên thanh toán: ${errorMessage}`);
-        return;
+      if (paymentMethod === 'wallet') {
+        if (userBalance === null || userBalance < totalCost) {
+          showError("Số dư trong ví không đủ để thực hiện giao dịch này.");
+          return;
+        }
+        const toastId = showLoading("Đang xử lý tin đăng...");
+        await createPost(data, toastId);
+      } else { // Stripe payment
+        setPendingPostData(data);
+        const { data: intentData, error } = await supabase.functions.invoke('create-payment-intent', {
+          body: { amount: totalCost },
+        });
+        if (error) {
+          let errorMessage = error.message;
+          try {
+            const errorBody = await error.context.json();
+            if (errorBody.error) {
+              errorMessage = errorBody.error;
+            }
+          } catch (e) { /* Ignore parsing errors */ }
+          showError(`Không thể tạo phiên thanh toán: ${errorMessage}`);
+          return;
+        }
+        if (!intentData.clientSecret) {
+          showError("Không nhận được mã thanh toán từ máy chủ. Vui lòng thử lại.");
+          return;
+        }
+        setClientSecret(intentData.clientSecret);
+        setShowPaymentDialog(true);
       }
-      if (!intentData.clientSecret) {
-        showError("Không nhận được mã thanh toán từ máy chủ. Vui lòng thử lại.");
-        return;
-      }
-      setClientSecret(intentData.clientSecret);
-      setShowPaymentDialog(true);
-    } else {
+    } else { // Free post
       const toastId = showLoading("Đang xử lý tin đăng...");
       await createPost(data, toastId);
     }
   }
+
+  const formatCurrency = (amount: number | null) => {
+    if (amount === null) return 'Đang tải...';
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+  };
 
   return (
     <>
@@ -373,7 +400,21 @@ export function CreatePostForm() {
 
             {selectedTier !== 'free' && (
               <Card className="bg-muted/40">
-                  <CardContent className="pt-6">
+                  <CardContent className="pt-6 space-y-4">
+                      <RadioGroup onValueChange={(value) => setPaymentMethod(value as any)} defaultValue={paymentMethod} className="space-y-2">
+                        <FormLabel>Phương thức thanh toán</FormLabel>
+                        <FormItem className="flex items-center space-x-3 space-y-0 rounded-md border bg-background p-4 has-[:checked]:border-primary">
+                          <FormControl><RadioGroupItem value="wallet" /></FormControl>
+                          <FormLabel className="font-normal w-full">
+                            Thanh toán từ ví
+                            <span className="block text-sm text-muted-foreground">Số dư: {formatCurrency(userBalance)}</span>
+                          </FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-3 space-y-0 rounded-md border bg-background p-4 has-[:checked]:border-primary">
+                          <FormControl><RadioGroupItem value="stripe" /></FormControl>
+                          <FormLabel className="font-normal">Thanh toán trực tiếp (Stripe)</FormLabel>
+                        </FormItem>
+                      </RadioGroup>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
                           <FormField
                               control={formMethods.control}
