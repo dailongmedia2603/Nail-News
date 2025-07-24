@@ -49,9 +49,9 @@ const editPostFormSchema = z.object({
 type EditPostFormValues = z.infer<typeof editPostFormSchema>;
 
 const servicesList = [
-  { id: "nail", label: "Nail" },
-  { id: "toc", label: "Tóc" },
-  { id: "mi", label: "Mi" },
+  { id: "Nail", label: "Nail" },
+  { id: "Tóc", label: "Tóc" },
+  { id: "Mi", label: "Mi" },
 ] as const;
 
 export function EditPostForm({ postId }: { postId: string }) {
@@ -67,6 +67,7 @@ export function EditPostForm({ postId }: { postId: string }) {
   });
 
   const selectedStateId = formMethods.watch("state_id");
+  const category = formMethods.watch("category");
 
   useEffect(() => {
     const fetchPostAndCategories = async () => {
@@ -159,6 +160,16 @@ export function EditPostForm({ postId }: { postId: string }) {
     navigate(`/posts/${postId}`);
   }
 
+  if (isLoading) {
+    return (
+        <div className="space-y-4">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-20 w-full" />
+            <Skeleton className="h-64 w-full" />
+        </div>
+    );
+  }
+
   return (
     <FormProvider {...formMethods}>
       <Form {...formMethods}>
@@ -175,6 +186,70 @@ export function EditPostForm({ postId }: { postId: string }) {
             )}/>
             <FormField control={formMethods.control} name="zip" render={({ field }) => ( <FormItem><FormLabel>Mã ZIP</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )}/>
           </div>
+
+          {category === "Bán tiệm" && (
+            <div className="space-y-8 p-6 border rounded-lg">
+              <h3 className="text-lg font-medium">Thông tin chi tiết (Bán tiệm)</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                  <FormField control={formMethods.control} name="area" render={({ field }) => (<FormItem><FormLabel>Diện tích (sqft)</FormLabel><FormControl><Input placeholder="1200" {...field} /></FormControl><FormMessage /></FormItem>)}/>
+                  <FormField control={formMethods.control} name="chairs" render={({ field }) => (<FormItem><FormLabel>Số ghế</FormLabel><FormControl><Input type="number" placeholder="6" {...field} /></FormControl><FormMessage /></FormItem>)}/>
+                  <FormField control={formMethods.control} name="tables" render={({ field }) => (<FormItem><FormLabel>Số bàn</FormLabel><FormControl><Input type="number" placeholder="6" {...field} /></FormControl><FormMessage /></FormItem>)}/>
+                  <FormField control={formMethods.control} name="staff" render={({ field }) => (<FormItem><FormLabel>Số nhân sự</FormLabel><FormControl><Input type="number" placeholder="4" {...field} /></FormControl><FormMessage /></FormItem>)}/>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <FormField control={formMethods.control} name="revenue" render={({ field }) => (<FormItem><FormLabel>Doanh thu</FormLabel><FormControl><Input placeholder="VD: $30,000/tháng" {...field} /></FormControl><FormMessage /></FormItem>)}/>
+                  <FormField control={formMethods.control} name="operating_hours" render={({ field }) => (<FormItem><FormLabel>Giờ hoạt động</FormLabel><FormControl><Input placeholder="VD: 10am - 7pm" {...field} /></FormControl><FormMessage /></FormItem>)}/>
+              </div>
+              <FormField control={formMethods.control} name="exact_address" render={({ field }) => (<FormItem><FormLabel>Địa chỉ chính xác</FormLabel><FormControl><Input placeholder="123 Main St, Houston, TX 77002" {...field} /></FormControl><FormMessage /></FormItem>)}/>
+              <FormField control={formMethods.control} name="services" render={() => (
+                  <FormItem><FormLabel>Các dịch vụ</FormLabel>
+                      <div className="flex items-center space-x-4">
+                      {servicesList.map((item) => (
+                          <FormField key={item.id} control={formMethods.control} name="services" render={({ field }) => (
+                              <FormItem key={item.id} className="flex flex-row items-start space-x-3 space-y-0">
+                                  <FormControl><Checkbox checked={field.value?.includes(item.id)} onCheckedChange={(checked) => {
+                                      return checked ? field.onChange([...(field.value || []), item.id]) : field.onChange(field.value?.filter((value) => value !== item.id))
+                                  }}/></FormControl>
+                                  <FormLabel className="font-normal">{item.label}</FormLabel>
+                              </FormItem>
+                          )}/>
+                      ))}
+                      </div>
+                  <FormMessage /></FormItem>
+              )}/>
+            </div>
+          )}
+
+          {category === "Cần thợ" && (
+            <div className="space-y-8 p-6 border rounded-lg">
+              <h3 className="text-lg font-medium">Thông tin chi tiết (Cần thợ)</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <FormField control={formMethods.control} name="salary_info" render={({ field }) => (<FormItem><FormLabel>Thông tin lương</FormLabel><FormControl><Input placeholder="VD: $1000-$1500/tuần, thỏa thuận" {...field} /></FormControl><FormMessage /></FormItem>)}/>
+                  <FormField control={formMethods.control} name="store_status" render={({ field }) => (
+                      <FormItem><FormLabel>Trạng thái tiệm</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Chọn trạng thái" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Đang hoạt động">Đang hoạt động</SelectItem><SelectItem value="Sắp khai trương">Sắp khai trương</SelectItem><SelectItem value="Đã đóng cửa">Đã đóng cửa</SelectItem></SelectContent></Select><FormMessage /></FormItem>
+                  )}/>
+              </div>
+              <FormField control={formMethods.control} name="operating_hours" render={({ field }) => (<FormItem><FormLabel>Giờ hoạt động</FormLabel><FormControl><Input placeholder="VD: 10am - 7pm" {...field} /></FormControl><FormMessage /></FormItem>)}/>
+              <FormField control={formMethods.control} name="exact_address" render={({ field }) => (<FormItem><FormLabel>Địa chỉ chính xác</FormLabel><FormControl><Input placeholder="123 Main St, Houston, TX 77002" {...field} /></FormControl><FormMessage /></FormItem>)}/>
+              <FormField control={formMethods.control} name="services" render={() => (
+                  <FormItem><FormLabel>Dịch vụ kinh doanh</FormLabel>
+                      <div className="flex items-center space-x-4">
+                      {servicesList.map((item) => (
+                          <FormField key={item.id} control={formMethods.control} name="services" render={({ field }) => (
+                              <FormItem key={item.id} className="flex flex-row items-start space-x-3 space-y-0">
+                                  <FormControl><Checkbox checked={field.value?.includes(item.id)} onCheckedChange={(checked) => {
+                                      return checked ? field.onChange([...(field.value || []), item.id]) : field.onChange(field.value?.filter((value) => value !== item.id))
+                                  }}/></FormControl>
+                                  <FormLabel className="font-normal">{item.label}</FormLabel>
+                              </FormItem>
+                          )}/>
+                      ))}
+                      </div>
+                  <FormMessage /></FormItem>
+              )}/>
+            </div>
+          )}
+
           <FormItem>
             <FormLabel>Tag & Từ khóa</FormLabel>
             <TagSelector name="tags" />
