@@ -204,7 +204,14 @@ export function CreatePostForm() {
         body: { amount: totalCost },
       });
       if (error) {
-        showError(`Không thể tạo phiên thanh toán: ${error.message}`);
+        let errorMessage = error.message;
+        try {
+          const errorBody = await error.context.json();
+          if (errorBody.error) {
+            errorMessage = errorBody.error;
+          }
+        } catch (e) { /* Ignore parsing errors */ }
+        showError(`Không thể tạo phiên thanh toán: ${errorMessage}`);
         return;
       }
       if (!intentData.clientSecret) {
