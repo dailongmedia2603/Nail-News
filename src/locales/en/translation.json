@@ -22,5 +22,34 @@
     "title": "Manage Listings",
     "subtitle": "View, edit, or delete the listings you have posted.",
     "headerTitle": "Title"
+  },
+  "adminDashboardPage": {
+    "title": "Admin Dashboard",
+    "managePosts": "Manage Listings",
+    "managePostsDesc": "View, edit, and delete all listings",
+    "manageBlog": "Manage Blog",
+    "manageBlogDesc": "Create and manage blog articles",
+    "manageCategories": "Manage Categories",
+    "manageCategoriesDesc": "Manage states and cities",
+    "manageTags": "Manage Tags",
+    "manageTagsDesc": "Manage tags and keywords",
+    "systemConfig": "System Configuration",
+    "systemConfigDesc": "Customize logo, website name, and other information",
+    "userList": "User List",
+    "headerName": "Name",
+    "headerEmail": "Email",
+    "headerPhone": "Phone",
+    "headerRole": "Role",
+    "headerBalance": "Balance",
+    "headerJoined": "Date Joined",
+    "headerActions": "Actions",
+    "changeRole": "Change Role",
+    "changeRoleDialogTitle": "Change role for {{name}}",
+    "changeRoleDialogDesc": "Select a new role for this user."
+  },
+  "common": {
+    "na": "N/A",
+    "save": "Save",
+    "cancel": "Cancel"
   }
 }
