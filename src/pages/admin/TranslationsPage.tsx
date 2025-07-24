@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,8 +10,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 type Translation = { key: string; vi: string | null; en: string | null; };
+type GroupedTranslations = { [group: string]: Translation[] };
 
 const TranslationsPage = () => {
   const [translations, setTranslations] = useState<Translation[]>([]);
@@ -28,6 +30,17 @@ const TranslationsPage = () => {
   };
 
   useEffect(() => { fetchTranslations(); }, []);
+
+  const groupedTranslations = useMemo(() => {
+    return translations.reduce((acc: GroupedTranslations, item) => {
+      const group = item.key.split('.')[0] || 'general';
+      if (!acc[group]) {
+        acc[group] = [];
+      }
+      acc[group].push(item);
+      return acc;
+    }, {});
+  }, [translations]);
 
   const handleSave = async () => {
     if (!formData.key.trim()) {
@@ -64,32 +77,41 @@ const TranslationsPage = () => {
         <CardContent>
           {loading ? (
             <div className="space-y-2">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-1/3">Mã tham chiếu (Key)</TableHead>
-                  <TableHead className="w-1/3">Tiếng Việt</TableHead>
-                  <TableHead className="w-1/3">Tiếng Anh</TableHead>
-                  <TableHead className="text-right">Hành động</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {translations.map(t => (
-                  <TableRow key={t.key}>
-                    <TableCell className="font-mono">{t.key}</TableCell>
-                    <TableCell>{t.vi}</TableCell>
-                    <TableCell>{t.en}</TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="ghost" size="icon" onClick={() => openDialog('edit', t)}><Edit className="h-4 w-4" /></Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <Accordion type="multiple" className="w-full">
+              {Object.entries(groupedTranslations).map(([group, items]) => (
+                <AccordionItem key={group} value={group}>
+                  <AccordionTrigger className="text-lg font-semibold capitalize">{group.replace(/Page$/, ' Page')}</AccordionTrigger>
+                  <AccordionContent>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-1/3">Mã tham chiếu (Key)</TableHead>
+                          <TableHead className="w-1/3">Tiếng Việt</TableHead>
+                          <TableHead className="w-1/3">Tiếng Anh</TableHead>
+                          <TableHead className="text-right">Hành động</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {items.map(t => (
+                          <TableRow key={t.key}>
+                            <TableCell className="font-mono">{t.key}</TableCell>
+                            <TableCell>{t.vi}</TableCell>
+                            <TableCell>{t.en}</TableCell>
+                            <TableCell className="text-right">
+                              <Button variant="ghost" size="icon" onClick={() => openDialog('edit', t)}><Edit className="h-4 w-4" /></Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
           )}
         </CardContent>
       </Card>
