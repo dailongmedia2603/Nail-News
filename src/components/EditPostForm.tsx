@@ -34,18 +34,23 @@ import {
 type State = { id: number; name: string; };
 type City = { id: number; name: string; state_id: number; };
 
+const optionalNumber = z.preprocess(
+    (val) => (val === "" || val === null || val === undefined ? undefined : Number(val)),
+    z.number({ invalid_type_error: "Giá trị phải là một con số." }).optional()
+);
+
 const editPostFormSchema = z.object({
   title: z.string().min(1, "Tiêu đề không được để trống."),
   description: z.string().optional(),
   category: z.enum(["Bán tiệm", "Cần thợ", "Học nail"]).optional(),
-  state_id: z.coerce.number().optional(),
-  city_id: z.coerce.number().optional(),
+  state_id: optionalNumber,
+  city_id: optionalNumber,
   zip: z.string().optional(),
   exact_address: z.string().optional(),
   area: z.string().optional(),
-  chairs: z.coerce.number().optional(),
-  tables: z.coerce.number().optional(),
-  staff: z.coerce.number().optional(),
+  chairs: optionalNumber,
+  tables: optionalNumber,
+  staff: optionalNumber,
   revenue: z.string().optional(),
   operating_hours: z.string().optional(),
   services: z.array(z.string()).optional(),
