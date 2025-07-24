@@ -42,7 +42,7 @@ const optionalNumber = z.preprocess(
 const editPostFormSchema = z.object({
   title: z.string().min(1, "Tiêu đề không được để trống."),
   description: z.string().optional(),
-  category: z.enum(["Bán tiệm", "Cần thợ", "Học nail"]).optional(),
+  category: z.enum(["Bán tiệm", "Cần thợ", "Dịch vụ", "Tiệm nail", "Nail supply", "Renew license", "Photo, video", "Beauty school"]).optional(),
   state_id: optionalNumber,
   city_id: optionalNumber,
   zip: z.string().optional(),
@@ -196,7 +196,16 @@ export function EditPostForm({ postId }: { postId: string }) {
         <form onSubmit={formMethods.handleSubmit(onSubmit)} className="space-y-8">
           <FormField control={formMethods.control} name="title" render={({ field }) => ( <FormItem><FormLabel>Tiêu đề</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )}/>
           <FormField control={formMethods.control} name="description" render={({ field }) => ( <FormItem><FormLabel>Mô tả</FormLabel><FormControl><Textarea {...field} rows={5} /></FormControl><FormMessage /></FormItem> )}/>
-          <FormField control={formMethods.control} name="category" render={({ field }) => ( <FormItem><FormLabel>Loại tin</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Bán tiệm">Bán tiệm</SelectItem><SelectItem value="Cần thợ">Cần thợ</SelectItem><SelectItem value="Học nail">Học nail</SelectItem></SelectContent></Select><FormMessage /></FormItem> )}/>
+          <FormField control={formMethods.control} name="category" render={({ field }) => ( <FormItem><FormLabel>Loại tin</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent>
+            <SelectItem value="Bán tiệm">Bán tiệm</SelectItem>
+            <SelectItem value="Cần thợ">Cần thợ</SelectItem>
+            <SelectItem value="Dịch vụ">Dịch vụ</SelectItem>
+            <SelectItem value="Tiệm nail">Tiệm nail</SelectItem>
+            <SelectItem value="Nail supply">Nail supply</SelectItem>
+            <SelectItem value="Renew license">Renew license</SelectItem>
+            <SelectItem value="Photo, video">Photo, video</SelectItem>
+            <SelectItem value="Beauty school">Beauty school</SelectItem>
+          </SelectContent></Select><FormMessage /></FormItem> )}/>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <FormField control={formMethods.control} name="state_id" render={({ field }) => (
                 <FormItem><FormLabel>Tiểu bang</FormLabel><Select onValueChange={field.onChange} value={field.value?.toString()}><FormControl><SelectTrigger><SelectValue placeholder="Chọn tiểu bang" /></SelectTrigger></FormControl><SelectContent>{states.map(s => <SelectItem key={s.id} value={s.id.toString()}>{s.name}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>

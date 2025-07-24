@@ -26,7 +26,13 @@
   "postCategories": {
     "all": "Tất cả",
     "sellSalon": "Bán tiệm",
-    "needTech": "Cần thợ"
+    "needTech": "Cần thợ",
+    "services": "Dịch vụ",
+    "nailSalons": "Tiệm nail",
+    "nailSupply": "Nail supply",
+    "renewLicense": "Renew license",
+    "photoVideo": "Photo, video",
+    "beautySchool": "Beauty school"
   },
   "postCard": {
     "chairs": "{{count}} ghế",

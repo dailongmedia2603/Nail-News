@@ -26,7 +26,13 @@
   "postCategories": {
     "all": "All",
     "sellSalon": "Sell Salon",
-    "needTech": "Need Tech"
+    "needTech": "Need Tech",
+    "services": "Services",
+    "nailSalons": "Nail Salons",
+    "nailSupply": "Nail Supply",
+    "renewLicense": "Renew License",
+    "photoVideo": "Photo & Video",
+    "beautySchool": "Beauty School"
   },
   "postCard": {
     "chairs": "{{count}} chairs",

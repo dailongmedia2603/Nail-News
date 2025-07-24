@@ -17,6 +17,12 @@ const categories = [
   { value: "Tất cả", key: "postCategories.all" },
   { value: "Bán tiệm", key: "postCategories.sellSalon" },
   { value: "Cần thợ", key: "postCategories.needTech" },
+  { value: "Dịch vụ", key: "postCategories.services" },
+  { value: "Tiệm nail", key: "postCategories.nailSalons" },
+  { value: "Nail supply", key: "postCategories.nailSupply" },
+  { value: "Renew license", key: "postCategories.renewLicense" },
+  { value: "Photo, video", key: "postCategories.photoVideo" },
+  { value: "Beauty school", key: "postCategories.beautySchool" },
 ];
 
 const HomePage = () => {
@@ -151,7 +157,7 @@ const HomePage = () => {
       </div>
       <div className="flex justify-between items-center mb-4">
         <Tabs value={activeCategory} onValueChange={setActiveCategory} className="w-full md:w-auto">
-          <TabsList>
+          <TabsList className="flex flex-wrap h-auto">
             {categories.map((category) => (
               <TabsTrigger key={category.value} value={category.value}>
                 {t(category.key)}
