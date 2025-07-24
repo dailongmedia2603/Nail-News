@@ -186,9 +186,7 @@ const MyPostsPage = () => {
                     </Button>
                 )}
             </div>
-            {loading ? (
-              <div className="space-y-2"> <Skeleton className="h-10 w-full" /> <Skeleton className="h-10 w-full" /> </div>
-            ) : (
+            <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -250,7 +248,7 @@ const MyPostsPage = () => {
                   )}
                 </TableBody>
               </Table>
-            )}
+            </div>
           </CardContent>
         </Card>
       </div>

@@ -11,6 +11,7 @@ import { format, isPast } from "date-fns";
 import { showError, showSuccess, showLoading, dismissToast } from "@/utils/toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 type AdminPost = {
     id: string;
@@ -23,6 +24,7 @@ type AdminPost = {
 };
 
 const AdminPostsPage = () => {
+  const { t } = useTranslation();
   const [posts, setPosts] = useState<AdminPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [postToDelete, setPostToDelete] = useState<AdminPost | null>(null);
@@ -69,11 +71,11 @@ const AdminPostsPage = () => {
 
   return (
     <div className="container mx-auto p-4 md:p-6">
-      <h1 className="text-3xl font-bold mb-6">Quản lý Tin đăng</h1>
+      <h1 className="text-3xl font-bold mb-6">{t('adminPostsPage.title')}</h1>
       <Card>
-        <CardHeader><CardTitle>Tất cả tin đăng</CardTitle></CardHeader>
+        <CardHeader><CardTitle>{t('adminPostsPage.allPosts')}</CardTitle></CardHeader>
         <CardContent>
-          {loading ? ( <div className="space-y-2"><Skeleton className="h-10 w-full" /><Skeleton className="h-10 w-full" /></div> ) : (
+          <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -108,7 +110,7 @@ const AdminPostsPage = () => {
                 ))}
               </TableBody>
             </Table>
-          )}
+          </div>
         </CardContent>
       </Card>
       <AlertDialog open={!!postToDelete} onOpenChange={(open) => !open && setPostToDelete(null)}>

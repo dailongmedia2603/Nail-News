@@ -98,7 +98,7 @@ const AdminDashboardPage = () => {
       <Card>
         <CardHeader><CardTitle>{t('adminDashboardPage.userList')}</CardTitle></CardHeader>
         <CardContent>
-          {loading ? ( <div className="space-y-2"><Skeleton className="h-10 w-full" /><Skeleton className="h-10 w-full" /></div> ) : (
+          <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -135,7 +135,7 @@ const AdminDashboardPage = () => {
                 ))}
               </TableBody>
             </Table>
-          )}
+          </div>
         </CardContent>
       </Card>
 

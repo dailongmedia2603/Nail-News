@@ -9,21 +9,38 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, User, PlusCircle, Shield } from "lucide-react";
+import { LogOut, User, PlusCircle, Shield, Menu } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type Settings = {
   website_name: string;
   logo_url: string;
 };
 
+const NavLinks = () => {
+  const { t } = useTranslation();
+  return (
+    <>
+      <Link to="/tutorials" className="transition-colors hover:text-foreground/80 text-foreground">
+        {t('header.tutorials')}
+      </Link>
+      <Link to="/blog" className="transition-colors hover:text-foreground/80 text-foreground">
+        {t('header.blog')}
+      </Link>
+    </>
+  );
+};
+
 export default function Header() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [userInitial, setUserInitial] = useState("");
@@ -83,22 +100,19 @@ export default function Header() {
           <Link to="/" className="mr-6 flex items-center space-x-2">
             {settings.logo_url ? <img src={settings.logo_url} alt="Logo" className="h-8" /> : <span className="font-bold">{settings.website_name}</span>}
           </Link>
-          <nav className="flex items-center space-x-6 text-sm font-medium">
-            <Link to="/tutorials" className="transition-colors hover:text-foreground/80 text-foreground/60">
-              {t('header.tutorials')}
-            </Link>
-            <Link to="/blog" className="transition-colors hover:text-foreground/80 text-foreground/60">
-              {t('header.blog')}
-            </Link>
-          </nav>
+          {!isMobile && (
+            <nav className="flex items-center space-x-6 text-sm font-medium">
+              <NavLinks />
+            </nav>
+          )}
         </div>
         <div className="flex flex-1 items-center justify-end space-x-2">
           <LanguageSwitcher />
           {loading ? null : session ? (
             <>
-              <Button onClick={() => navigate('/create-post')}>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                {t('header.post_ad')}
+              <Button onClick={() => navigate('/create-post')} size={isMobile ? "icon" : "default"}>
+                <PlusCircle className={isMobile ? "h-4 w-4" : "mr-2 h-4 w-4"} />
+                {!isMobile && t('header.post_ad')}
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -135,10 +149,32 @@ export default function Header() {
               </DropdownMenu>
             </>
           ) : (
-            <div className="flex items-center space-x-2">
-              <Button variant="outline" onClick={() => navigate('/login')}>{t('header.login')}</Button>
-              <Button onClick={() => navigate('/signup')}>{t('header.signup')}</Button>
-            </div>
+            !isMobile && (
+              <div className="flex items-center space-x-2">
+                <Button variant="outline" onClick={() => navigate('/login')}>{t('header.login')}</Button>
+                <Button onClick={() => navigate('/signup')}>{t('header.signup')}</Button>
+              </div>
+            )
+          )}
+          {isMobile && (
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon">
+                  <Menu className="h-4 w-4" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent>
+                <nav className="flex flex-col items-start space-y-4 pt-8 text-lg">
+                  <NavLinks />
+                  {!session && (
+                    <>
+                      <Button variant="outline" onClick={() => navigate('/login')} className="w-full">{t('header.login')}</Button>
+                      <Button onClick={() => navigate('/signup')} className="w-full">{t('header.signup')}</Button>
+                    </>
+                  )}
+                </nav>
+              </SheetContent>
+            </Sheet>
           )}
         </div>
       </div>
