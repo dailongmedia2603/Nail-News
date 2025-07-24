@@ -33,7 +33,7 @@ const sidebarNavItems = [
     title: "Lịch sử đăng nhập",
     href: "/profile/history",
     icon: <History className="mr-2 h-4 w-4" />,
-    disabled: true,
+    disabled: false, // Kích hoạt liên kết
   },
 ];
 
