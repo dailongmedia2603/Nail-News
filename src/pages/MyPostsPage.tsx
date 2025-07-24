@@ -18,10 +18,18 @@ import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
 import { Label } from "@/components/ui/label";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe, Stripe } from "@stripe/stripe-js";
+import { CheckoutForm } from "@/components/CheckoutForm";
 
 type Transaction = { id: number; post_id: string; amount: number; }
 
 const PRICING = { urgent: 10, vip: 25 };
+const STRIPE_PUBLISHABLE_KEY = "pk_test_51RoTWa1ayrvGWBb9qyTGEe7XHym0TKMTmZp4fG2ncHBw2kvJH5YT6ZgaOo2gaZs8jLXW9a353Fg9VgobnOe23jEE00RiTBJCoG";
+let stripePromise: Promise<Stripe | null>;
+if (STRIPE_PUBLISHABLE_KEY) {
+  stripePromise = loadStripe(STRIPE_PUBLISHABLE_KEY);
+}
 
 const MyPostsPage = () => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -31,6 +39,7 @@ const MyPostsPage = () => {
   const [dialogState, setDialogState] = useState<{ type: 'delete-single' | 'delete-bulk' | 'renew' | null, post?: Post | null }>({ type: null, post: null });
   const [renewalTier, setRenewalTier] = useState<'urgent' | 'vip'>('urgent');
   const [renewalDuration, setRenewalDuration] = useState<number>(3);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const totalCost = useMemo(() => {
@@ -98,19 +107,24 @@ const MyPostsPage = () => {
 
   const handleRenew = async () => {
     if (!dialogState.post) return;
+    const { data: intentData, error } = await supabase.functions.invoke('create-payment-intent', {
+      body: { amount: totalCost },
+    });
+    if (error || !intentData.clientSecret) {
+      showError("Không thể tạo phiên thanh toán. Vui lòng thử lại.");
+      return;
+    }
+    setClientSecret(intentData.clientSecret);
+  };
+
+  const handlePaymentSuccess = async () => {
+    if (!dialogState.post) return;
     const toastId = showLoading("Đang xử lý gia hạn...");
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       dismissToast(toastId);
       showError("Không tìm thấy người dùng.");
-      return;
-    }
-
-    const { data: profile } = await supabase.from('profiles').select('balance').eq('id', user.id).single();
-    if (!profile || profile.balance < totalCost) {
-      dismissToast(toastId);
-      showError("Số dư trong ví không đủ.");
       return;
     }
 
@@ -126,8 +140,6 @@ const MyPostsPage = () => {
       return;
     }
 
-    const newBalance = profile.balance - totalCost;
-    await supabase.from('profiles').update({ balance: newBalance }).eq('id', user.id);
     await supabase.from('transactions').insert({
       user_id: user.id,
       amount: -totalCost,
@@ -137,8 +149,9 @@ const MyPostsPage = () => {
 
     dismissToast(toastId);
     showSuccess("Gia hạn tin đăng thành công!");
-    setDialogState({ type: null });
-    fetchData(); // Refresh data
+    setDialogState({ type: null, post: null });
+    setClientSecret(null);
+    fetchData();
   };
 
   const getStatus = (post: Post) => {
@@ -234,9 +247,7 @@ const MyPostsPage = () => {
                             <DropdownMenuTrigger asChild><Button variant="ghost" className="h-8 w-8 p-0"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem onSelect={() => navigate(`/posts/${post.id}/edit`)}><Pencil className="mr-2 h-4 w-4" />Sửa</DropdownMenuItem>
-                              <DropdownMenuItem onSelect={() => setDialogState({ type: 'renew', post })}>
-                                <RefreshCw className="mr-2 h-4 w-4" />Gia hạn
-                              </DropdownMenuItem>
+                              <DropdownMenuItem onSelect={() => setDialogState({ type: 'renew', post })}><RefreshCw className="mr-2 h-4 w-4" />Gia hạn</DropdownMenuItem>
                               <DropdownMenuItem className="text-red-600" onSelect={() => setDialogState({ type: 'delete-single', post })}><Trash2 className="mr-2 h-4 w-4" />Xóa</DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -268,43 +279,51 @@ const MyPostsPage = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      <Dialog open={dialogState.type === 'renew'} onOpenChange={(open) => !open && setDialogState({ type: null })}>
+      <Dialog open={dialogState.type === 'renew'} onOpenChange={(open) => { if (!open) { setDialogState({ type: null }); setClientSecret(null); } }}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Gia hạn tin đăng</DialogTitle>
             <DialogDescription>Chọn gói và thời hạn mới cho tin "{dialogState.post?.title}".</DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <RadioGroup value={renewalTier} onValueChange={(v) => setRenewalTier(v as any)} className="space-y-2">
-              <Label>Chọn gói mới</Label>
-              <div className="flex items-center space-x-3 space-y-0 rounded-md border p-4 has-[:checked]:border-primary">
-                <RadioGroupItem value="urgent" id="r-urgent" />
-                <Label htmlFor="r-urgent" className="font-normal flex items-center gap-2"><Zap className="h-4 w-4 text-orange-500" /> Tin gấp ($10/tháng)</Label>
+          {!clientSecret ? (
+            <>
+              <div className="grid gap-4 py-4">
+                <RadioGroup value={renewalTier} onValueChange={(v) => setRenewalTier(v as any)} className="space-y-2">
+                  <Label>Chọn gói mới</Label>
+                  <div className="flex items-center space-x-3 space-y-0 rounded-md border p-4 has-[:checked]:border-primary">
+                    <RadioGroupItem value="urgent" id="r-urgent" />
+                    <Label htmlFor="r-urgent" className="font-normal flex items-center gap-2"><Zap className="h-4 w-4 text-orange-500" /> Tin gấp ($10/tháng)</Label>
+                  </div>
+                  <div className="flex items-center space-x-3 space-y-0 rounded-md border p-4 has-[:checked]:border-primary">
+                    <RadioGroupItem value="vip" id="r-vip" />
+                    <Label htmlFor="r-vip" className="font-normal flex items-center gap-2"><Star className="h-4 w-4 text-yellow-500" /> Tin VIP ($25/tháng)</Label>
+                  </div>
+                </RadioGroup>
+                <div className="grid grid-cols-2 items-center gap-4">
+                  <Select value={renewalDuration.toString()} onValueChange={(v) => setRenewalDuration(parseInt(v))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="3">3 tháng</SelectItem>
+                      <SelectItem value="6">6 tháng</SelectItem>
+                      <SelectItem value="9">9 tháng</SelectItem>
+                      <SelectItem value="12">12 tháng</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <div className="text-right">
+                    <p className="text-sm text-muted-foreground">Tổng chi phí</p>
+                    <p className="text-2xl font-bold">{formatCurrency(totalCost)}</p>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center space-x-3 space-y-0 rounded-md border p-4 has-[:checked]:border-primary">
-                <RadioGroupItem value="vip" id="r-vip" />
-                <Label htmlFor="r-vip" className="font-normal flex items-center gap-2"><Star className="h-4 w-4 text-yellow-500" /> Tin VIP ($25/tháng)</Label>
-              </div>
-            </RadioGroup>
-            <div className="grid grid-cols-2 items-center gap-4">
-              <Select value={renewalDuration.toString()} onValueChange={(v) => setRenewalDuration(parseInt(v))}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="3">3 tháng</SelectItem>
-                  <SelectItem value="6">6 tháng</SelectItem>
-                  <SelectItem value="9">9 tháng</SelectItem>
-                  <SelectItem value="12">12 tháng</SelectItem>
-                </SelectContent>
-              </Select>
-              <div className="text-right">
-                <p className="text-sm text-muted-foreground">Tổng chi phí</p>
-                <p className="text-2xl font-bold">{formatCurrency(totalCost)}</p>
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button type="submit" onClick={handleRenew}>Xác nhận gia hạn</Button>
-          </DialogFooter>
+              <DialogFooter>
+                <Button type="submit" onClick={handleRenew}>Tiếp tục thanh toán</Button>
+              </DialogFooter>
+            </>
+          ) : (
+            <Elements stripe={stripePromise} options={{ clientSecret }}>
+              <CheckoutForm onSuccess={handlePaymentSuccess} />
+            </Elements>
+          )}
         </DialogContent>
       </Dialog>
     </ProfileLayout>
