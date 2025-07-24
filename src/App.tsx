@@ -34,6 +34,7 @@ import SettingsPage from "./pages/admin/SettingsPage";
 import LoginHistoryPage from "./pages/LoginHistoryPage";
 import UpdatePasswordPage from "./pages/UpdatePasswordPage";
 import FeaturedPostsPage from "./pages/FeaturedPostsPage";
+import DirectoryPage from "./pages/DirectoryPage";
 
 const queryClient = new QueryClient();
 
@@ -64,6 +65,7 @@ const AppContent = () => {
         <Route path="/tutorials" element={<TutorialsPage />} />
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/blog/:id" element={<BlogPostDetailPage />} />
+        <Route path="/directory" element={<DirectoryPage />} />
 
         {/* Protected Routes - Must be logged in */}
         <Route element={<ProtectedLayout />}>

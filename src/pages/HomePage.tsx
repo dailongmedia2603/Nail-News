@@ -18,11 +18,11 @@ const categories = [
   { value: "Bán tiệm", key: "postCategories.sellSalon" },
   { value: "Cần thợ", key: "postCategories.needTech" },
   { value: "Dịch vụ", key: "postCategories.services" },
-  { value: "Tiệm nail", key: "postCategories.nailSalons" },
-  { value: "Nail supply", key: "postCategories.nailSupply" },
+  { value: "Tiệm nail", key: "postCategories.nailSalons", slug: "nail-salons", isDirectory: true },
+  { value: "Nail supply", key: "postCategories.nailSupply", slug: "nail-supply", isDirectory: true },
   { value: "Renew license", key: "postCategories.renewLicense" },
   { value: "Photo, video", key: "postCategories.photoVideo" },
-  { value: "Beauty school", key: "postCategories.beautySchool" },
+  { value: "Beauty school", key: "postCategories.beautySchool", slug: "beauty-school", isDirectory: true },
 ];
 
 const HomePage = () => {
@@ -107,6 +107,15 @@ const HomePage = () => {
     fetchFavorites();
   }, []);
 
+  const handleCategoryChange = (value: string) => {
+    const category = categories.find(c => c.value === value);
+    if (category?.isDirectory) {
+      navigate(`/directory?tab=${category.slug}`);
+    } else {
+      setActiveCategory(value);
+    }
+  };
+
   const handleFavoriteToggle = async (postId: string, isCurrentlyFavorited: boolean) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -156,7 +165,7 @@ const HomePage = () => {
         <PostSearch />
       </div>
       <div className="flex justify-between items-center mb-4">
-        <Tabs value={activeCategory} onValueChange={setActiveCategory} className="w-full md:w-auto">
+        <Tabs value={activeCategory} onValueChange={handleCategoryChange} className="w-full md:w-auto">
           <TabsList className="flex flex-wrap h-auto">
             {categories.map((category) => (
               <TabsTrigger key={category.value} value={category.value}>
