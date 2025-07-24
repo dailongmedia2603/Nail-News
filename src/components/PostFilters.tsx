@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { SlidersHorizontal } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 type State = { id: number; name: string; };
 type City = { id: number; name: string; state_id: number; };
@@ -16,6 +17,7 @@ interface PostFiltersProps {
 }
 
 export function PostFilters({ onFiltersApply }: PostFiltersProps) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [states, setStates] = useState<State[]>([]);
   const [cities, setCities] = useState<City[]>([]);
@@ -80,22 +82,22 @@ export function PostFilters({ onFiltersApply }: PostFiltersProps) {
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Lọc tin đăng</SheetTitle>
+          <SheetTitle>{t('postFilters.title')}</SheetTitle>
         </SheetHeader>
         <div className="py-4 space-y-6">
           <div className="space-y-2">
-            <Label>Địa điểm</Label>
+            <Label>{t('postFilters.location')}</Label>
             <Select onValueChange={(value) => setSelectedState(Number(value))} value={selectedState?.toString()}>
-              <SelectTrigger><SelectValue placeholder="Chọn tiểu bang" /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder={t('postFilters.selectState')} /></SelectTrigger>
               <SelectContent>{states.map(s => <SelectItem key={s.id} value={s.id.toString()}>{s.name}</SelectItem>)}</SelectContent>
             </Select>
             <Select onValueChange={(value) => setSelectedCity(Number(value))} value={selectedCity?.toString()} disabled={!selectedState}>
-              <SelectTrigger><SelectValue placeholder="Chọn thành phố" /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder={t('postFilters.selectCity')} /></SelectTrigger>
               <SelectContent>{filteredCities.map(c => <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>)}</SelectContent>
             </Select>
           </div>
           <div className="space-y-2">
-            <Label>Tag & Từ khóa</Label>
+            <Label>{t('postFilters.tagsKeywords')}</Label>
             <div className="space-y-2 max-h-60 overflow-y-auto p-2 border rounded-md">
               {tags.map(tag => (
                 <div key={tag.id} className="flex items-center space-x-2">
@@ -111,8 +113,8 @@ export function PostFilters({ onFiltersApply }: PostFiltersProps) {
           </div>
         </div>
         <SheetFooter>
-          <Button variant="ghost" onClick={handleReset}>Xóa bộ lọc</Button>
-          <Button onClick={handleApply}>Áp dụng</Button>
+          <Button variant="ghost" onClick={handleReset}>{t('common.resetFilters')}</Button>
+          <Button onClick={handleApply}>{t('common.apply')}</Button>
         </SheetFooter>
       </SheetContent>
     </Sheet>

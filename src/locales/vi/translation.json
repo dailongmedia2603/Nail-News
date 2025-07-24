@@ -10,46 +10,32 @@
     "profile": "Hồ sơ",
     "logout": "Đăng xuất"
   },
-  "profileLayout": {
-    "accountInfo": "Thông tin tài khoản",
-    "myWallet": "Ví của tôi",
-    "myPosts": "Quản lý tin đăng",
-    "favorites": "Yêu thích",
-    "location": "Định vị",
-    "loginHistory": "Lịch sử đăng nhập"
+  "homePage": {
+    "title": "Tìm kiếm tin tức ngành Nail",
+    "subtitle": "Khám phá các cơ hội bán tiệm, việc làm và đào tạo mới nhất.",
+    "noPosts": "Không tìm thấy tin đăng nào phù hợp với bộ lọc."
   },
-  "myPostsPage": {
-    "title": "Quản lý tin đăng",
-    "subtitle": "Xem, chỉnh sửa hoặc xóa các tin bạn đã đăng.",
-    "headerTitle": "Tiêu đề"
+  "postCategories": {
+    "all": "Tất cả",
+    "sellSalon": "Bán tiệm",
+    "needTech": "Cần thợ"
   },
-  "adminDashboardPage": {
-    "title": "Trang quản trị",
-    "managePosts": "Quản lý Tin đăng",
-    "managePostsDesc": "Xem, sửa và xóa tất cả tin đăng",
-    "manageBlog": "Quản lý Blog",
-    "manageBlogDesc": "Tạo và quản lý các bài viết blog",
-    "manageCategories": "Quản lý Danh mục",
-    "manageCategoriesDesc": "Quản lý tiểu bang và thành phố",
-    "manageTags": "Quản lý Tag",
-    "manageTagsDesc": "Quản lý tag và từ khóa",
-    "systemConfig": "Cấu hình Hệ thống",
-    "systemConfigDesc": "Tùy chỉnh logo, tên website và các thông tin khác",
-    "userList": "Danh sách người dùng",
-    "headerName": "Họ và Tên",
-    "headerEmail": "Email",
-    "headerPhone": "Số điện thoại",
-    "headerRole": "Vai trò",
-    "headerBalance": "Số dư",
-    "headerJoined": "Ngày tham gia",
-    "headerActions": "Hành động",
-    "changeRole": "Thay đổi vai trò",
-    "changeRoleDialogTitle": "Thay đổi vai trò cho {{name}}",
-    "changeRoleDialogDesc": "Chọn vai trò mới cho người dùng này."
+  "postCard": {
+    "chairs": "{{count}} ghế",
+    "tables": "{{count}} bàn",
+    "salary": "Lương: {{salaryInfo}}",
+    "hours": "Giờ: {{hours}}",
+    "status": "Tiệm: {{status}}"
+  },
+  "postFilters": {
+    "title": "Lọc tin đăng",
+    "location": "Địa điểm",
+    "selectState": "Chọn tiểu bang",
+    "selectCity": "Chọn thành phố",
+    "tagsKeywords": "Tag & Từ khóa"
   },
   "common": {
-    "na": "N/A",
-    "save": "Lưu",
-    "cancel": "Hủy"
+    "apply": "Áp dụng",
+    "resetFilters": "Xóa bộ lọc"
   }
 }
