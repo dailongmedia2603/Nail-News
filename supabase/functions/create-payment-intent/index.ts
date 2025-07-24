@@ -1,3 +1,5 @@
+/// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
+
 import { serve } from 'https://deno.land/std@0.190.0/http/server.ts'
 import Stripe from 'https://esm.sh/stripe@14.20.0?target=deno'
 
@@ -34,9 +36,10 @@ serve(async (req) => {
       status: 200,
     })
   } catch (error) {
+    console.error('Error creating payment intent:', error.message);
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 400,
+      status: 500,
     })
   }
 })

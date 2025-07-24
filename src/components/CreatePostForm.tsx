@@ -203,8 +203,12 @@ export function CreatePostForm() {
       const { data: intentData, error } = await supabase.functions.invoke('create-payment-intent', {
         body: { amount: totalCost },
       });
-      if (error || !intentData.clientSecret) {
-        showError("Không thể tạo phiên thanh toán. Vui lòng thử lại.");
+      if (error) {
+        showError(`Không thể tạo phiên thanh toán: ${error.message}`);
+        return;
+      }
+      if (!intentData.clientSecret) {
+        showError("Không nhận được mã thanh toán từ máy chủ. Vui lòng thử lại.");
         return;
       }
       setClientSecret(intentData.clientSecret);
