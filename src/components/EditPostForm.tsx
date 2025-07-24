@@ -27,12 +27,12 @@ type State = { id: number; name: string; };
 type City = { id: number; name: string; state_id: number; };
 
 const editPostFormSchema = z.object({
-  title: z.string().min(5, "Tiêu đề phải có ít nhất 5 ký tự."),
-  description: z.string().min(10, "Mô tả phải có ít nhất 10 ký tự."),
-  category: z.enum(["Bán tiệm", "Cần thợ", "Học nail"]),
-  state_id: z.coerce.number({ required_error: "Bạn phải chọn tiểu bang." }),
-  city_id: z.coerce.number({ required_error: "Bạn phải chọn thành phố." }),
-  zip: z.string().min(5, "Mã ZIP phải có 5 chữ số.").max(5, "Mã ZIP phải có 5 chữ số."),
+  title: z.string().optional(),
+  description: z.string().optional(),
+  category: z.enum(["Bán tiệm", "Cần thợ", "Học nail"]).optional(),
+  state_id: z.coerce.number().optional(),
+  city_id: z.coerce.number().optional(),
+  zip: z.string().optional(),
   exact_address: z.string().optional(),
   area: z.string().optional(),
   chairs: z.coerce.number().optional(),
@@ -125,7 +125,10 @@ export function EditPostForm({ postId }: { postId: string }) {
 
     const selectedState = states.find(s => s.id === data.state_id);
     const selectedCity = cities.find(c => c.id === data.city_id);
-    const locationString = `${selectedCity?.name}, ${selectedState?.name}, ${data.zip}`;
+    const locationString = [selectedCity?.name, selectedState?.name, data.zip]
+      .filter(Boolean)
+      .join(', ');
+      
     const { city_id, state_id, zip, tags, ...restOfData } = data;
 
     const { error: updateError } = await supabase
