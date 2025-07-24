@@ -27,7 +27,7 @@ type State = { id: number; name: string; };
 type City = { id: number; name: string; state_id: number; };
 
 const editPostFormSchema = z.object({
-  title: z.string().optional(),
+  title: z.string().min(1, "Tiêu đề không được để trống."),
   description: z.string().optional(),
   category: z.enum(["Bán tiệm", "Cần thợ", "Học nail"]).optional(),
   state_id: z.coerce.number().optional(),
