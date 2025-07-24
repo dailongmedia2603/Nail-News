@@ -40,24 +40,8 @@ const AppLayout = () => {
       }
     };
 
-    const fetchAndApplyTranslations = async () => {
-      const { data, error } = await supabase.from('translations').select('key, vi, en');
-
-      if (error) {
-        console.error("Error fetching dynamic translations:", error);
-        return;
-      }
-
-      if (data) {
-        const resources = transformTranslations(data);
-        i18n.addResourceBundle('en', 'translation', resources.en.translation, true, true);
-        i18n.addResourceBundle('vi', 'translation', resources.vi.translation, true, true);
-      }
-    };
-
     fetchAndApplyBranding();
-    fetchAndApplyTranslations();
-  }, [i18n]);
+  }, []);
 
   return (
     <div className="relative flex min-h-screen flex-col">
