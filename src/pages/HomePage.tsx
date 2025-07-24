@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import { saveActiveCategory, loadActiveCategory, saveFilters, loadFilters } from '@/lib/search-storage';
 import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import type { Session } from "@supabase/supabase-js";
 
 const categories = [
   { value: "Tất cả", key: "postCategories.all" },
@@ -26,7 +27,22 @@ const HomePage = () => {
   const [activeCategory, setActiveCategory] = useState<string>(loadActiveCategory);
   const [filters, setFilters] = useState<{ stateId: number | null; cityId: number | null; tagIds: number[] }>(loadFilters);
   const [favoritePostIds, setFavoritePostIds] = useState<Set<string>>(new Set());
+  const [session, setSession] = useState<Session | null>(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const getSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setSession(session);
+    };
+    getSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const fetchPosts = async () => {
     setLoading(true);
@@ -122,6 +138,8 @@ const HomePage = () => {
     navigate(`/posts/${postId}`);
   };
 
+  const showNoPostsMessage = (session && paidPosts.length === 0 && regularPosts.length === 0) || (!session && regularPosts.length === 0);
+
   return (
     <div className="container mx-auto p-4 md:p-6">
       <div className="text-center my-8">
@@ -160,7 +178,7 @@ const HomePage = () => {
           </div>
         ) : (
           <>
-            {paidPosts.length > 0 && (
+            {session && paidPosts.length > 0 && (
               <section className="mb-12">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-2xl font-bold flex items-center">
@@ -207,7 +225,7 @@ const HomePage = () => {
               </section>
             )}
 
-            {paidPosts.length === 0 && regularPosts.length === 0 && (
+            {showNoPostsMessage && (
                  <div className="text-center py-16">
                     <p className="text-muted-foreground">{t('homePage.noPosts')}</p>
                 </div>
