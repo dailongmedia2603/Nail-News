@@ -10,15 +10,66 @@
     "profile": "Profile",
     "logout": "Log Out"
   },
-  "adminPostsPage": {
-    "title": "Manage Listings",
-    "allPosts": "All Listings",
-    "headerTitle": "Title",
-    "headerAuthor": "Author",
-    "headerCategory": "Category",
-    "headerStatus": "Status",
-    "headerActions": "Actions",
-    "statusActive": "Active",
-    "statusExpired": "Expired"
+  "homePage": {
+    "title": "Search for News in the Nail Industry",
+    "subtitle": "Discover the latest opportunities for salon sales, jobs, and training.",
+    "noPosts": "No listings found that match the filters."
+  },
+  "postCategories": {
+    "all": "All",
+    "sellSalon": "Sell Salon",
+    "needTech": "Need Tech"
+  },
+  "postCard": {
+    "chairs": "{{count}} chairs",
+    "tables": "{{count}} tables",
+    "salary": "Salary: {{salaryInfo}}",
+    "hours": "Hours: {{hours}}",
+    "status": "Salon: {{status}}"
+  },
+  "postDetailPage": {
+    "postedOn": "Posted on {{date}}",
+    "views": "{{count}} views",
+    "detailedDescription": "Detailed Description",
+    "basicInfo": "Basic Information",
+    "area": "Area:",
+    "chairs": "Chairs:",
+    "tables": "Tables:",
+    "staff": "Staff:",
+    "scaleInfo": "Scale Information",
+    "revenue": "Revenue:",
+    "hours": "Operating Hours:",
+    "jobInfo": "Job Information",
+    "salary": "Salary:",
+    "salonStatus": "Salon Status:",
+    "businessServices": "Business Services",
+    "location": "Location",
+    "address": "Address:",
+    "mapComingSoon": "Map will be integrated soon.<br/>(Requires API Key from Google Maps Platform to display)",
+    "tagsKeywords": "Tags & Keywords",
+    "postNotFound": "Listing not found."
+  },
+  "profilePage": {
+    "accountInfoTitle": "Account Information",
+    "accountInfoSubtitle": "Update your account information.",
+    "changePasswordTitle": "Change Password",
+    "changePasswordSubtitle": "Click the button below to change your password.",
+    "changePasswordButton": "Change Password",
+    "dialogTitle": "Change Password",
+    "dialogDescription": "For security, you will be logged out after successfully changing your password."
+  },
+  "adminDashboardPage": {
+    "title": "Admin Dashboard",
+    "managePosts": "Manage Listings",
+    "managePostsDesc": "View, edit, and delete all listings",
+    "manageBlog": "Manage Blog",
+    "manageBlogDesc": "Create and manage blog articles",
+    "manageCategories": "Manage Categories",
+    "manageCategoriesDesc": "Manage states and cities",
+    "manageTags": "Manage Tags",
+    "manageTagsDesc": "Manage tags and keywords",
+    "systemConfig": "System Configuration",
+    "systemConfigDesc": "Customize logo, website name, and other information",
+    "userList": "User List"
   }
 }

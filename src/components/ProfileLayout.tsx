@@ -2,15 +2,39 @@ import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { User, Heart, MapPin, History, Wallet, List } from "lucide-react";
-import { useTranslation } from "react-i18next";
 
 const sidebarNavItems = [
-  { titleKey: "profileLayout.accountInfo", href: "/profile", icon: <User className="mr-2 h-4 w-4" /> },
-  { titleKey: "profileLayout.myWallet", href: "/profile/wallet", icon: <Wallet className="mr-2 h-4 w-4" /> },
-  { titleKey: "profileLayout.myPosts", href: "/profile/my-posts", icon: <List className="mr-2 h-4 w-4" /> },
-  { titleKey: "profileLayout.favorites", href: "/profile/favorites", icon: <Heart className="mr-2 h-4 w-4" /> },
-  { titleKey: "profileLayout.location", href: "/profile/location", icon: <MapPin className="mr-2 h-4 w-4" /> },
-  { titleKey: "profileLayout.loginHistory", href: "/profile/history", icon: <History className="mr-2 h-4 w-4" />, disabled: false },
+  {
+    title: "Thông tin tài khoản",
+    href: "/profile",
+    icon: <User className="mr-2 h-4 w-4" />,
+  },
+  {
+    title: "Ví của tôi",
+    href: "/profile/wallet",
+    icon: <Wallet className="mr-2 h-4 w-4" />,
+  },
+  {
+    title: "Quản lý tin đăng",
+    href: "/profile/my-posts",
+    icon: <List className="mr-2 h-4 w-4" />,
+  },
+  {
+    title: "Yêu thích",
+    href: "/profile/favorites",
+    icon: <Heart className="mr-2 h-4 w-4" />,
+  },
+  {
+    title: "Định vị",
+    href: "/profile/location",
+    icon: <MapPin className="mr-2 h-4 w-4" />,
+  },
+  {
+    title: "Lịch sử đăng nhập",
+    href: "/profile/history",
+    icon: <History className="mr-2 h-4 w-4" />,
+    disabled: false,
+  },
 ];
 
 interface ProfileLayoutProps {
@@ -18,7 +42,6 @@ interface ProfileLayoutProps {
 }
 
 export default function ProfileLayout({ children }: ProfileLayoutProps) {
-  const { t } = useTranslation();
   return (
     <div className="container mx-auto flex flex-1 flex-col space-y-8 p-4 md:p-10">
        <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
@@ -32,15 +55,17 @@ export default function ProfileLayout({ children }: ProfileLayoutProps) {
                 className={({ isActive }) =>
                   cn(
                     buttonVariants({ variant: "ghost" }),
-                    "whitespace-nowrap justify-start",
-                    isActive ? "bg-muted hover:bg-muted" : "hover:bg-transparent hover:underline",
+                    "whitespace-nowrap justify-start", // Prevent wrapping on mobile
+                    isActive
+                      ? "bg-muted hover:bg-muted"
+                      : "hover:bg-transparent hover:underline",
                     item.disabled && "cursor-not-allowed opacity-50"
                   )
                 }
                 onClick={(e) => item.disabled && e.preventDefault()}
               >
                 {item.icon}
-                {t(item.titleKey)}
+                {item.title}
               </NavLink>
             ))}
           </nav>

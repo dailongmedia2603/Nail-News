@@ -10,15 +10,66 @@
     "profile": "Hồ sơ",
     "logout": "Đăng xuất"
   },
-  "adminPostsPage": {
-    "title": "Quản lý Tin đăng",
-    "allPosts": "Tất cả tin đăng",
-    "headerTitle": "Tiêu đề",
-    "headerAuthor": "Tác giả",
-    "headerCategory": "Loại tin",
-    "headerStatus": "Trạng thái",
-    "headerActions": "Hành động",
-    "statusActive": "Đang hoạt động",
-    "statusExpired": "Hết hạn"
+  "homePage": {
+    "title": "Tìm kiếm tin tức ngành Nail",
+    "subtitle": "Khám phá các cơ hội bán tiệm, việc làm và đào tạo mới nhất.",
+    "noPosts": "Không tìm thấy tin đăng nào phù hợp với bộ lọc."
+  },
+  "postCategories": {
+    "all": "Tất cả",
+    "sellSalon": "Bán tiệm",
+    "needTech": "Cần thợ"
+  },
+  "postCard": {
+    "chairs": "{{count}} ghế",
+    "tables": "{{count}} bàn",
+    "salary": "Lương: {{salaryInfo}}",
+    "hours": "Giờ: {{hours}}",
+    "status": "Tiệm: {{status}}"
+  },
+  "postDetailPage": {
+    "postedOn": "Đăng ngày {{date}}",
+    "views": "{{count}} lượt xem",
+    "detailedDescription": "Mô tả chi tiết",
+    "basicInfo": "Thông tin cơ bản",
+    "area": "Diện tích:",
+    "chairs": "Số ghế:",
+    "tables": "Số bàn:",
+    "staff": "Nhân sự:",
+    "scaleInfo": "Thông tin quy mô",
+    "revenue": "Doanh thu:",
+    "hours": "Giờ hoạt động:",
+    "jobInfo": "Thông tin công việc",
+    "salary": "Lương:",
+    "salonStatus": "Trạng thái tiệm:",
+    "businessServices": "Dịch vụ kinh doanh",
+    "location": "Vị trí",
+    "address": "Địa chỉ:",
+    "mapComingSoon": "Bản đồ sẽ sớm được tích hợp.<br/>(Cần API Key từ Google Maps Platform để hiển thị)",
+    "tagsKeywords": "Tag & Từ khóa",
+    "postNotFound": "Không tìm thấy tin đăng."
+  },
+  "profilePage": {
+    "accountInfoTitle": "Thông tin tài khoản",
+    "accountInfoSubtitle": "Cập nhật thông tin tài khoản của bạn.",
+    "changePasswordTitle": "Đổi mật khẩu",
+    "changePasswordSubtitle": "Nhấp vào nút bên dưới để đổi mật khẩu của bạn.",
+    "changePasswordButton": "Đổi mật khẩu",
+    "dialogTitle": "Đổi mật khẩu",
+    "dialogDescription": "Để bảo mật, bạn sẽ được đăng xuất sau khi đổi mật khẩu thành công."
+  },
+  "adminDashboardPage": {
+    "title": "Trang quản trị",
+    "managePosts": "Quản lý Tin đăng",
+    "managePostsDesc": "Xem, sửa và xóa tất cả tin đăng",
+    "manageBlog": "Quản lý Blog",
+    "manageBlogDesc": "Tạo và quản lý các bài viết blog",
+    "manageCategories": "Quản lý Danh mục",
+    "manageCategoriesDesc": "Quản lý tiểu bang và thành phố",
+    "manageTags": "Quản lý Tag",
+    "manageTagsDesc": "Quản lý tag và từ khóa",
+    "systemConfig": "Cấu hình Hệ thống",
+    "systemConfigDesc": "Tùy chỉnh logo, tên website và các thông tin khác",
+    "userList": "Danh sách người dùng"
   }
 }

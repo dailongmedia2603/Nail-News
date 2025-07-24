@@ -61,12 +61,12 @@ const AdminPostsPage = () => {
 
   const getStatus = (post: AdminPost) => {
     if (post.tier === 'free' || !post.expires_at) {
-      return <Badge variant="default">{t('adminPostsPage.statusActive')}</Badge>;
+      return <Badge variant="default">Đang hoạt động</Badge>;
     }
     if (isPast(new Date(post.expires_at))) {
-      return <Badge variant="secondary">{t('adminPostsPage.statusExpired')}</Badge>;
+      return <Badge variant="secondary">Hết hạn</Badge>;
     }
-    return <Badge variant="default">{t('adminPostsPage.statusActive')}</Badge>;
+    return <Badge variant="default">Đang hoạt động</Badge>;
   };
 
   return (
@@ -79,11 +79,11 @@ const AdminPostsPage = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t('adminPostsPage.headerTitle')}</TableHead>
-                  <TableHead>{t('adminPostsPage.headerAuthor')}</TableHead>
-                  <TableHead>{t('adminPostsPage.headerCategory')}</TableHead>
-                  <TableHead>{t('adminPostsPage.headerStatus')}</TableHead>
-                  <TableHead className="text-right">{t('adminPostsPage.headerActions')}</TableHead>
+                  <TableHead>Tiêu đề</TableHead>
+                  <TableHead>Tác giả</TableHead>
+                  <TableHead>Loại tin</TableHead>
+                  <TableHead>Trạng thái</TableHead>
+                  <TableHead className="text-right">Hành động</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

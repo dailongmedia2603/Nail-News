@@ -98,46 +98,44 @@ const AdminDashboardPage = () => {
       <Card>
         <CardHeader><CardTitle>{t('adminDashboardPage.userList')}</CardTitle></CardHeader>
         <CardContent>
-          {loading ? ( <div className="space-y-2"><Skeleton className="h-10 w-full" /><Skeleton className="h-10 w-full" /></div> ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Họ và Tên</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Số điện thoại</TableHead>
-                    <TableHead>Vai trò</TableHead>
-                    <TableHead>Số dư</TableHead>
-                    <TableHead>Ngày tham gia</TableHead>
-                    <TableHead className="text-right">Hành động</TableHead>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Họ và Tên</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Số điện thoại</TableHead>
+                  <TableHead>Vai trò</TableHead>
+                  <TableHead>Số dư</TableHead>
+                  <TableHead>Ngày tham gia</TableHead>
+                  <TableHead className="text-right">Hành động</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {users.map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell>{user.first_name} {user.last_name}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.phone || 'N/A'}</TableCell>
+                    <TableCell><Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>{user.role}</Badge></TableCell>
+                    <TableCell>{formatCurrency(user.balance)}</TableCell>
+                    <TableCell>{format(new Date(user.created_at), 'dd/MM/yyyy')}</TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild><Button variant="ghost" className="h-8 w-8 p-0"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onSelect={() => { setSelectedUser(user); setNewRole(user.role as any); setIsRoleDialogOpen(true); }}>
+                            <UserCog className="mr-2 h-4 w-4" />
+                            Thay đổi vai trò
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {users.map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell>{user.first_name} {user.last_name}</TableCell>
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>{user.phone || 'N/A'}</TableCell>
-                      <TableCell><Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>{user.role}</Badge></TableCell>
-                      <TableCell>{formatCurrency(user.balance)}</TableCell>
-                      <TableCell>{format(new Date(user.created_at), 'dd/MM/yyyy')}</TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild><Button variant="ghost" className="h-8 w-8 p-0"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onSelect={() => { setSelectedUser(user); setNewRole(user.role as any); setIsRoleDialogOpen(true); }}>
-                              <UserCog className="mr-2 h-4 w-4" />
-                              Thay đổi vai trò
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
 
