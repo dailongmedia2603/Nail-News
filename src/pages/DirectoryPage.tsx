@@ -153,6 +153,8 @@ const DirectoryPage = () => {
       const { data: bannersData, error: bannersError } = await supabase
         .from('banners')
         .select('*, posts(title, description)')
+        .eq('is_active', true)
+        .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
         .order('display_order', { ascending: true });
 
       if (postsError || bannersError) {
