@@ -88,7 +88,9 @@
     "manageTagsDesc": "Quản lý các tag và từ khóa.",
     "systemConfig": "Cấu hình Hệ thống",
     "systemConfigDesc": "Thay đổi cài đặt toàn trang web.",
-    "userList": "Danh sách người dùng"
+    "userList": "Danh sách người dùng",
+    "manageDirectory": "Quản lý Danh bạ",
+    "manageDirectoryDesc": "Thêm, sửa, xóa các mục trong danh bạ."
   },
   "adminPostsPage": {
     "title": "Quản lý Tin đăng",

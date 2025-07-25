@@ -88,7 +88,9 @@
     "manageTagsDesc": "Manage tags and keywords.",
     "systemConfig": "System Configuration",
     "systemConfigDesc": "Change site-wide settings.",
-    "userList": "User List"
+    "userList": "User List",
+    "manageDirectory": "Manage Directory",
+    "manageDirectoryDesc": "Add, edit, and delete directory listings."
   },
   "adminPostsPage": {
     "title": "Manage Posts",
