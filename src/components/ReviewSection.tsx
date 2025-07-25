@@ -7,25 +7,28 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { formatDistanceToNow } from 'date-fns';
 import { vi } from 'date-fns/locale';
-import { showError, showSuccess, showLoading, dismissToast } from '@/utils/toast';
-import { Loader2, Trash2 } from 'lucide-react';
+import { showError, showSuccess } from '@/utils/toast';
+import { Loader2, Trash2, Star } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
-type Comment = {
+type Review = {
   id: number;
   created_at: string;
   content: string;
   author_id: string;
   author_name: string | null;
+  rating: number | null;
 };
 
-interface CommentSectionProps {
+interface ReviewSectionProps {
   postId: string;
 }
 
-export function CommentSection({ postId }: CommentSectionProps) {
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [newComment, setNewComment] = useState('');
+export function ReviewSection({ postId }: ReviewSectionProps) {
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [newReview, setNewReview] = useState('');
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -43,7 +46,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
     checkAdminStatus();
   }, []);
 
-  const fetchComments = async () => {
+  const fetchReviews = async () => {
     setLoading(true);
     const { data, error } = await supabase
       .from('comments')
@@ -52,26 +55,29 @@ export function CommentSection({ postId }: CommentSectionProps) {
       .order('created_at', { ascending: false });
 
     if (error) {
-      showError('Không thể tải bình luận.');
+      showError('Không thể tải đánh giá.');
       console.error(error);
     } else {
-      setComments(data || []);
+      setReviews(data || []);
     }
     setLoading(false);
   };
 
   useEffect(() => {
-    fetchComments();
+    fetchReviews();
   }, [postId]);
 
-  const handleSubmitComment = async (e: React.FormEvent) => {
+  const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (newComment.trim() === '') return;
+    if (newReview.trim() === '' || rating === 0) {
+      showError('Vui lòng chọn số sao và viết đánh giá của bạn.');
+      return;
+    }
 
     setIsSubmitting(true);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      showError('Bạn cần đăng nhập để bình luận.');
+      showError('Bạn cần đăng nhập để đánh giá.');
       setIsSubmitting(false);
       return;
     }
@@ -89,26 +95,28 @@ export function CommentSection({ postId }: CommentSectionProps) {
       .insert({
         post_id: postId,
         author_id: user.id,
-        content: newComment,
+        content: newReview,
         author_name: authorName,
+        rating: rating,
       });
 
     if (error) {
-      showError('Gửi bình luận thất bại.');
+      showError('Gửi đánh giá thất bại.');
     } else {
-      setNewComment('');
-      fetchComments(); // Refresh comments list
+      setNewReview('');
+      setRating(0);
+      fetchReviews();
     }
     setIsSubmitting(false);
   };
 
-  const handleDeleteComment = async (commentId: number) => {
-    const { error } = await supabase.from('comments').delete().eq('id', commentId);
+  const handleDeleteReview = async (reviewId: number) => {
+    const { error } = await supabase.from('comments').delete().eq('id', reviewId);
     if (error) {
-      showError("Xóa bình luận thất bại.");
+      showError("Xóa đánh giá thất bại.");
     } else {
-      showSuccess("Đã xóa bình luận.");
-      setComments(comments.filter(c => c.id !== commentId));
+      showSuccess("Đã xóa đánh giá.");
+      setReviews(reviews.filter(r => r.id !== reviewId));
     }
   };
 
@@ -122,30 +130,52 @@ export function CommentSection({ postId }: CommentSectionProps) {
 
   return (
     <Card>
-      <CardHeader><CardTitle>Bình luận</CardTitle></CardHeader>
+      <CardHeader><CardTitle>Đánh giá</CardTitle></CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmitComment} className="space-y-4">
-          <Textarea placeholder="Viết bình luận của bạn..." value={newComment} onChange={(e) => setNewComment(e.target.value)} rows={3} />
+        <form onSubmit={handleSubmitReview} className="space-y-4">
+          <div className="flex items-center gap-1">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <Star
+                key={star}
+                className="h-6 w-6 cursor-pointer transition-colors"
+                fill={(hoverRating || rating) >= star ? '#facc15' : 'none'}
+                stroke={(hoverRating || rating) >= star ? '#facc15' : 'currentColor'}
+                onMouseEnter={() => setHoverRating(star)}
+                onMouseLeave={() => setHoverRating(0)}
+                onClick={() => setRating(star)}
+              />
+            ))}
+          </div>
+          <Textarea placeholder="Viết đánh giá của bạn..." value={newReview} onChange={(e) => setNewReview(e.target.value)} rows={3} />
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Gửi bình luận
+            Gửi đánh giá
           </Button>
         </form>
         <Separator className="my-6" />
         <div className="space-y-6">
-          {loading ? ( <p>Đang tải bình luận...</p> ) : comments.length > 0 ? (
-            comments.map((comment) => (
-              <div key={comment.id} className="flex items-start space-x-4 group">
+          {loading ? ( <p>Đang tải đánh giá...</p> ) : reviews.length > 0 ? (
+            reviews.map((review) => (
+              <div key={review.id} className="flex items-start space-x-4 group">
                 <Avatar>
                   <AvatarImage />
-                  <AvatarFallback>{getInitials(comment.author_name)}</AvatarFallback>
+                  <AvatarFallback>{getInitials(review.author_name)}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="font-semibold">{comment.author_name || 'Người dùng'}</p>
-                    <p className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: vi })}</p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-semibold">{review.author_name || 'Người dùng'}</p>
+                      {review.rating && (
+                        <div className="flex items-center gap-0.5 mt-1">
+                          {[1, 2, 3, 4, 5].map(star => (
+                            <Star key={star} className="h-4 w-4" fill={review.rating! >= star ? '#facc15' : 'none'} stroke={review.rating! >= star ? '#facc15' : 'currentColor'} />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(review.created_at), { addSuffix: true, locale: vi })}</p>
                   </div>
-                  <p className="text-sm whitespace-pre-wrap">{comment.content}</p>
+                  <p className="text-sm whitespace-pre-wrap mt-2">{review.content}</p>
                 </div>
                 {isAdmin && (
                   <AlertDialog>
@@ -157,11 +187,11 @@ export function CommentSection({ postId }: CommentSectionProps) {
                     <AlertDialogContent>
                       <AlertDialogHeader>
                         <AlertDialogTitle>Bạn có chắc chắn muốn xóa?</AlertDialogTitle>
-                        <AlertDialogDescription>Hành động này không thể hoàn tác. Bình luận này sẽ bị xóa vĩnh viễn.</AlertDialogDescription>
+                        <AlertDialogDescription>Hành động này không thể hoàn tác. Đánh giá này sẽ bị xóa vĩnh viễn.</AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Hủy</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => handleDeleteComment(comment.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Xóa</AlertDialogAction>
+                        <AlertDialogAction onClick={() => handleDeleteReview(review.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Xóa</AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>
@@ -169,7 +199,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
               </div>
             ))
           ) : (
-            <p className="text-sm text-muted-foreground text-center">Chưa có bình luận nào. Hãy là người đầu tiên!</p>
+            <p className="text-sm text-muted-foreground text-center">Chưa có đánh giá nào. Hãy là người đầu tiên!</p>
           )}
         </div>
       </CardContent>

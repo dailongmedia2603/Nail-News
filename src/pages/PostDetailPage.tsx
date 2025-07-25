@@ -9,7 +9,7 @@ import { MapPin, Calendar, Square, Armchair, Table, Users, DollarSign, Clock, Ch
 import { format } from 'date-fns';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { showSuccess } from '@/utils/toast';
-import { CommentSection } from '@/components/CommentSection';
+import { ReviewSection } from '@/components/ReviewSection';
 import { Badge } from '@/components/ui/badge';
 import { useTranslation } from 'react-i18next';
 
@@ -203,7 +203,7 @@ const PostDetailPage = () => {
             </CardContent>
         </Card>
 
-        <CommentSection postId={id} />
+        <ReviewSection postId={id} />
       </div>
     </div>
   );
