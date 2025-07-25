@@ -9,6 +9,7 @@ import { type Post } from '@/components/PostCard';
 import { Link } from 'react-router-dom';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ChevronRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 type GroupedData = {
   [category: string]: {
@@ -17,6 +18,90 @@ type GroupedData = {
     };
   };
 };
+
+// New component for the 3-column layout
+const ThreeColumnDirectoryLayout = ({ posts }: { posts: Post[] }) => {
+  const [selectedLocation, setSelectedLocation] = useState<{ state: string; city: string | null } | null>(null);
+
+  const groupedByLocation = useMemo(() => {
+    return posts.reduce((acc, post) => {
+      const locationParts = post.location?.split(',').map(p => p.trim());
+      const city = locationParts?.[0] || 'Chưa xác định';
+      const state = locationParts?.[1] || 'Chưa xác định';
+      if (state === 'Chưa xác định') return acc;
+
+      if (!acc[state]) acc[state] = {};
+      if (!acc[state][city]) acc[state][city] = [];
+      acc[state][city].push(post);
+      return acc;
+    }, {} as { [state: string]: { [city: string]: Post[] } });
+  }, [posts]);
+
+  const filteredPosts = useMemo(() => {
+    if (!selectedLocation) return posts;
+    if (selectedLocation.city) {
+      return groupedByLocation[selectedLocation.state]?.[selectedLocation.city] || [];
+    }
+    return Object.values(groupedByLocation[selectedLocation.state] || {}).flat();
+  }, [selectedLocation, posts, groupedByLocation]);
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      {/* Left Column: Navigation */}
+      <div className="lg:col-span-1">
+        <div className="space-y-2">
+          {Object.keys(groupedByLocation).sort().map(state => (
+            <div key={state}>
+              <h3 
+                className="font-semibold bg-muted p-2 rounded-t-md cursor-pointer"
+                onClick={() => setSelectedLocation({ state, city: null })}
+              >
+                {state}
+              </h3>
+              <ul className="pl-2 border-l border-r border-b rounded-b-md">
+                {Object.keys(groupedByLocation[state]).sort().map(city => (
+                  <li key={city}>
+                    <button 
+                      className={cn(
+                        "w-full text-left p-2 text-sm hover:bg-muted/50",
+                        selectedLocation?.city === city && "bg-muted"
+                      )}
+                      onClick={() => setSelectedLocation({ state, city })}
+                    >
+                      {city} ({groupedByLocation[state][city].length})
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Center Column: Listings */}
+      <div className="lg:col-span-2">
+        <div className="space-y-4">
+          {filteredPosts.map(post => (
+            <div key={post.id}>
+              <Link to={`/posts/${post.id}`} className="font-semibold text-primary hover:underline">
+                {post.title}
+              </Link>
+              <p className="text-sm text-muted-foreground">{post.exact_address || post.location}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Right Column: Ads */}
+      <div className="lg:col-span-1 space-y-4">
+        <Card><CardContent className="p-2"><img src="https://placehold.co/300x150/FBBF24/FFFFFF?text=Quang+Cao" alt="Ad 1" className="w-full rounded-md" /></CardContent></Card>
+        <Card><CardContent className="p-2"><img src="https://placehold.co/300x150/3B82F6/FFFFFF?text=Banner" alt="Ad 2" className="w-full rounded-md" /></CardContent></Card>
+        <Card><CardContent className="p-2"><img src="https://placehold.co/300x150/10B981/FFFFFF?text=Khuyen+Mai" alt="Ad 3" className="w-full rounded-md" /></CardContent></Card>
+      </div>
+    </div>
+  );
+};
+
 
 const DirectoryPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -76,7 +161,7 @@ const DirectoryPage = () => {
     setSelectedCity({ category, state, city });
   };
 
-  const renderDirectory = (category: string) => {
+  const renderNailSalonDirectory = (category: string) => {
     const categoryPosts = groupedPosts[category];
     if (!categoryPosts || Object.keys(categoryPosts).length === 0) {
       return <p className="text-muted-foreground text-center py-8">Chưa có tin đăng nào trong mục này.</p>;
@@ -156,9 +241,9 @@ const DirectoryPage = () => {
               <Skeleton className="h-64 w-full" />
             ) : (
               <>
-                <TabsContent value="nail-salons" className="mt-0">{renderDirectory('Tiệm nail')}</TabsContent>
-                <TabsContent value="nail-supply" className="mt-0">{renderDirectory('Nail supply')}</TabsContent>
-                <TabsContent value="beauty-school" className="mt-0">{renderDirectory('Beauty school')}</TabsContent>
+                <TabsContent value="nail-salons" className="mt-0">{renderNailSalonDirectory('Tiệm nail')}</TabsContent>
+                <TabsContent value="nail-supply" className="mt-0"><ThreeColumnDirectoryLayout posts={posts.filter(p => p.category === 'Nail supply')} /></TabsContent>
+                <TabsContent value="beauty-school" className="mt-0"><ThreeColumnDirectoryLayout posts={posts.filter(p => p.category === 'Beauty school')} /></TabsContent>
               </>
             )}
           </CardContent>
