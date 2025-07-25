@@ -9,8 +9,18 @@ import { type Post } from '@/components/PostCard';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
+type Banner = {
+  id: number;
+  type: 'image' | 'post';
+  image_url?: string;
+  link_url?: string;
+  post_id?: string;
+  display_location: string;
+  posts?: { title: string, description: string | null };
+};
+
 // Component for the 3-column layout
-const ThreeColumnDirectoryLayout = ({ posts }: { posts: Post[] }) => {
+const ThreeColumnDirectoryLayout = ({ posts, banners }: { posts: Post[], banners: Banner[] }) => {
   const [selectedLocation, setSelectedLocation] = useState<{ state: string; city: string | null } | null>(null);
 
   const groupedByLocation = useMemo(() => {
@@ -93,9 +103,22 @@ const ThreeColumnDirectoryLayout = ({ posts }: { posts: Post[] }) => {
 
       {/* Right Column: Ads */}
       <div className="lg:col-span-1 space-y-4">
-        <Card><CardContent className="p-2"><img src="https://placehold.co/300x150/FBBF24/FFFFFF?text=Quang+Cao" alt="Ad 1" className="w-full rounded-md" /></CardContent></Card>
-        <Card><CardContent className="p-2"><img src="https://placehold.co/300x150/3B82F6/FFFFFF?text=Banner" alt="Ad 2" className="w-full rounded-md" /></CardContent></Card>
-        <Card><CardContent className="p-2"><img src="https://placehold.co/300x150/10B981/FFFFFF?text=Khuyen+Mai" alt="Ad 3" className="w-full rounded-md" /></CardContent></Card>
+        {banners.map(banner => (
+          <Card key={banner.id}>
+            <CardContent className="p-2">
+              {banner.type === 'image' ? (
+                <a href={banner.link_url} target="_blank" rel="noopener noreferrer">
+                  <img src={banner.image_url} alt="Banner Ad" className="w-full rounded-md" />
+                </a>
+              ) : (
+                <Link to={`/posts/${banner.post_id}`} className="block p-2 hover:bg-muted rounded-md">
+                  <h4 className="font-semibold">{banner.posts?.title}</h4>
+                  <p className="text-xs text-muted-foreground line-clamp-2">{banner.posts?.description}</p>
+                </Link>
+              )}
+            </CardContent>
+          </Card>
+        ))}
       </div>
     </div>
   );
@@ -105,6 +128,7 @@ const ThreeColumnDirectoryLayout = ({ posts }: { posts: Post[] }) => {
 const DirectoryPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [posts, setPosts] = useState<Post[]>([]);
+  const [banners, setBanners] = useState<Banner[]>([]);
   const [loading, setLoading] = useState(true);
 
   const tabSlugs = {
@@ -117,26 +141,34 @@ const DirectoryPage = () => {
   const activeCategory = tabSlugs[activeTab as keyof typeof tabSlugs];
 
   useEffect(() => {
-    const fetchDirectoryPosts = async () => {
+    const fetchData = async () => {
       setLoading(true);
-      const { data, error } = await supabase
+      const { data: postsData, error: postsError } = await supabase
         .from('posts')
         .select('*')
         .in('category', ['Tiệm nail', 'Nail supply', 'Beauty school']);
 
-      if (error) {
+      const { data: bannersData, error: bannersError } = await supabase
+        .from('banners')
+        .select('*, posts(title, description)')
+        .eq('is_active', true);
+
+      if (postsError || bannersError) {
         showError('Không thể tải dữ liệu danh bạ.');
       } else {
-        setPosts(data || []);
+        setPosts(postsData || []);
+        setBanners(bannersData || []);
       }
       setLoading(false);
     };
-    fetchDirectoryPosts();
+    fetchData();
   }, []);
 
   const handleTabChange = (slug: string) => {
     setSearchParams({ tab: slug });
   };
+
+  const filteredBanners = banners.filter(b => b.display_location === activeTab);
 
   return (
     <div className="container mx-auto p-4 md:p-6">
@@ -155,9 +187,9 @@ const DirectoryPage = () => {
               <Skeleton className="h-64 w-full" />
             ) : (
               <>
-                <TabsContent value="nail-salons" className="mt-0"><ThreeColumnDirectoryLayout posts={posts.filter(p => p.category === 'Tiệm nail')} /></TabsContent>
-                <TabsContent value="nail-supply" className="mt-0"><ThreeColumnDirectoryLayout posts={posts.filter(p => p.category === 'Nail supply')} /></TabsContent>
-                <TabsContent value="beauty-school" className="mt-0"><ThreeColumnDirectoryLayout posts={posts.filter(p => p.category === 'Beauty school')} /></TabsContent>
+                <TabsContent value="nail-salons" className="mt-0"><ThreeColumnDirectoryLayout posts={posts.filter(p => p.category === 'Tiệm nail')} banners={filteredBanners} /></TabsContent>
+                <TabsContent value="nail-supply" className="mt-0"><ThreeColumnDirectoryLayout posts={posts.filter(p => p.category === 'Nail supply')} banners={filteredBanners} /></TabsContent>
+                <TabsContent value="beauty-school" className="mt-0"><ThreeColumnDirectoryLayout posts={posts.filter(p => p.category === 'Beauty school')} banners={filteredBanners} /></TabsContent>
               </>
             )}
           </CardContent>
