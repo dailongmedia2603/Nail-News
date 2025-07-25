@@ -247,7 +247,6 @@ function BannerForm({ initialData, posts, onSave, onCancel }: { initialData?: Ba
                   mode="single"
                   selected={field.value || undefined}
                   onSelect={field.onChange}
-                  initialFocus
                 />
               </PopoverContent>
             </Popover>
