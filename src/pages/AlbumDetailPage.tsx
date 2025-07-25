@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { type Post } from "@/components/PostCard";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CommentSection } from "@/components/CommentSection";
 import { type Review as Comment } from "@/components/ReviewSection";
@@ -37,6 +37,10 @@ const AlbumDetailPage = () => {
     const fetchAlbum = async () => {
       if (!id) return;
       setLoading(true);
+
+      // Increment view count
+      await supabase.rpc('increment_view_count', { post_id_to_update: id });
+
       const { data, error } = await supabase
         .from('posts')
         .select('*')
@@ -78,7 +82,10 @@ const AlbumDetailPage = () => {
           </Link>
         </Button>
         <h1 className="text-3xl font-bold">{album.title}</h1>
-        {album.description && <p className="text-muted-foreground mt-2">{album.description}</p>}
+        <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+            {album.description && <p>{album.description}</p>}
+            <div className="flex items-center"><Eye className="mr-1 h-4 w-4" /> {album.view_count} lượt xem</div>
+        </div>
       </div>
 
       <div>

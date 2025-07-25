@@ -152,8 +152,7 @@ const HomePage = () => {
     }
   };
   
-  const handleViewPost = async (postId: string) => {
-    await supabase.rpc('increment_view_count', { post_id_to_update: postId });
+  const handleViewPost = (postId: string) => {
     navigate(`/posts/${postId}`);
   };
 

@@ -48,6 +48,9 @@ const PostDetailPage = () => {
       if (!id) return;
       setLoading(true);
       
+      // Increment view count
+      await supabase.rpc('increment_view_count', { post_id_to_update: id });
+
       const { data, error } = await supabase
         .from('posts')
         .select('*')
