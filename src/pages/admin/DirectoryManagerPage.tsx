@@ -76,6 +76,13 @@ const DirectoryManagerPage = () => {
 
   const handleSave = async (values: DirectoryItemFormValues) => {
     const toastId = showLoading("Đang lưu...");
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+        dismissToast(toastId);
+        showError("Không thể xác thực người dùng. Vui lòng đăng nhập lại.");
+        return;
+    }
+
     const selectedState = states.find(s => s.id === values.state_id);
     const selectedCity = cities.find(c => c.id === values.city_id);
     const locationString = [selectedCity?.name, selectedState?.name, values.zip].filter(Boolean).join(', ');
@@ -86,6 +93,7 @@ const DirectoryManagerPage = () => {
       location: locationString,
       exact_address: values.exact_address,
       category: dialogState.category,
+      author_id: user.id, // Gán ID của admin làm tác giả
     };
 
     let error;
