@@ -11,6 +11,7 @@ import { CommentSection } from "@/components/CommentSection";
 import { type Review as Comment } from "@/components/ReviewSection";
 import { showError } from "@/utils/toast";
 import { VideoPlayer } from "@/components/VideoPlayer";
+import { AlbumRating } from "@/components/AlbumRating";
 
 const AlbumDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -82,10 +83,11 @@ const AlbumDetailPage = () => {
           </Link>
         </Button>
         <h1 className="text-3xl font-bold">{album.title}</h1>
-        <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
-            {album.description && <p>{album.description}</p>}
+        <div className="flex flex-col md:flex-row md:items-center gap-x-4 gap-y-2 mt-2 text-sm text-muted-foreground">
             <div className="flex items-center"><Eye className="mr-1 h-4 w-4" /> {album.view_count} lượt xem</div>
+            <AlbumRating postId={id} />
         </div>
+        {album.description && <p className="text-muted-foreground mt-4">{album.description}</p>}
       </div>
 
       <div>
