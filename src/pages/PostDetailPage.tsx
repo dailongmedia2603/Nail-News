@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { type Post } from '@/components/PostCard';
@@ -8,10 +8,11 @@ import { Button } from '@/components/ui/button';
 import { MapPin, Calendar, Square, Armchair, Table, Users, DollarSign, Clock, CheckCircle, Share2, Store, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { showSuccess } from '@/utils/toast';
-import { ReviewSection } from '@/components/ReviewSection';
+import { showSuccess, showError } from '@/utils/toast';
+import { ReviewSection, type Review } from '@/components/ReviewSection';
 import { Badge } from '@/components/ui/badge';
 import { useTranslation } from 'react-i18next';
+import { StarRatingDisplay } from '@/components/StarRatingDisplay';
 
 type Tag = { id: number; name: string; };
 
@@ -20,8 +21,24 @@ const PostDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const [post, setPost] = useState<Post | null>(null);
   const [tags, setTags] = useState<Tag[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const fetchReviews = async () => {
+    if (!id) return;
+    const { data, error } = await supabase
+      .from('comments')
+      .select('*')
+      .eq('post_id', id)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      showError('Không thể tải đánh giá.');
+    } else {
+      setReviews(data || []);
+    }
+  };
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -50,11 +67,20 @@ const PostDetailPage = () => {
         setTags(tagData.map((item: any) => item.tags));
       }
 
+      await fetchReviews();
       setLoading(false);
     };
 
     fetchPost();
   }, [id]);
+
+  const averageRating = useMemo(() => {
+    if (reviews.length === 0) return 0;
+    const validReviews = reviews.filter(r => r.rating !== null);
+    if (validReviews.length === 0) return 0;
+    const total = validReviews.reduce((acc, review) => acc + (review.rating || 0), 0);
+    return total / validReviews.length;
+  }, [reviews]);
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -123,6 +149,13 @@ const PostDetailPage = () => {
                     <CardHeader><CardTitle>{t('postDetailPage.detailedDescription')}</CardTitle></CardHeader>
                     <CardContent className="prose dark:prose-invert max-w-none whitespace-pre-wrap">
                         <p>{post.description}</p>
+                        {reviews.length > 0 && (
+                            <div className="mt-4 flex items-center gap-2">
+                                <span className="font-medium">Rating:</span>
+                                <StarRatingDisplay rating={averageRating} />
+                                <span className="text-sm text-muted-foreground">({averageRating.toFixed(1)})</span>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             </div>
@@ -203,7 +236,7 @@ const PostDetailPage = () => {
             </CardContent>
         </Card>
 
-        <ReviewSection postId={id} />
+        <ReviewSection postId={id} reviews={reviews} onReviewSubmit={fetchReviews} />
       </div>
     </div>
   );

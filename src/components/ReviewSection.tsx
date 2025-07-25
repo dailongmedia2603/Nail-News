@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -11,7 +11,7 @@ import { showError, showSuccess } from '@/utils/toast';
 import { Loader2, Trash2, Star } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
-type Review = {
+export type Review = {
   id: number;
   created_at: string;
   content: string;
@@ -22,18 +22,18 @@ type Review = {
 
 interface ReviewSectionProps {
   postId: string;
+  reviews: Review[];
+  onReviewSubmit: () => void;
 }
 
-export function ReviewSection({ postId }: ReviewSectionProps) {
-  const [reviews, setReviews] = useState<Review[]>([]);
+export function ReviewSection({ postId, reviews, onReviewSubmit }: ReviewSectionProps) {
   const [newReview, setNewReview] = useState('');
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
-  const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
-  useEffect(() => {
+  useState(() => {
     const checkAdminStatus = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
@@ -44,28 +44,7 @@ export function ReviewSection({ postId }: ReviewSectionProps) {
       }
     };
     checkAdminStatus();
-  }, []);
-
-  const fetchReviews = async () => {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('comments')
-      .select('*')
-      .eq('post_id', postId)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      showError('Không thể tải đánh giá.');
-      console.error(error);
-    } else {
-      setReviews(data || []);
-    }
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchReviews();
-  }, [postId]);
+  });
 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,7 +84,7 @@ export function ReviewSection({ postId }: ReviewSectionProps) {
     } else {
       setNewReview('');
       setRating(0);
-      fetchReviews();
+      onReviewSubmit(); // Trigger refetch in parent
     }
     setIsSubmitting(false);
   };
@@ -116,7 +95,7 @@ export function ReviewSection({ postId }: ReviewSectionProps) {
       showError("Xóa đánh giá thất bại.");
     } else {
       showSuccess("Đã xóa đánh giá.");
-      setReviews(reviews.filter(r => r.id !== reviewId));
+      onReviewSubmit(); // Trigger refetch in parent
     }
   };
 
@@ -154,7 +133,7 @@ export function ReviewSection({ postId }: ReviewSectionProps) {
         </form>
         <Separator className="my-6" />
         <div className="space-y-6">
-          {loading ? ( <p>Đang tải đánh giá...</p> ) : reviews.length > 0 ? (
+          {reviews.length > 0 ? (
             reviews.map((review) => (
               <div key={review.id} className="flex items-start space-x-4 group">
                 <Avatar>
