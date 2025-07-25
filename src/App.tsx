@@ -37,6 +37,7 @@ import FeaturedPostsPage from "./pages/FeaturedPostsPage";
 import DirectoryPage from "./pages/DirectoryPage";
 import PhotoGalleryPage from "./pages/PhotoGalleryPage";
 import AlbumDetailPage from "./pages/AlbumDetailPage";
+import AdminDirectoryManagerPage from "./pages/admin/DirectoryManagerPage";
 
 const queryClient = new QueryClient();
 
@@ -93,6 +94,7 @@ const AppContent = () => {
             <Route path="categories" element={<CategoriesPage />} />
             <Route path="tags" element={<TagsPage />} />
             <Route path="settings" element={<SettingsPage />} />
+            <Route path="directory" element={<AdminDirectoryManagerPage />} />
           </Route>
         </Route>
       </Route>
