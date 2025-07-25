@@ -10,6 +10,12 @@ import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, Pagi
 
 const ITEMS_PER_PAGE = 50;
 
+const getYoutubeThumbnail = (url: string) => {
+  if (!url) return '/placeholder.svg';
+  const videoId = url.split('v=')[1]?.split('&')[0] || url.split('/').pop();
+  return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+};
+
 const PhotoGalleryPage = () => {
   const [albums, setAlbums] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
@@ -83,7 +89,7 @@ const PhotoGalleryPage = () => {
     );
   };
 
-  const renderAlbumGrid = (albumsToRender: Post[]) => (
+  const renderAlbumGrid = (albumsToRender: Post[], isVideo: boolean) => (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-8 mt-6">
       {albumsToRender.map((album) => (
         <Link to={`/photo-video/${album.id}`} key={album.id} className="group space-y-2">
@@ -95,7 +101,7 @@ const PhotoGalleryPage = () => {
           </div>
           <div className="aspect-video overflow-hidden rounded-lg border">
             <img
-              src={album.images?.[0] || '/placeholder.svg'}
+              src={isVideo ? getYoutubeThumbnail(album.images?.[0] || '') : album.images?.[0] || '/placeholder.svg'}
               alt={album.title}
               className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
@@ -117,7 +123,7 @@ const PhotoGalleryPage = () => {
             <h2 className="text-2xl font-bold flex items-center"><ImageIcon className="mr-2 h-6 w-6" /> Thư viện ảnh</h2>
             <Input placeholder="Tìm kiếm album ảnh..." className="max-w-sm" value={imageSearch} onChange={e => setImageSearch(e.target.value)} />
           </div>
-          {loading ? <Skeleton className="h-64 w-full mt-6" /> : paginatedImageAlbums.length > 0 ? renderAlbumGrid(paginatedImageAlbums) : <p className="text-center mt-8 text-muted-foreground">Không tìm thấy album ảnh nào.</p>}
+          {loading ? <Skeleton className="h-64 w-full mt-6" /> : paginatedImageAlbums.length > 0 ? renderAlbumGrid(paginatedImageAlbums, false) : <p className="text-center mt-8 text-muted-foreground">Không tìm thấy album ảnh nào.</p>}
           {renderPagination(currentImagePage, totalImagePages, setCurrentImagePage)}
         </TabsContent>
         <TabsContent value="videos" className="mt-6">
@@ -125,7 +131,7 @@ const PhotoGalleryPage = () => {
             <h2 className="text-2xl font-bold flex items-center"><Video className="mr-2 h-6 w-6" /> Thư viện video</h2>
             <Input placeholder="Tìm kiếm album video..." className="max-w-sm" value={videoSearch} onChange={e => setVideoSearch(e.target.value)} />
           </div>
-          {loading ? <Skeleton className="h-64 w-full mt-6" /> : paginatedVideoAlbums.length > 0 ? renderAlbumGrid(paginatedVideoAlbums) : <p className="text-center mt-8 text-muted-foreground">Không tìm thấy album video nào.</p>}
+          {loading ? <Skeleton className="h-64 w-full mt-6" /> : paginatedVideoAlbums.length > 0 ? renderAlbumGrid(paginatedVideoAlbums, true) : <p className="text-center mt-8 text-muted-foreground">Không tìm thấy album video nào.</p>}
           {renderPagination(currentVideoPage, totalVideoPages, setCurrentVideoPage)}
         </TabsContent>
       </Tabs>
