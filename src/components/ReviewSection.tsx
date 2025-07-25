@@ -185,7 +185,9 @@ export function ReviewSection({ postId, reviews, onReviewSubmit }: ReviewSection
 
   return (
     <Card>
-      <CardHeader><CardTitle>Đánh giá</CardTitle></CardHeader>
+      <CardHeader>
+        <CardTitle>Đánh giá ({reviews.length})</CardTitle>
+      </CardHeader>
       <CardContent>
         {currentUser && (userReview && !isEditing ? (
           <div className="p-4 border rounded-md bg-muted/50">
