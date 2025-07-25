@@ -40,6 +40,15 @@ const ThreeColumnDirectoryLayout = ({ posts }: { posts: Post[] }) => {
       {/* Left Column: Navigation */}
       <div className="lg:col-span-1">
         <div className="space-y-2">
+          <button
+            className={cn(
+              "w-full text-left p-2 text-sm font-semibold hover:bg-muted rounded-md",
+              !selectedLocation && "bg-muted"
+            )}
+            onClick={() => setSelectedLocation(null)}
+          >
+            Tất cả ({posts.length})
+          </button>
           {Object.keys(groupedByLocation).sort().map(state => (
             <div key={state}>
               <h3 
