@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
@@ -174,7 +174,36 @@ function BannerForm({ initialData, posts, onSave, onCancel }: { initialData?: Ba
         
         {type === 'image' && (
           <>
-            <FormField control={form.control} name="image_upload" render={({ field }) => <FormItem><FormLabel>Tải ảnh lên</FormLabel>{imagePreview && <img src={imagePreview} className="h-20 my-2" />}<FormControl><Input type="file" accept="image/*" onChange={(e) => { field.onChange(e.target.files); if (e.target.files?.[0]) setImagePreview(URL.createObjectURL(e.target.files[0])); }} /></FormControl><FormMessage /></FormItem>} />
+            <FormField control={form.control} name="image_upload" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tải ảnh lên</FormLabel>
+                <FormDescription>Kích thước đề xuất: 300x150 pixels.</FormDescription>
+                <FormControl>
+                  <label className="cursor-pointer flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-md hover:bg-muted">
+                    {imagePreview ? (
+                        <img src={imagePreview} alt="Xem trước banner" className="h-full w-full object-contain rounded-md p-2" />
+                    ) : (
+                        <div className="text-center text-muted-foreground">
+                            <UploadCloud className="mx-auto h-8 w-8" />
+                            <p className="mt-2 text-sm">Nhấp để tải lên</p>
+                        </div>
+                    )}
+                    <Input 
+                        type="file" 
+                        className="sr-only" 
+                        accept="image/*" 
+                        onChange={(e) => { 
+                            field.onChange(e.target.files); 
+                            if (e.target.files?.[0]) {
+                                setImagePreview(URL.createObjectURL(e.target.files[0]));
+                            } 
+                        }} 
+                    />
+                  </label>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
             <FormField control={form.control} name="link_url" render={({ field }) => <FormItem><FormLabel>Link liên kết</FormLabel><FormControl><Input placeholder="https://example.com" {...field} /></FormControl><FormMessage /></FormItem>} />
           </>
         )}
