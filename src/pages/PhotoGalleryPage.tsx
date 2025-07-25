@@ -1,11 +1,9 @@
 import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "react-router-dom";
 import { type Post } from "@/components/PostCard";
-import { Badge } from "@/components/ui/badge";
-import { Camera, Image as ImageIcon, Video } from "lucide-react";
+import { Image as ImageIcon, Video } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationNext, PaginationLink } from "@/components/ui/pagination";
@@ -86,26 +84,22 @@ const PhotoGalleryPage = () => {
   };
 
   const renderAlbumGrid = (albumsToRender: Post[]) => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-8 mt-6">
       {albumsToRender.map((album) => (
-        <Link to={`/photo-video/${album.id}`} key={album.id} className="group">
-          <Card className="overflow-hidden h-full flex flex-col">
-            <CardContent className="p-0 relative aspect-square">
-              <img
-                src={album.images?.[0] || '/placeholder.svg'}
-                alt={album.title}
-                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              <Badge variant="secondary" className="absolute top-2 right-2">
-                <Camera className="mr-1 h-3 w-3" />
-                {album.images?.length || 0}
-              </Badge>
-            </CardContent>
-            <div className="p-4 bg-background flex-grow">
-              <h3 className="font-semibold group-hover:text-primary">{album.title}</h3>
-            </div>
-          </Card>
+        <Link to={`/photo-video/${album.id}`} key={album.id} className="group space-y-2">
+          <div className="flex justify-between items-center">
+            <h3 className="font-semibold truncate group-hover:text-primary">{album.title}</h3>
+            <span className="flex-shrink-0 text-xs bg-muted text-muted-foreground rounded-full h-5 w-5 flex items-center justify-center">
+              {album.images?.length || 0}
+            </span>
+          </div>
+          <div className="aspect-video overflow-hidden rounded-lg border">
+            <img
+              src={album.images?.[0] || '/placeholder.svg'}
+              alt={album.title}
+              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+          </div>
         </Link>
       ))}
     </div>

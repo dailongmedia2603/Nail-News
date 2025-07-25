@@ -7,11 +7,29 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ReviewSection, type Review } from "@/components/ReviewSection";
+import { showError } from "@/utils/toast";
 
 const AlbumDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const [album, setAlbum] = useState<Post | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const fetchReviews = async () => {
+    if (!id) return;
+    const { data, error } = await supabase
+      .from('comments')
+      .select('*')
+      .eq('post_id', id)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      showError('Không thể tải đánh giá.');
+    } else {
+      setReviews(data || []);
+    }
+  };
 
   useEffect(() => {
     const fetchAlbum = async () => {
@@ -25,8 +43,10 @@ const AlbumDetailPage = () => {
 
       if (error) {
         console.error("Lỗi tải album:", error);
+      } else {
+        setAlbum(data);
+        await fetchReviews();
       }
-      setAlbum(data);
       setLoading(false);
     };
     fetchAlbum();
@@ -42,22 +62,24 @@ const AlbumDetailPage = () => {
     );
   }
 
-  if (!album) {
+  if (!album || !id) {
     return <div className="text-center py-16">Không tìm thấy album.</div>;
   }
 
   return (
-    <div className="container mx-auto max-w-4xl p-4 md:p-6">
-      <Button asChild variant="ghost" className="mb-4">
-        <Link to="/photo-video">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Quay lại thư viện
-        </Link>
-      </Button>
-      <h1 className="text-3xl font-bold">{album.title}</h1>
-      <p className="text-muted-foreground mt-1">{album.location}</p>
+    <div className="container mx-auto max-w-4xl p-4 md:p-6 space-y-8">
+      <div>
+        <Button asChild variant="ghost" className="mb-4 -ml-4">
+          <Link to="/photo-video">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Quay lại thư viện
+          </Link>
+        </Button>
+        <h1 className="text-3xl font-bold">{album.title}</h1>
+        {album.description && <p className="text-muted-foreground mt-2">{album.description}</p>}
+      </div>
 
-      <div className="mt-6">
+      <div>
         <Carousel className="w-full">
           <CarouselContent>
             {album.images?.map((media, index) => (
@@ -78,6 +100,8 @@ const AlbumDetailPage = () => {
           <CarouselNext />
         </Carousel>
       </div>
+
+      <ReviewSection postId={id} reviews={reviews} onReviewSubmit={fetchReviews} />
     </div>
   );
 };
