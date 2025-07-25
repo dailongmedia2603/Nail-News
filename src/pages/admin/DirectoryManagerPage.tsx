@@ -217,7 +217,7 @@ function DirectoryItemForm({ initialData, onSave, onCancel, states, cities }: { 
           <FormField control={form.control} name="zip" render={({ field }) => <FormItem><FormLabel>Mã ZIP</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>} />
         </div>
         <FormField control={form.control} name="exact_address" render={({ field }) => <FormItem><FormLabel>Địa chỉ chính xác</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>} />
-        <FormField control={form.control} name="operating_hours" render={({ field }) => <FormItem><FormLabel>Giờ hoạt động</FormLabel><FormControl><Input placeholder="VD: 10am - 7pm" {...field} /></FormControl><FormMessage /></FormItem>} />
+        <FormField control={form.control} name="operating_hours" render={({ field }) => <FormItem><FormLabel>Giờ hoạt động</FormLabel><FormControl><Textarea placeholder="VD: Thứ 2 - Thứ 6: 10am - 7pm&#x0a;Thứ 7: 9am - 5pm" {...field} /></FormControl><FormMessage /></FormItem>} />
         <DialogFooter>
           <DialogClose asChild><Button type="button" variant="outline" onClick={onCancel}>Hủy</Button></DialogClose>
           <Button type="submit">Lưu</Button>
