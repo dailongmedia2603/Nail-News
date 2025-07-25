@@ -91,7 +91,7 @@ const ThreeColumnDirectoryLayout = ({ posts, banners }: { posts: Post[], banners
       <div className="lg:col-span-2">
         <div className="space-y-4">
           {filteredPosts.map(post => (
-            <div key={post.id}>
+            <div key={post.id} className="p-3 rounded-md border hover:bg-muted">
               <Link to={`/posts/${post.id}`} className="font-semibold text-primary hover:underline">
                 {post.title}
               </Link>
