@@ -40,6 +40,7 @@ import AlbumDetailPage from "./pages/AlbumDetailPage";
 import AdminDirectoryManagerPage from "./pages/admin/DirectoryManagerPage";
 import AdminBannersPage from "./pages/admin/BannersPage";
 import AdminPhotoVideoPage from "./pages/admin/PhotoVideoPage";
+import AdminServicesPage from "./pages/admin/ServicesPage";
 
 const queryClient = new QueryClient();
 
@@ -99,6 +100,7 @@ const AppContent = () => {
             <Route path="directory" element={<AdminDirectoryManagerPage />} />
             <Route path="banners" element={<AdminBannersPage />} />
             <Route path="photo-video" element={<AdminPhotoVideoPage />} />
+            <Route path="services" element={<AdminServicesPage />} />
           </Route>
         </Route>
       </Route>

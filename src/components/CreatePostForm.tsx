@@ -37,7 +37,7 @@ type City = { id: number; name: string; state_id: number; };
 const createPostFormSchema = z.object({
   title: z.string().min(5, "Tiêu đề phải có ít nhất 5 ký tự."),
   description: z.string().min(10, "Mô tả phải có ít nhất 10 ký tự."),
-  category: z.enum(["Bán tiệm", "Cần thợ", "Dịch vụ", "Tiệm nail", "Nail supply", "Renew license", "Photo, video", "Beauty school"], { required_error: "Bạn phải chọn một loại tin." }),
+  category: z.enum(["Bán tiệm", "Cần thợ", "Tiệm nail", "Nail supply", "Renew license", "Photo, video", "Beauty school"], { required_error: "Bạn phải chọn một loại tin." }),
   state_id: z.coerce.number({ required_error: "Bạn phải chọn tiểu bang." }),
   city_id: z.coerce.number({ required_error: "Bạn phải chọn thành phố." }),
   zip: z.string().min(5, "Mã ZIP phải có 5 chữ số.").max(5, "Mã ZIP phải có 5 chữ số."),
@@ -264,7 +264,6 @@ export function CreatePostForm() {
             <FormField control={formMethods.control} name="category" render={({ field }) => ( <FormItem><FormLabel>Loại tin</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Chọn loại tin" /></SelectTrigger></FormControl><SelectContent>
               <SelectItem value="Bán tiệm">Bán tiệm</SelectItem>
               <SelectItem value="Cần thợ">Cần thợ</SelectItem>
-              <SelectItem value="Dịch vụ">Dịch vụ</SelectItem>
               <SelectItem value="Tiệm nail">Tiệm nail</SelectItem>
               <SelectItem value="Nail supply">Nail supply</SelectItem>
               <SelectItem value="Renew license">Renew license</SelectItem>
@@ -347,21 +346,6 @@ export function CreatePostForm() {
                         ))}
                         </div>
                     <FormMessage /></FormItem>
-                )}/>
-              </div>
-            )}
-
-            {category === "Dịch vụ" && (
-              <div className="space-y-8 p-6 border rounded-lg">
-                <h3 className="text-lg font-medium">Thông tin chi tiết (Dịch vụ)</h3>
-                <FormField control={formMethods.control} name="exact_address" render={({ field }) => (<FormItem><FormLabel>Địa chỉ</FormLabel><FormControl><Input placeholder="123 Main St, Houston, TX 77002" {...field} /></FormControl><FormMessage /></FormItem>)}/>
-                <FormField control={formMethods.control} name="operating_hours" render={({ field }) => (<FormItem><FormLabel>Giờ hoạt động</FormLabel><FormControl><Input placeholder="VD: 10am - 7pm" {...field} /></FormControl><FormMessage /></FormItem>)}/>
-                <FormField control={formMethods.control} name="images" render={() => (
-                  <FormItem>
-                    <FormLabel>Hình ảnh/Video</FormLabel>
-                    <FormControl><ImageUploader name="images" /></FormControl>
-                    <FormMessage />
-                  </FormItem>
                 )}/>
               </div>
             )}

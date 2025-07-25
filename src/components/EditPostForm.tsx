@@ -42,7 +42,7 @@ const optionalNumber = z.preprocess(
 const editPostFormSchema = z.object({
   title: z.string().min(1, "Tiêu đề không được để trống."),
   description: z.string().optional(),
-  category: z.enum(["Bán tiệm", "Cần thợ", "Dịch vụ", "Tiệm nail", "Nail supply", "Renew license", "Photo, video", "Beauty school"]).optional(),
+  category: z.enum(["Bán tiệm", "Cần thợ", "Tiệm nail", "Nail supply", "Renew license", "Photo, video", "Beauty school"]).optional(),
   state_id: optionalNumber,
   city_id: optionalNumber,
   zip: z.string().optional(),
@@ -199,7 +199,6 @@ export function EditPostForm({ postId }: { postId: string }) {
           <FormField control={formMethods.control} name="category" render={({ field }) => ( <FormItem><FormLabel>Loại tin</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent>
             <SelectItem value="Bán tiệm">Bán tiệm</SelectItem>
             <SelectItem value="Cần thợ">Cần thợ</SelectItem>
-            <SelectItem value="Dịch vụ">Dịch vụ</SelectItem>
             <SelectItem value="Tiệm nail">Tiệm nail</SelectItem>
             <SelectItem value="Nail supply">Nail supply</SelectItem>
             <SelectItem value="Renew license">Renew license</SelectItem>
@@ -278,15 +277,7 @@ export function EditPostForm({ postId }: { postId: string }) {
               )}/>
             </div>
           )}
-
-          {category === "Dịch vụ" && (
-              <div className="space-y-8 p-6 border rounded-lg">
-                <h3 className="text-lg font-medium">Thông tin chi tiết (Dịch vụ)</h3>
-                <FormField control={formMethods.control} name="exact_address" render={({ field }) => (<FormItem><FormLabel>Địa chỉ</FormLabel><FormControl><Input placeholder="123 Main St, Houston, TX 77002" {...field} /></FormControl><FormMessage /></FormItem>)}/>
-                <FormField control={formMethods.control} name="operating_hours" render={({ field }) => (<FormItem><FormLabel>Giờ hoạt động</FormLabel><FormControl><Input placeholder="VD: 10am - 7pm" {...field} /></FormControl><FormMessage /></FormItem>)}/>
-              </div>
-            )}
-
+          
           <FormItem>
             <FormLabel>Tag & Từ khóa</FormLabel>
             <TagSelector name="tags" />
