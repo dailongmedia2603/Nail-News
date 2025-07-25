@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Search } from 'lucide-react';
 
 type License = {
   id: number;
@@ -16,6 +18,7 @@ const RenewLicensePage = () => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [licenses, setLicenses] = useState<License[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,6 +34,15 @@ const RenewLicensePage = () => {
     };
     fetchData();
   }, []);
+
+  const filteredLicenses = useMemo(() => {
+    if (!searchTerm) return licenses;
+    return licenses.filter(license => 
+      license.license_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      license.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      license.location.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [licenses, searchTerm]);
 
   return (
     <div className="container mx-auto p-4 md:p-6 space-y-8">
@@ -49,6 +61,16 @@ const RenewLicensePage = () => {
       <Card>
         <CardHeader>
           <CardTitle>DANH SÁCH BẰNG HẾT HẠN HÔM NAY</CardTitle>
+          <div className="relative mt-4">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Tìm kiếm theo loại bằng, tên, hoặc nơi cấp..."
+              className="w-full pl-8"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
         </CardHeader>
         <CardContent>
           {loading ? <Skeleton className="h-40 w-full" /> : (
@@ -61,13 +83,19 @@ const RenewLicensePage = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {licenses.map(license => (
-                  <TableRow key={license.id}>
-                    <TableCell>{license.license_type}</TableCell>
-                    <TableCell>{license.name}</TableCell>
-                    <TableCell>{license.location}</TableCell>
+                {filteredLicenses.length > 0 ? (
+                  filteredLicenses.map(license => (
+                    <TableRow key={license.id}>
+                      <TableCell>{license.license_type}</TableCell>
+                      <TableCell>{license.name}</TableCell>
+                      <TableCell>{license.location}</TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={3} className="text-center">Không tìm thấy kết quả.</TableCell>
                   </TableRow>
-                ))}
+                )}
               </TableBody>
             </Table>
           )}
