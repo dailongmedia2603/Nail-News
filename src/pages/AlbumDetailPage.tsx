@@ -7,16 +7,17 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ReviewSection, type Review } from "@/components/ReviewSection";
+import { CommentSection } from "@/components/CommentSection";
+import { type Review as Comment } from "@/components/ReviewSection";
 import { showError } from "@/utils/toast";
 
 const AlbumDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const [album, setAlbum] = useState<Post | null>(null);
-  const [reviews, setReviews] = useState<Review[]>([]);
+  const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchReviews = async () => {
+  const fetchComments = async () => {
     if (!id) return;
     const { data, error } = await supabase
       .from('comments')
@@ -25,9 +26,9 @@ const AlbumDetailPage = () => {
       .order('created_at', { ascending: false });
 
     if (error) {
-      showError('Không thể tải đánh giá.');
+      showError('Không thể tải bình luận.');
     } else {
-      setReviews(data || []);
+      setComments(data || []);
     }
   };
 
@@ -45,7 +46,7 @@ const AlbumDetailPage = () => {
         console.error("Lỗi tải album:", error);
       } else {
         setAlbum(data);
-        await fetchReviews();
+        await fetchComments();
       }
       setLoading(false);
     };
@@ -101,7 +102,7 @@ const AlbumDetailPage = () => {
         </Carousel>
       </div>
 
-      <ReviewSection postId={id} reviews={reviews} onReviewSubmit={fetchReviews} />
+      <CommentSection postId={id} reviews={comments} onReviewSubmit={fetchComments} />
     </div>
   );
 };
