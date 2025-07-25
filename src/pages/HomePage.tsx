@@ -20,7 +20,7 @@ const categories = [
   { value: "Dịch vụ", key: "postCategories.services" },
   { value: "Tiệm nail", key: "postCategories.nailSalons", slug: "nail-salons", isDirectory: true },
   { value: "Nail supply", key: "postCategories.nailSupply", slug: "nail-supply", isDirectory: true },
-  { value: "Renew license", key: "postCategories.renewLicense" },
+  { value: "Renew license", key: "postCategories.renewLicense", slug: "/renew-license", isDirectory: true },
   { value: "Photo, video", key: "postCategories.photoVideo", slug: "/photo-video", isDirectory: true },
   { value: "Beauty school", key: "postCategories.beautySchool", slug: "beauty-school", isDirectory: true },
 ];

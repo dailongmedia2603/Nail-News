@@ -41,6 +41,8 @@ import AdminDirectoryManagerPage from "./pages/admin/DirectoryManagerPage";
 import AdminBannersPage from "./pages/admin/BannersPage";
 import AdminPhotoVideoPage from "./pages/admin/PhotoVideoPage";
 import AdminServicesPage from "./pages/admin/ServicesPage";
+import AdminRenewLicensePage from "./pages/admin/RenewLicensePage";
+import RenewLicensePage from "./pages/RenewLicensePage";
 
 const queryClient = new QueryClient();
 
@@ -74,6 +76,7 @@ const AppContent = () => {
         <Route path="/directory" element={<DirectoryPage />} />
         <Route path="/photo-video" element={<PhotoGalleryPage />} />
         <Route path="/photo-video/:id" element={<AlbumDetailPage />} />
+        <Route path="/renew-license" element={<RenewLicensePage />} />
 
         {/* Protected Routes - Must be logged in */}
         <Route element={<ProtectedLayout />}>
@@ -101,6 +104,7 @@ const AppContent = () => {
             <Route path="banners" element={<AdminBannersPage />} />
             <Route path="photo-video" element={<AdminPhotoVideoPage />} />
             <Route path="services" element={<AdminServicesPage />} />
+            <Route path="renew-license" element={<AdminRenewLicensePage />} />
           </Route>
         </Route>
       </Route>
