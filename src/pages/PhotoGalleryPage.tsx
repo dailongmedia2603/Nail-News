@@ -41,7 +41,7 @@ const PhotoGalleryPage = () => {
     const images: Post[] = [];
     const videos: Post[] = [];
     albums.forEach(album => {
-      const hasVideo = album.images?.some(url => url.includes('.mp4') || url.includes('.mov'));
+      const hasVideo = album.images?.some(url => url.includes('youtube.com') || url.includes('youtu.be'));
       if (hasVideo) {
         videos.push(album);
       } else {

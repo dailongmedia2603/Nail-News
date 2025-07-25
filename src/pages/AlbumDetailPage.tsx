@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { CommentSection } from "@/components/CommentSection";
 import { type Review as Comment } from "@/components/ReviewSection";
 import { showError } from "@/utils/toast";
+import { VideoPlayer } from "@/components/VideoPlayer";
 
 const AlbumDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -87,8 +88,8 @@ const AlbumDetailPage = () => {
               <CarouselItem key={index}>
                 <Card>
                   <CardContent className="flex aspect-video items-center justify-center p-0">
-                    {media.includes('.mp4') || media.includes('.mov') ? (
-                       <video src={media} className="rounded-lg object-contain w-full h-full" controls />
+                    {media.includes('youtube.com') || media.includes('youtu.be') ? (
+                      <VideoPlayer videoId={media.split('v=')[1] || media.split('/').pop()!} />
                     ) : (
                        <img src={media} alt={`Ảnh ${index + 1}`} className="rounded-lg object-contain w-full h-full" />
                     )}
