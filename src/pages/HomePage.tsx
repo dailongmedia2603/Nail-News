@@ -18,6 +18,11 @@ const categories = [
   { value: "Bán tiệm", key: "postCategories.sellSalon" },
   { value: "Cần thợ", key: "postCategories.needTech" },
   { value: "Dịch vụ", key: "postCategories.services" },
+  { value: "Tiệm nail", key: "postCategories.nailSalons", slug: "nail-salons", isDirectory: true },
+  { value: "Nail supply", key: "postCategories.nailSupply", slug: "nail-supply", isDirectory: true },
+  { value: "Renew license", key: "postCategories.renewLicense" },
+  { value: "Photo, video", key: "postCategories.photoVideo", slug: "/photo-video", isDirectory: true },
+  { value: "Beauty school", key: "postCategories.beautySchool", slug: "beauty-school", isDirectory: true },
 ];
 
 const HomePage = () => {
@@ -48,12 +53,15 @@ const HomePage = () => {
   const fetchPosts = async () => {
     setLoading(true);
     
-    const { data, error } = await supabase.rpc('filter_posts', {
-      p_category: activeCategory === 'Tất cả' ? null : activeCategory,
-      p_state_id: filters.stateId,
-      p_city_id: filters.cityId,
-      p_tag_ids: filters.tagIds.length > 0 ? filters.tagIds : null,
-    });
+    let query = supabase.from('posts').select('*');
+
+    if (activeCategory !== 'Tất cả') {
+      query = query.eq('category', activeCategory);
+    } else {
+      query = query.in('category', ['Bán tiệm', 'Cần thợ', 'Dịch vụ']);
+    }
+
+    const { data, error } = await query;
 
     if (error) {
       console.error("Lỗi lọc tin đăng:", error);
@@ -86,7 +94,9 @@ const HomePage = () => {
   useEffect(() => {
     saveActiveCategory(activeCategory);
     saveFilters(filters);
-    fetchPosts();
+    if (!categories.find(c => c.value === activeCategory)?.isDirectory) {
+      fetchPosts();
+    }
   }, [activeCategory, filters]);
 
   useEffect(() => {
@@ -103,7 +113,16 @@ const HomePage = () => {
   }, []);
 
   const handleCategoryChange = (value: string) => {
-    setActiveCategory(value);
+    const category = categories.find(c => c.value === value);
+    if (category?.isDirectory) {
+      if (category.slug?.startsWith('/')) {
+        navigate(category.slug);
+      } else {
+        navigate(`/directory?tab=${category.slug}`);
+      }
+    } else {
+      setActiveCategory(value);
+    }
   };
 
   const handleFavoriteToggle = async (postId: string, isCurrentlyFavorited: boolean) => {
