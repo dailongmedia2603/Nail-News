@@ -279,6 +279,14 @@ export function EditPostForm({ postId }: { postId: string }) {
             </div>
           )}
 
+          {category === "Dịch vụ" && (
+              <div className="space-y-8 p-6 border rounded-lg">
+                <h3 className="text-lg font-medium">Thông tin chi tiết (Dịch vụ)</h3>
+                <FormField control={formMethods.control} name="exact_address" render={({ field }) => (<FormItem><FormLabel>Địa chỉ</FormLabel><FormControl><Input placeholder="123 Main St, Houston, TX 77002" {...field} /></FormControl><FormMessage /></FormItem>)}/>
+                <FormField control={formMethods.control} name="operating_hours" render={({ field }) => (<FormItem><FormLabel>Giờ hoạt động</FormLabel><FormControl><Input placeholder="VD: 10am - 7pm" {...field} /></FormControl><FormMessage /></FormItem>)}/>
+              </div>
+            )}
+
           <FormItem>
             <FormLabel>Tag & Từ khóa</FormLabel>
             <TagSelector name="tags" />

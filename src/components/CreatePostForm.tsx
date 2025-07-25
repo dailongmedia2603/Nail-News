@@ -96,6 +96,7 @@ export function CreatePostForm() {
   const selectedStateId = formMethods.watch("state_id");
   const selectedTier = formMethods.watch("tier");
   const selectedDuration = formMethods.watch("duration");
+  const category = formMethods.watch("category");
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -280,7 +281,7 @@ export function CreatePostForm() {
               <FormField control={formMethods.control} name="zip" render={({ field }) => ( <FormItem><FormLabel>Mã ZIP</FormLabel><FormControl><Input placeholder="VD: 77002" {...field} /></FormControl><FormMessage /></FormItem> )}/>
             </div>
 
-            {formMethods.watch("category") === "Bán tiệm" && (
+            {category === "Bán tiệm" && (
               <div className="space-y-8 p-6 border rounded-lg">
                 <h3 className="text-lg font-medium">Thông tin chi tiết (Bán tiệm)</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -294,13 +295,6 @@ export function CreatePostForm() {
                     <FormField control={formMethods.control} name="operating_hours" render={({ field }) => (<FormItem><FormLabel>Giờ hoạt động</FormLabel><FormControl><Input placeholder="VD: 10am - 7pm" {...field} /></FormControl><FormMessage /></FormItem>)}/>
                 </div>
                 <FormField control={formMethods.control} name="exact_address" render={({ field }) => (<FormItem><FormLabel>Địa chỉ chính xác</FormLabel><FormControl><Input placeholder="123 Main St, Houston, TX 77002" {...field} /></FormControl><FormMessage /></FormItem>)}/>
-                <FormItem>
-                  <FormLabel>Vị trí trên bản đồ</FormLabel>
-                  <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
-                      <p className="text-muted-foreground text-center p-4">Bản đồ sẽ sớm được tích hợp.<br/>(Cần API Key từ Google Maps Platform để hiển thị)</p>
-                  </div>
-                  <FormDescription>Sau khi nhập địa chỉ chính xác, vị trí sẽ được tự động ghim trên bản đồ.</FormDescription>
-                </FormItem>
                 <FormField control={formMethods.control} name="services" render={({ field }) => (
                     <FormItem><FormLabel>Các dịch vụ</FormLabel>
                         <div className="flex items-center space-x-4">
@@ -327,7 +321,7 @@ export function CreatePostForm() {
               </div>
             )}
 
-            {formMethods.watch("category") === "Cần thợ" && (
+            {category === "Cần thợ" && (
               <div className="space-y-8 p-6 border rounded-lg">
                 <h3 className="text-lg font-medium">Thông tin chi tiết (Cần thợ)</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -338,13 +332,6 @@ export function CreatePostForm() {
                 </div>
                 <FormField control={formMethods.control} name="operating_hours" render={({ field }) => (<FormItem><FormLabel>Giờ hoạt động</FormLabel><FormControl><Input placeholder="VD: 10am - 7pm" {...field} /></FormControl><FormMessage /></FormItem>)}/>
                 <FormField control={formMethods.control} name="exact_address" render={({ field }) => (<FormItem><FormLabel>Địa chỉ chính xác</FormLabel><FormControl><Input placeholder="123 Main St, Houston, TX 77002" {...field} /></FormControl><FormMessage /></FormItem>)}/>
-                <FormItem>
-                  <FormLabel>Vị trí trên bản đồ</FormLabel>
-                  <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
-                      <p className="text-muted-foreground text-center p-4">Bản đồ sẽ sớm được tích hợp.<br/>(Cần API Key từ Google Maps Platform để hiển thị)</p>
-                  </div>
-                  <FormDescription>Sau khi nhập địa chỉ chính xác, vị trí sẽ được tự động ghim trên bản đồ.</FormDescription>
-                </FormItem>
                 <FormField control={formMethods.control} name="services" render={({ field }) => (
                     <FormItem><FormLabel>Dịch vụ kinh doanh</FormLabel>
                         <div className="flex items-center space-x-4">
@@ -360,6 +347,21 @@ export function CreatePostForm() {
                         ))}
                         </div>
                     <FormMessage /></FormItem>
+                )}/>
+              </div>
+            )}
+
+            {category === "Dịch vụ" && (
+              <div className="space-y-8 p-6 border rounded-lg">
+                <h3 className="text-lg font-medium">Thông tin chi tiết (Dịch vụ)</h3>
+                <FormField control={formMethods.control} name="exact_address" render={({ field }) => (<FormItem><FormLabel>Địa chỉ</FormLabel><FormControl><Input placeholder="123 Main St, Houston, TX 77002" {...field} /></FormControl><FormMessage /></FormItem>)}/>
+                <FormField control={formMethods.control} name="operating_hours" render={({ field }) => (<FormItem><FormLabel>Giờ hoạt động</FormLabel><FormControl><Input placeholder="VD: 10am - 7pm" {...field} /></FormControl><FormMessage /></FormItem>)}/>
+                <FormField control={formMethods.control} name="images" render={() => (
+                  <FormItem>
+                    <FormLabel>Hình ảnh/Video</FormLabel>
+                    <FormControl><ImageUploader name="images" /></FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}/>
               </div>
             )}
