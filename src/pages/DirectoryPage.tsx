@@ -111,10 +111,12 @@ const ThreeColumnDirectoryLayout = ({ posts, banners }: { posts: Post[], banners
                   <img src={banner.image_url} alt="Banner Ad" className="w-full rounded-md" />
                 </a>
               ) : (
-                <Link to={`/posts/${banner.post_id}`} className="block p-2 hover:bg-muted rounded-md">
-                  <h4 className="font-semibold">{banner.posts?.title}</h4>
-                  <p className="text-xs text-muted-foreground line-clamp-2">{banner.posts?.description}</p>
-                </Link>
+                banner.posts && (
+                  <Link to={`/posts/${banner.post_id}`} className="block p-2 hover:bg-muted rounded-md">
+                    <h4 className="font-semibold">{banner.posts.title}</h4>
+                    <p className="text-xs text-muted-foreground line-clamp-2">{banner.posts.description}</p>
+                  </Link>
+                )
               )}
             </CardContent>
           </Card>

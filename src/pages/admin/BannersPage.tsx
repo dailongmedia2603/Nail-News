@@ -34,9 +34,6 @@ const bannerSchema = z.object({
   image_upload: z.any().optional(),
   link_url: z.string().optional(),
   post_id: z.string().optional(),
-}).refine(data => data.type !== 'image' || (data.image_upload || data.link_url), {
-  message: "Ảnh và link không được để trống cho loại 'Ảnh'",
-  path: ["image_upload"],
 });
 
 type BannerFormValues = z.infer<typeof bannerSchema>;
