@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MoreHorizontal, UserCog, List, Newspaper, FolderKanban, Tags, Settings, BookUser, Image as ImageIcon } from "lucide-react";
+import { MoreHorizontal, UserCog, List, Newspaper, FolderKanban, Tags, Settings, BookUser, Image as ImageIcon, Briefcase } from "lucide-react";
 import { format } from "date-fns";
 import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
 import { Label } from "@/components/ui/label";
@@ -93,6 +93,10 @@ const AdminDashboardPage = () => {
         <Card className="cursor-pointer hover:bg-muted" onClick={() => navigate('/admin/photo-video')}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">{t('adminDashboardPage.managePhotoVideo')}</CardTitle><ImageIcon className="h-4 w-4 text-muted-foreground" /></CardHeader>
             <CardContent><p className="text-xs text-muted-foreground">{t('adminDashboardPage.managePhotoVideoDesc')}</p></CardContent>
+        </Card>
+        <Card className="cursor-pointer hover:bg-muted" onClick={() => navigate('/admin/services')}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">{t('adminDashboardPage.manageServices')}</CardTitle><Briefcase className="h-4 w-4 text-muted-foreground" /></CardHeader>
+            <CardContent><p className="text-xs text-muted-foreground">{t('adminDashboardPage.manageServicesDesc')}</p></CardContent>
         </Card>
         <Card className="cursor-pointer hover:bg-muted" onClick={() => navigate('/admin/categories')}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">{t('adminDashboardPage.manageCategories')}</CardTitle><FolderKanban className="h-4 w-4 text-muted-foreground" /></CardHeader>

@@ -92,7 +92,9 @@
     "manageDirectory": "Manage Directory",
     "manageDirectoryDesc": "Add, edit, and delete directory listings.",
     "managePhotoVideo": "Manage Photos & Videos",
-    "managePhotoVideoDesc": "Add, edit, and delete photo and video albums."
+    "managePhotoVideoDesc": "Add, edit, and delete photo and video albums.",
+    "manageServices": "Manage Services",
+    "manageServicesDesc": "Add, edit, and delete service listings."
   },
   "adminPostsPage": {
     "title": "Manage Posts",
