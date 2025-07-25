@@ -129,7 +129,7 @@ const DirectoryManagerPage = () => {
             {data.map(item => (
               <TableRow key={item.id}>
                 <TableCell className="font-medium">{item.title}</TableCell>
-                <TableCell>{item.location}</TableCell>
+                <TableCell>{item.exact_address || item.location}</TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
