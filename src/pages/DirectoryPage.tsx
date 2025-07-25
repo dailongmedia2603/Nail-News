@@ -104,7 +104,7 @@ const ThreeColumnDirectoryLayout = ({ posts, banners }: { posts: Post[], banners
       {/* Right Column: Ads */}
       <div className="lg:col-span-1 space-y-4">
         {banners.map(banner => (
-          <Card key={banner.id}>
+          <Card key={banner.id} className="border-yellow-300 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-700/30">
             <CardContent className="p-2">
               {banner.type === 'image' ? (
                 <a href={banner.link_url} target="_blank" rel="noopener noreferrer">
@@ -112,7 +112,7 @@ const ThreeColumnDirectoryLayout = ({ posts, banners }: { posts: Post[], banners
                 </a>
               ) : (
                 banner.posts && (
-                  <Link to={`/posts/${banner.post_id}`} className="block p-2 hover:bg-muted rounded-md">
+                  <Link to={`/posts/${banner.post_id}`} className="block p-2 hover:bg-yellow-100/50 dark:hover:bg-yellow-900/40 rounded-md">
                     <h4 className="font-semibold">{banner.posts.title}</h4>
                     <p className="text-xs text-muted-foreground line-clamp-2">{banner.posts.description}</p>
                   </Link>
@@ -153,8 +153,6 @@ const DirectoryPage = () => {
       const { data: bannersData, error: bannersError } = await supabase
         .from('banners')
         .select('*, posts(title, description)')
-        .eq('is_active', true)
-        .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
         .order('display_order', { ascending: true });
 
       if (postsError || bannersError) {
