@@ -4,6 +4,7 @@ import { Star } from 'lucide-react';
 import { Skeleton } from './ui/skeleton';
 import { showError } from '@/utils/toast';
 import type { User } from '@supabase/supabase-js';
+import { StarRatingDisplay } from './StarRatingDisplay';
 
 interface AlbumRatingProps {
   postId: string;
@@ -12,6 +13,7 @@ interface AlbumRatingProps {
 export function AlbumRating({ postId }: AlbumRatingProps) {
   const [ratingCount, setRatingCount] = useState(0);
   const [userHasRated, setUserHasRated] = useState(false);
+  const [userRating, setUserRating] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hoverRating, setHoverRating] = useState(0);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -31,8 +33,12 @@ export function AlbumRating({ postId }: AlbumRatingProps) {
         showError("Không thể tải dữ liệu đánh giá.");
       } else {
         setRatingCount(count || 0);
-        if (user && data.some(r => r.user_id === user.id)) {
-          setUserHasRated(true);
+        if (user) {
+          const userReview = data.find(r => r.user_id === user.id);
+          if (userReview) {
+            setUserHasRated(true);
+            setUserRating(userReview.rating);
+          }
         }
       }
       setIsLoading(false);
@@ -55,6 +61,7 @@ export function AlbumRating({ postId }: AlbumRatingProps) {
       showError("Chấm điểm thất bại.");
     } else {
       setUserHasRated(true);
+      setUserRating(rating);
       setRatingCount(prev => prev + 1);
     }
   };
@@ -66,8 +73,11 @@ export function AlbumRating({ postId }: AlbumRatingProps) {
   return (
     <div className="flex items-center gap-2">
       <span>Cho điểm:</span>
-      {userHasRated ? (
-        <span className="text-red-500 font-bold">Thank you..!</span>
+      {userHasRated && userRating ? (
+        <div className="flex items-center gap-2">
+          <StarRatingDisplay rating={userRating} className="h-6" />
+          <span className="text-sm text-muted-foreground">({ratingCount})</span>
+        </div>
       ) : (
         <>
           <div className="flex items-center">
