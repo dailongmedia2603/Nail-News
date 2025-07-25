@@ -13,16 +13,19 @@ type License = {
 
 const RenewLicensePage = () => {
   const [content, setContent] = useState('');
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [licenses, setLicenses] = useState<License[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const { data: contentData } = await supabase.from('system_settings').select('value').eq('key', 'renew_license_content').single();
+      const { data } = await supabase.from('system_settings').select('key, value').in('key', ['renew_license_content', 'renew_license_image_url']);
+      const settings = data?.reduce((acc, { key, value }) => ({ ...acc, [key]: value }), {} as { [key: string]: string }) || {};
+      setContent(settings.renew_license_content || '<p>Nội dung chưa được cập nhật.</p>');
+      setImageUrl(settings.renew_license_image_url || null);
+
       const { data: licensesData } = await supabase.from('licenses').select('*').order('created_at', { ascending: false });
-      
-      setContent(contentData?.value || '<p>Nội dung chưa được cập nhật.</p>');
       setLicenses(licensesData || []);
       setLoading(false);
     };
@@ -37,7 +40,10 @@ const RenewLicensePage = () => {
           <Skeleton className="h-64 w-full" />
         </div>
       ) : (
-        <article className="prose dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: content }} />
+        <div className="grid md:grid-cols-2 gap-8 items-start">
+          {imageUrl && <img src={imageUrl} alt="Renew License" className="w-full rounded-lg" />}
+          <article className="prose dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: content }} />
+        </div>
       )}
 
       <Card>

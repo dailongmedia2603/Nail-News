@@ -12,7 +12,8 @@ import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { PlusCircle, Edit, Trash2 } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, UploadCloud, X } from 'lucide-react';
+import { v4 as uuidv4 } from 'uuid';
 
 type License = {
   id: number;
@@ -31,6 +32,8 @@ type LicenseFormValues = z.infer<typeof licenseSchema>;
 
 const AdminRenewLicensePage = () => {
   const [content, setContent] = useState('');
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [licenses, setLicenses] = useState<License[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -38,9 +41,12 @@ const AdminRenewLicensePage = () => {
 
   const fetchData = async () => {
     setLoading(true);
-    const { data: contentData } = await supabase.from('system_settings').select('value').eq('key', 'renew_license_content').single();
+    const { data } = await supabase.from('system_settings').select('key, value').in('key', ['renew_license_content', 'renew_license_image_url']);
+    const settings = data?.reduce((acc, { key, value }) => ({ ...acc, [key]: value }), {} as { [key: string]: string }) || {};
+    setContent(settings.renew_license_content || '');
+    setImageUrl(settings.renew_license_image_url || null);
+
     const { data: licensesData } = await supabase.from('licenses').select('*').order('created_at', { ascending: false });
-    setContent(contentData?.value || '');
     setLicenses(licensesData || []);
     setLoading(false);
   };
@@ -52,10 +58,35 @@ const AdminRenewLicensePage = () => {
   const handleSaveContent = async () => {
     setIsSaving(true);
     const toastId = showLoading("Đang lưu nội dung...");
-    const { error } = await supabase.from('system_settings').upsert({ key: 'renew_license_content', value: content });
+    let finalImageUrl = imageUrl;
+
+    if (imageFile) {
+      const fileName = `public/renew_license_${uuidv4()}`;
+      const { data, error } = await supabase.storage.from('system_assets').upload(fileName, imageFile, { upsert: true });
+      if (error) {
+        dismissToast(toastId);
+        showError("Tải ảnh thất bại: " + error.message);
+        setIsSaving(false);
+        return;
+      }
+      finalImageUrl = supabase.storage.from('system_assets').getPublicUrl(data.path).data.publicUrl;
+    }
+
+    const updates = [
+      supabase.from('system_settings').upsert({ key: 'renew_license_content', value: content }),
+      supabase.from('system_settings').upsert({ key: 'renew_license_image_url', value: finalImageUrl }),
+    ];
+
+    const results = await Promise.all(updates);
     dismissToast(toastId);
-    if (error) showError("Lưu nội dung thất bại.");
-    else showSuccess("Đã lưu nội dung thành công.");
+
+    if (results.some(r => r.error)) {
+      showError("Lưu nội dung thất bại.");
+    } else {
+      showSuccess("Đã lưu nội dung thành công.");
+      setImageUrl(finalImageUrl);
+      setImageFile(null);
+    }
     setIsSaving(false);
   };
 
@@ -97,7 +128,28 @@ const AdminRenewLicensePage = () => {
         <CardContent>
           {loading ? <Skeleton className="h-64 w-full" /> : (
             <div className="space-y-4">
-              <ReactQuill theme="snow" value={content} onChange={setContent} modules={quillModules} className="bg-background" />
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="font-medium">Hình ảnh</label>
+                  <label className="cursor-pointer flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-md hover:bg-muted">
+                    {imageUrl || imageFile ? (
+                      <div className="relative w-full h-full">
+                        <img src={imageFile ? URL.createObjectURL(imageFile) : imageUrl} alt="Xem trước" className="w-full h-full object-contain rounded-md p-2" />
+                        <Button variant="destructive" size="icon" className="absolute top-2 right-2 h-8 w-8" onClick={(e) => { e.preventDefault(); setImageUrl(null); setImageFile(null); }}>
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="text-center text-muted-foreground">
+                        <UploadCloud className="mx-auto h-10 w-10" />
+                        <p className="mt-2 text-sm">Nhấp để tải lên</p>
+                      </div>
+                    )}
+                    <Input type="file" className="sr-only" accept="image/*" onChange={(e) => e.target.files?.[0] && setImageFile(e.target.files[0])} />
+                  </label>
+                </div>
+                <ReactQuill theme="snow" value={content} onChange={setContent} modules={quillModules} className="bg-background h-64" />
+              </div>
               <Button onClick={handleSaveContent} disabled={isSaving}>{isSaving ? 'Đang lưu...' : 'Lưu Nội dung'}</Button>
             </div>
           )}
