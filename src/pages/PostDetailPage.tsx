@@ -160,6 +160,15 @@ const PostDetailPage = () => {
                     </Card>
                 )}
 
+                {(post.category === 'Tiệm nail' || post.category === 'Nail supply' || post.category === 'Beauty school') && post.operating_hours && (
+                    <Card>
+                        <CardHeader><CardTitle>{t('postDetailPage.basicInfo')}</CardTitle></CardHeader>
+                        <CardContent className="space-y-3 text-sm">
+                            <div className="flex items-center"><Clock className="mr-2 h-4 w-4 text-muted-foreground" /> {t('postDetailPage.hours')} <strong>{post.operating_hours}</strong></div>
+                        </CardContent>
+                    </Card>
+                )}
+
                 {post.services && post.services.length > 0 && (
                     <Card>
                         <CardHeader><CardTitle>{t('postDetailPage.businessServices')}</CardTitle></CardHeader>
