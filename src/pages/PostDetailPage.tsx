@@ -10,11 +10,14 @@ import { format } from 'date-fns';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { showSuccess, showError } from '@/utils/toast';
 import { ReviewSection, type Review } from '@/components/ReviewSection';
+import { CommentSection } from '@/components/CommentSection';
 import { Badge } from '@/components/ui/badge';
 import { useTranslation } from 'react-i18next';
 import { StarRatingDisplay } from '@/components/StarRatingDisplay';
 
 type Tag = { id: number; name: string; };
+
+const reviewCategories = ['Tiệm nail', 'Nail supply', 'Beauty school'];
 
 const PostDetailPage = () => {
   const { t } = useTranslation();
@@ -105,6 +108,8 @@ const PostDetailPage = () => {
     return <div className="container mx-auto p-4 md:p-6 text-center text-red-500">{error || t('postDetailPage.postNotFound')}</div>;
   }
 
+  const isReviewable = post.category && reviewCategories.includes(post.category);
+
   return (
     <div className="container mx-auto p-4 md:p-6 max-w-4xl">
       <div className="space-y-6">
@@ -149,7 +154,7 @@ const PostDetailPage = () => {
                     <CardHeader><CardTitle>{t('postDetailPage.detailedDescription')}</CardTitle></CardHeader>
                     <CardContent className="prose dark:prose-invert max-w-none whitespace-pre-wrap">
                         <p>{post.description}</p>
-                        {reviews.length > 0 && (
+                        {isReviewable && reviews.length > 0 && (
                             <div className="mt-4 flex items-center gap-2">
                                 <span className="font-medium">Rating:</span>
                                 <StarRatingDisplay rating={averageRating} />
@@ -236,7 +241,11 @@ const PostDetailPage = () => {
             </CardContent>
         </Card>
 
-        <ReviewSection postId={id} reviews={reviews} onReviewSubmit={fetchReviews} />
+        {isReviewable ? (
+          <ReviewSection postId={id} reviews={reviews} onReviewSubmit={fetchReviews} />
+        ) : (
+          <CommentSection postId={id} reviews={reviews} onReviewSubmit={fetchReviews} />
+        )}
       </div>
     </div>
   );
