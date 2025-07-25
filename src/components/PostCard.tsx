@@ -50,6 +50,12 @@ export function PostCard({ post, isFavorited, onFavoriteToggle, onView, isFeatur
   const getCategoryTranslationKey = (category: string | null) => {
     if (category === "Bán tiệm") return "postCategories.sellSalon";
     if (category === "Cần thợ") return "postCategories.needTech";
+    if (category === "Dịch vụ") return "postCategories.services";
+    if (category === "Tiệm nail") return "postCategories.nailSalons";
+    if (category === "Nail supply") return "postCategories.nailSupply";
+    if (category === "Renew license") return "postCategories.renewLicense";
+    if (category === "Photo, video") return "postCategories.photoVideo";
+    if (category === "Beauty school") return "postCategories.beautySchool";
     return category || "";
   };
 
