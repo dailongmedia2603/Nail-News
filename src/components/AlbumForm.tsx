@@ -12,14 +12,19 @@ import { ImageUploader } from "./ImageUploader";
 import { type Post } from "./PostCard";
 import { v4 as uuidv4 } from 'uuid';
 
-const albumFormSchema = z.object({
+const imageAlbumSchema = z.object({
   title: z.string().min(1, "Tiêu đề không được để trống."),
   description: z.string().optional(),
   images: z.any().optional(),
-  videos: z.array(z.object({ url: z.string().url("Link YouTube không hợp lệ.") })).optional(),
 });
 
-type AlbumFormValues = z.infer<typeof albumFormSchema>;
+const videoAlbumSchema = z.object({
+  title: z.string().min(1, "Tiêu đề không được để trống."),
+  description: z.string().optional(),
+  videos: z.array(z.object({ url: z.string().url("Link YouTube không hợp lệ.") })).min(1),
+});
+
+type AlbumFormValues = z.infer<typeof imageAlbumSchema> & z.infer<typeof videoAlbumSchema>;
 
 interface AlbumFormProps {
   albumType: 'image' | 'video';
@@ -30,7 +35,7 @@ interface AlbumFormProps {
 
 export function AlbumForm({ albumType, initialData, onSave, onCancel }: AlbumFormProps) {
   const form = useForm<AlbumFormValues>({
-    resolver: zodResolver(albumFormSchema),
+    resolver: zodResolver(albumType === 'image' ? imageAlbumSchema : videoAlbumSchema),
     defaultValues: {
       title: initialData?.title || '',
       description: initialData?.description || '',
