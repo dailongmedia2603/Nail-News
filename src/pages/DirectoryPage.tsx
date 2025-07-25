@@ -89,9 +89,9 @@ const ThreeColumnDirectoryLayout = ({ posts, banners }: { posts: Post[], banners
 
       {/* Center Column: Listings */}
       <div className="lg:col-span-2">
-        <div>
-          {filteredPosts.map((post, index) => (
-            <div key={post.id} className={cn("p-3", index < filteredPosts.length - 1 && "border-b")}>
+        <div className="space-y-4">
+          {filteredPosts.map(post => (
+            <div key={post.id} className="p-3 rounded-md border hover:bg-muted">
               <Link to={`/posts/${post.id}`} className="font-semibold text-primary hover:underline">
                 {post.title}
               </Link>
@@ -153,6 +153,8 @@ const DirectoryPage = () => {
       const { data: bannersData, error: bannersError } = await supabase
         .from('banners')
         .select('*, posts(title, description)')
+        .eq('is_active', true)
+        .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
         .order('display_order', { ascending: true });
 
       if (postsError || bannersError) {
