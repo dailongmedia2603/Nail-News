@@ -76,7 +76,7 @@ export function PostCard({ post, isFavorited, onFavoriteToggle, onView, isFeatur
     <Card 
       className={cn(
         "flex flex-col h-full cursor-pointer transition-all",
-        isFeatured && "border-primary/50 bg-primary/5"
+        isFeatured && "border-yellow-300 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-700/30"
       )} 
       onClick={() => onView(post.id)}
     >
