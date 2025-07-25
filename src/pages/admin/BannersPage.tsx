@@ -10,11 +10,15 @@ import { Switch } from '@/components/ui/switch';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { showError, showSuccess, showLoading, dismissToast } from '@/utils/toast';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { PlusCircle, Edit, Trash2, UploadCloud } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, UploadCloud, CalendarIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
 import { type Post } from '@/components/PostCard';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 type Banner = {
   id: number;
@@ -24,6 +28,8 @@ type Banner = {
   post_id?: string;
   display_location: string;
   is_active: boolean;
+  display_order: number;
+  expires_at: string | null;
   posts?: { title: string };
 };
 
@@ -34,6 +40,8 @@ const bannerSchema = z.object({
   image_upload: z.any().optional(),
   link_url: z.string().optional(),
   post_id: z.string().optional(),
+  display_order: z.coerce.number().default(0),
+  expires_at: z.date().optional().nullable(),
 });
 
 type BannerFormValues = z.infer<typeof bannerSchema>;
@@ -46,7 +54,7 @@ const AdminBannersPage = () => {
 
   const fetchData = async () => {
     setLoading(true);
-    const { data: bannersData, error: bannersError } = await supabase.from('banners').select('*, posts(title)');
+    const { data: bannersData, error: bannersError } = await supabase.from('banners').select('*, posts(title)').order('display_order');
     const { data: postsData, error: postsError } = await supabase.from('posts').select('*');
     if (bannersError || postsError) showError('Không thể tải dữ liệu.');
     else {
@@ -67,6 +75,13 @@ const AdminBannersPage = () => {
     }
   };
 
+  const getStatus = (banner: Banner) => {
+    const isActive = banner.is_active;
+    const isExpired = banner.expires_at && new Date(banner.expires_at) < new Date();
+    if (isExpired) return <span className="text-red-500">Hết hạn</span>;
+    return isActive ? 'Hoạt động' : 'Tắt';
+  };
+
   return (
     <div className="container mx-auto p-4 md:p-6">
       <div className="flex justify-between items-center mb-6">
@@ -78,14 +93,16 @@ const AdminBannersPage = () => {
       <Card>
         <CardContent className="pt-6">
           <Table>
-            <TableHeader><TableRow><TableHead>Loại</TableHead><TableHead>Nội dung</TableHead><TableHead>Vị trí</TableHead><TableHead>Trạng thái</TableHead><TableHead className="text-right">Hành động</TableHead></TableRow></TableHeader>
+            <TableHeader><TableRow><TableHead>Thứ tự</TableHead><TableHead>Loại</TableHead><TableHead>Nội dung</TableHead><TableHead>Vị trí</TableHead><TableHead>Hết hạn</TableHead><TableHead>Trạng thái</TableHead><TableHead className="text-right">Hành động</TableHead></TableRow></TableHeader>
             <TableBody>
               {banners.map(banner => (
                 <TableRow key={banner.id}>
+                  <TableCell>{banner.display_order}</TableCell>
                   <TableCell>{banner.type}</TableCell>
                   <TableCell>{banner.type === 'image' ? <img src={banner.image_url} className="h-10" /> : banner.posts?.title}</TableCell>
                   <TableCell>{banner.display_location}</TableCell>
-                  <TableCell>{banner.is_active ? 'Hoạt động' : 'Tắt'}</TableCell>
+                  <TableCell>{banner.expires_at ? format(new Date(banner.expires_at), 'dd/MM/yyyy') : 'Không'}</TableCell>
+                  <TableCell>{getStatus(banner)}</TableCell>
                   <TableCell className="text-right">
                     <Button variant="ghost" size="icon" onClick={() => setDialogState({ type: 'edit', data: banner })}><Edit className="h-4 w-4" /></Button>
                     <Button variant="ghost" size="icon" onClick={() => handleDelete(banner.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
@@ -122,6 +139,8 @@ function BannerForm({ initialData, posts, onSave, onCancel }: { initialData?: Ba
       is_active: initialData?.is_active ?? true,
       link_url: initialData?.link_url || '',
       post_id: initialData?.post_id || undefined,
+      display_order: initialData?.display_order || 0,
+      expires_at: initialData?.expires_at ? new Date(initialData.expires_at) : null,
     },
   });
   const [imagePreview, setImagePreview] = useState<string | null>(initialData?.image_url || null);
@@ -146,6 +165,8 @@ function BannerForm({ initialData, posts, onSave, onCancel }: { initialData?: Ba
       image_url: values.type === 'image' ? imageUrl : null,
       link_url: values.type === 'image' ? values.link_url : null,
       post_id: values.type === 'post' ? values.post_id : null,
+      display_order: values.display_order,
+      expires_at: values.expires_at ? values.expires_at.toISOString() : null,
     };
 
     let error;
@@ -209,6 +230,30 @@ function BannerForm({ initialData, posts, onSave, onCancel }: { initialData?: Ba
           <FormField control={form.control} name="post_id" render={({ field }) => <FormItem><FormLabel>Chọn Tin đăng / Danh bạ</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent>{posts.map(p => <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>} />
         )}
 
+        <FormField control={form.control} name="display_order" render={({ field }) => <FormItem><FormLabel>Thứ tự hiển thị</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>} />
+        <FormField control={form.control} name="expires_at" render={({ field }) => (
+          <FormItem className="flex flex-col"><FormLabel>Ngày hết hạn</FormLabel>
+            <Popover>
+              <PopoverTrigger asChild>
+                <FormControl>
+                  <Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>
+                    {field.value ? format(field.value, "PPP") : <span>Chọn ngày</span>}
+                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                  </Button>
+                </FormControl>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={field.value || undefined}
+                  onSelect={field.onChange}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+            <FormMessage />
+          </FormItem>
+        )}
         <FormField control={form.control} name="is_active" render={({ field }) => <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm"><FormLabel>Hoạt động</FormLabel><FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl></FormItem>} />
         
         <DialogFooter>

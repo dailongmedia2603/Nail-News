@@ -153,7 +153,7 @@ const DirectoryPage = () => {
       const { data: bannersData, error: bannersError } = await supabase
         .from('banners')
         .select('*, posts(title, description)')
-        .eq('is_active', true);
+        .order('display_order', { ascending: true });
 
       if (postsError || bannersError) {
         showError('Không thể tải dữ liệu danh bạ.');
