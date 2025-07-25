@@ -90,7 +90,9 @@
     "systemConfigDesc": "Change site-wide settings.",
     "userList": "User List",
     "manageDirectory": "Manage Directory",
-    "manageDirectoryDesc": "Add, edit, and delete directory listings."
+    "manageDirectoryDesc": "Add, edit, and delete directory listings.",
+    "managePhotoVideo": "Manage Photos & Videos",
+    "managePhotoVideoDesc": "Add, edit, and delete photo and video albums."
   },
   "adminPostsPage": {
     "title": "Manage Posts",

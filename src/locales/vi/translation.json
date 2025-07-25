@@ -90,7 +90,9 @@
     "systemConfigDesc": "Thay đổi cài đặt toàn trang web.",
     "userList": "Danh sách người dùng",
     "manageDirectory": "Quản lý Danh bạ",
-    "manageDirectoryDesc": "Thêm, sửa, xóa các mục trong danh bạ."
+    "manageDirectoryDesc": "Thêm, sửa, xóa các mục trong danh bạ.",
+    "managePhotoVideo": "Quản lý Ảnh & Video",
+    "managePhotoVideoDesc": "Thêm, sửa, xóa các album ảnh và video."
   },
   "adminPostsPage": {
     "title": "Quản lý Tin đăng",
