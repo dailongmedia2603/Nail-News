@@ -44,6 +44,7 @@ import AdminServicesPage from "./pages/admin/ServicesPage";
 import AdminRenewLicensePage from "./pages/admin/RenewLicensePage";
 import RenewLicensePage from "./pages/RenewLicensePage";
 import AdminTransactionsPage from "./pages/admin/TransactionsPage";
+import RevenueReportPage from "./pages/admin/RevenueReportPage";
 
 const queryClient = new QueryClient();
 
@@ -107,6 +108,7 @@ const AppContent = () => {
             <Route path="services" element={<AdminServicesPage />} />
             <Route path="renew-license" element={<AdminRenewLicensePage />} />
             <Route path="transactions" element={<AdminTransactionsPage />} />
+            <Route path="revenue-report" element={<RevenueReportPage />} />
           </Route>
         </Route>
       </Route>

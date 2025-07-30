@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MoreHorizontal, UserCog, List, Newspaper, FolderKanban, Tags, Settings, BookUser, Image as ImageIcon, Briefcase, FileText, Receipt } from "lucide-react";
+import { MoreHorizontal, UserCog, List, Newspaper, FolderKanban, Tags, Settings, BookUser, Image as ImageIcon, Briefcase, FileText, Receipt, LineChart } from "lucide-react";
 import { format } from "date-fns";
 import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
 import { Label } from "@/components/ui/label";
@@ -74,6 +74,10 @@ const AdminDashboardPage = () => {
     <div className="container mx-auto p-4 md:p-6">
       <h1 className="text-3xl font-bold mb-6">{t('adminDashboardPage.title')}</h1>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-6">
+        <Card className="cursor-pointer hover:bg-muted" onClick={() => navigate('/admin/revenue-report')}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Báo cáo Doanh thu</CardTitle><LineChart className="h-4 w-4 text-muted-foreground" /></CardHeader>
+            <CardContent><p className="text-xs text-muted-foreground">Xem báo cáo và phân tích xu hướng kinh doanh.</p></CardContent>
+        </Card>
         <Card className="cursor-pointer hover:bg-muted" onClick={() => navigate('/admin/posts')}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">{t('adminDashboardPage.managePosts')}</CardTitle><List className="h-4 w-4 text-muted-foreground" /></CardHeader>
             <CardContent><p className="text-xs text-muted-foreground">{t('adminDashboardPage.managePostsDesc')}</p></CardContent>
