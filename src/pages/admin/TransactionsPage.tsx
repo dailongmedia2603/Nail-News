@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, PlusCircle, Edit, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
 import { showError, showSuccess, showLoading, dismissToast } from "@/utils/toast";
@@ -14,87 +14,161 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
-import { Separator } from "@/components/ui/separator";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
-// Schema for Price Settings Form
-const priceSettingsSchema = z.object({
-  price_urgent: z.coerce.number().positive("Giá phải là số dương."),
-  price_vip: z.coerce.number().positive("Giá phải là số dương."),
+// --- Pricing Manager Component ---
+
+type PricingTier = {
+  id: string;
+  name: string;
+  tier_id: string;
+  description: string | null;
+  base_price_per_month: number;
+  discount_3_months: number;
+  discount_6_months: number;
+  discount_9_months: number;
+  discount_12_months: number;
+  is_active: boolean;
+};
+
+const tierSchema = z.object({
+  name: z.string().min(1, "Tên gói không được để trống."),
+  tier_id: z.string().min(1, "ID gói không được để trống.").regex(/^[a-z0-9_]+$/, "ID chỉ được chứa chữ thường, số và dấu gạch dưới."),
+  description: z.string().optional(),
+  base_price_per_month: z.coerce.number().min(0, "Giá phải lớn hơn hoặc bằng 0."),
+  discount_3_months: z.coerce.number().min(0).max(100).default(0),
+  discount_6_months: z.coerce.number().min(0).max(100).default(0),
+  discount_9_months: z.coerce.number().min(0).max(100).default(0),
+  discount_12_months: z.coerce.number().min(0).max(100).default(0),
+  is_active: z.boolean().default(true),
 });
-type PriceSettingsFormValues = z.infer<typeof priceSettingsSchema>;
 
-// Price Settings Component
-const PriceSettingsForm = () => {
+type TierFormValues = z.infer<typeof tierSchema>;
+
+const PricingManager = () => {
+  const [tiers, setTiers] = useState<PricingTier[]>([]);
   const [loading, setLoading] = useState(true);
-  const form = useForm<PriceSettingsFormValues>({
-    resolver: zodResolver(priceSettingsSchema),
-  });
+  const [dialogState, setDialogState] = useState<{ type: 'add' | 'edit' | null; data?: PricingTier }>({ type: null });
 
-  useEffect(() => {
-    const fetchPrices = async () => {
-      setLoading(true);
-      const { data, error } = await supabase.from('system_settings').select('key, value').in('key', ['price_urgent', 'price_vip']);
-      if (error) {
-        showError("Không thể tải cài đặt giá.");
-      } else {
-        const settings = data.reduce((acc, { key, value }) => ({ ...acc, [key]: value }), {} as { [key: string]: any });
-        form.reset({
-          price_urgent: settings.price_urgent,
-          price_vip: settings.price_vip,
-        });
-      }
-      setLoading(false);
-    };
-    fetchPrices();
-  }, [form]);
+  const fetchTiers = async () => {
+    setLoading(true);
+    const { data, error } = await supabase.from('pricing_tiers').select('*').order('created_at');
+    if (error) showError("Không thể tải danh sách gói.");
+    else setTiers(data || []);
+    setLoading(false);
+  };
 
-  const onSubmit = async (data: PriceSettingsFormValues) => {
-    const toastId = showLoading("Đang lưu cài đặt giá...");
-    const updates = [
-      supabase.from('system_settings').upsert({ key: 'price_urgent', value: data.price_urgent.toString() }),
-      supabase.from('system_settings').upsert({ key: 'price_vip', value: data.price_vip.toString() }),
-    ];
-    const results = await Promise.all(updates);
+  useEffect(() => { fetchTiers(); }, []);
+
+  const handleSave = async (values: TierFormValues) => {
+    const toastId = showLoading("Đang lưu...");
+    let error;
+    if (dialogState.type === 'add') {
+      ({ error } = await supabase.from('pricing_tiers').insert(values));
+    } else if (dialogState.type === 'edit' && dialogState.data) {
+      ({ error } = await supabase.from('pricing_tiers').update(values).eq('id', dialogState.data.id));
+    }
     dismissToast(toastId);
-    if (results.some(r => r.error)) {
-      showError("Lưu cài đặt giá thất bại.");
-    } else {
-      showSuccess("Đã lưu cài đặt giá thành công.");
+    if (error) showError("Lưu thất bại: " + error.message);
+    else {
+      showSuccess("Lưu thành công!");
+      setDialogState({ type: null });
+      fetchTiers();
     }
   };
 
-  if (loading) {
-    return <Skeleton className="h-48 w-full" />;
-  }
+  const handleDelete = async (tierId: string) => {
+    const { error } = await supabase.from('pricing_tiers').delete().eq('id', tierId);
+    if (error) showError("Xóa thất bại: " + error.message);
+    else {
+      showSuccess("Xóa thành công!");
+      fetchTiers();
+    }
+  };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FormField control={form.control} name="price_urgent" render={({ field }) => (
-            <FormItem>
-              <FormLabel>Giá tin Gấp</FormLabel>
-              <FormControl><Input type="number" step="0.01" {...field} /></FormControl>
-              <FormDescription>Giá mỗi tháng (USD).</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}/>
-          <FormField control={form.control} name="price_vip" render={({ field }) => (
-            <FormItem>
-              <FormLabel>Giá tin VIP</FormLabel>
-              <FormControl><Input type="number" step="0.01" {...field} /></FormControl>
-              <FormDescription>Giá mỗi tháng (USD).</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}/>
-        </div>
-        <Button type="submit" disabled={form.formState.isSubmitting}>Lưu thay đổi</Button>
-      </form>
-    </Form>
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <Button onClick={() => setDialogState({ type: 'add' })}>
+          <PlusCircle className="mr-2 h-4 w-4" /> Thêm Gói Mới
+        </Button>
+      </div>
+      <Card>
+        <CardContent className="pt-6">
+          {loading ? <Skeleton className="h-40 w-full" /> : (
+            <Table>
+              <TableHeader><TableRow><TableHead>Tên Gói</TableHead><TableHead>Giá Cơ Bản/Tháng</TableHead><TableHead>Trạng Thái</TableHead><TableHead className="text-right">Hành động</TableHead></TableRow></TableHeader>
+              <TableBody>
+                {tiers.map(tier => (
+                  <TableRow key={tier.id}>
+                    <TableCell className="font-medium">{tier.name}</TableCell>
+                    <TableCell>${tier.base_price_per_month}</TableCell>
+                    <TableCell>{tier.is_active ? 'Hoạt động' : 'Tắt'}</TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="ghost" size="icon" onClick={() => setDialogState({ type: 'edit', data: tier })}><Edit className="h-4 w-4" /></Button>
+                      <Button variant="ghost" size="icon" onClick={() => handleDelete(tier.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+
+      <Dialog open={dialogState.type !== null} onOpenChange={(open) => !open && setDialogState({ type: null })}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader><DialogTitle>{dialogState.type === 'add' ? 'Thêm Gói Mới' : 'Chỉnh sửa Gói'}</DialogTitle></DialogHeader>
+          <TierForm key={dialogState.data?.id || 'new'} initialData={dialogState.data} onSave={handleSave} onCancel={() => setDialogState({ type: null })} />
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 };
 
-// Transaction History Component
+function TierForm({ initialData, onSave, onCancel }: { initialData?: PricingTier; onSave: (data: TierFormValues) => void; onCancel: () => void; }) {
+  const form = useForm<TierFormValues>({
+    resolver: zodResolver(tierSchema),
+    defaultValues: initialData || {
+      name: '', tier_id: '', description: '', base_price_per_month: 0,
+      discount_3_months: 0, discount_6_months: 0, discount_9_months: 0, discount_12_months: 0,
+      is_active: true,
+    },
+  });
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSave)} className="space-y-4 py-4 max-h-[70vh] overflow-y-auto pr-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField control={form.control} name="name" render={({ field }) => <FormItem><FormLabel>Tên Gói</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>} />
+          <FormField control={form.control} name="tier_id" render={({ field }) => <FormItem><FormLabel>ID Gói</FormLabel><FormControl><Input {...field} disabled={!!initialData} /></FormControl><FormDescription>Không thể thay đổi sau khi tạo.</FormDescription><FormMessage /></FormItem>} />
+        </div>
+        <FormField control={form.control} name="description" render={({ field }) => <FormItem><FormLabel>Mô tả</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>} />
+        <FormField control={form.control} name="base_price_per_month" render={({ field }) => <FormItem><FormLabel>Giá Cơ Bản / Tháng ($)</FormLabel><FormControl><Input type="number" step="0.01" {...field} /></FormControl><FormMessage /></FormItem>} />
+        <div>
+          <Label>Chính sách Giảm giá (%)</Label>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2">
+            <FormField control={form.control} name="discount_3_months" render={({ field }) => <FormItem><FormLabel>3 Tháng</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>} />
+            <FormField control={form.control} name="discount_6_months" render={({ field }) => <FormItem><FormLabel>6 Tháng</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>} />
+            <FormField control={form.control} name="discount_9_months" render={({ field }) => <FormItem><FormLabel>9 Tháng</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>} />
+            <FormField control={form.control} name="discount_12_months" render={({ field }) => <FormItem><FormLabel>12 Tháng</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>} />
+          </div>
+        </div>
+        <FormField control={form.control} name="is_active" render={({ field }) => <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm"><FormLabel>Hoạt động</FormLabel><FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl></FormItem>} />
+        <DialogFooter>
+          <DialogClose asChild><Button type="button" variant="outline" onClick={onCancel}>Hủy</Button></DialogClose>
+          <Button type="submit">Lưu</Button>
+        </DialogFooter>
+      </form>
+    </Form>
+  );
+}
+
+// --- Transaction History Component ---
+
 const TransactionHistory = () => {
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -158,7 +232,8 @@ const TransactionHistory = () => {
   );
 };
 
-// Main Page Component
+// --- Main Page Component ---
+
 const AdminTransactionsPage = () => {
   return (
     <div className="container mx-auto p-4 md:p-6">
@@ -166,21 +241,13 @@ const AdminTransactionsPage = () => {
       <Tabs defaultValue="history">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="history">Lịch sử Giao dịch</TabsTrigger>
-          <TabsTrigger value="pricing">Cài đặt Giá</TabsTrigger>
+          <TabsTrigger value="pricing">Quản lý Gói & Giá</TabsTrigger>
         </TabsList>
         <TabsContent value="history" className="mt-6">
           <TransactionHistory />
         </TabsContent>
         <TabsContent value="pricing" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Cài đặt Giá Dịch vụ</CardTitle>
-              <CardDescription>Thiết lập giá cho các gói tin đăng nổi bật.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <PriceSettingsForm />
-            </CardContent>
-          </Card>
+          <PricingManager />
         </TabsContent>
       </Tabs>
     </div>

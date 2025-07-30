@@ -21,7 +21,7 @@ import { useState, useMemo, useEffect } from "react";
 import { showLoading, showSuccess, showError, dismissToast } from "@/utils/toast";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from 'uuid';
-import { Loader2, Star, Zap } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { ImageUploader } from "./ImageUploader";
 import { Card, CardContent } from "./ui/card";
 import { addMonths } from 'date-fns';
@@ -33,6 +33,17 @@ import { CheckoutForm } from "./CheckoutForm";
 
 type State = { id: number; name: string; };
 type City = { id: number; name: string; state_id: number; };
+type PricingTier = {
+  id: string;
+  name: string;
+  tier_id: string;
+  description: string | null;
+  base_price_per_month: number;
+  discount_3_months: number;
+  discount_6_months: number;
+  discount_9_months: number;
+  discount_12_months: number;
+};
 
 const createPostFormSchema = z.object({
   title: z.string().min(5, "Tiêu đề phải có ít nhất 5 ký tự."),
@@ -52,7 +63,7 @@ const createPostFormSchema = z.object({
   images: z.instanceof(FileList).optional(),
   salary_info: z.string().optional(),
   store_status: z.string().optional(),
-  tier: z.enum(["free", "urgent", "vip"]).default("free"),
+  tier: z.string().default("free"),
   duration: z.coerce.number().optional(),
   tags: z.array(z.number()).optional(),
 });
@@ -82,7 +93,7 @@ export function CreatePostForm() {
   const [pendingPostData, setPendingPostData] = useState<CreatePostFormValues | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'wallet' | 'stripe'>('wallet');
   const [userBalance, setUserBalance] = useState<number | null>(null);
-  const [pricing, setPricing] = useState({ urgent: 10, vip: 25 });
+  const [pricingTiers, setPricingTiers] = useState<PricingTier[]>([]);
 
   const formMethods = useForm<CreatePostFormValues>({
     resolver: zodResolver(createPostFormSchema),
@@ -94,7 +105,7 @@ export function CreatePostForm() {
   });
 
   const selectedStateId = formMethods.watch("state_id");
-  const selectedTier = formMethods.watch("tier");
+  const selectedTierId = formMethods.watch("tier");
   const selectedDuration = formMethods.watch("duration");
   const category = formMethods.watch("category");
 
@@ -111,11 +122,8 @@ export function CreatePostForm() {
         setUserBalance(profile?.balance ?? 0);
       }
 
-      const { data: pricingData } = await supabase.from('system_settings').select('key, value').in('key', ['price_urgent', 'price_vip']);
-      if (pricingData) {
-        const newPricing = pricingData.reduce((acc, { key, value }) => ({ ...acc, [key.replace('price_', '')]: parseFloat(value) }), {} as { urgent: number, vip: number });
-        setPricing(newPricing);
-      }
+      const { data: tiersData } = await supabase.from('pricing_tiers').select('*').eq('is_active', true);
+      setPricingTiers(tiersData || []);
     };
     fetchInitialData();
   }, []);
@@ -130,9 +138,21 @@ export function CreatePostForm() {
   }, [selectedStateId, cities, formMethods]);
 
   const totalCost = useMemo(() => {
-    if (selectedTier === 'free' || !selectedDuration) return 0;
-    return pricing[selectedTier as 'urgent' | 'vip'] * selectedDuration;
-  }, [selectedTier, selectedDuration, pricing]);
+    const selectedTierDetails = pricingTiers.find(p => p.tier_id === selectedTierId);
+    if (!selectedTierDetails || selectedTierId === 'free' || !selectedDuration) return 0;
+
+    let discountPercent = 0;
+    switch (selectedDuration) {
+        case 3: discountPercent = selectedTierDetails.discount_3_months; break;
+        case 6: discountPercent = selectedTierDetails.discount_6_months; break;
+        case 9: discountPercent = selectedTierDetails.discount_9_months; break;
+        case 12: discountPercent = selectedTierDetails.discount_12_months; break;
+    }
+
+    const total = selectedTierDetails.base_price_per_month * selectedDuration;
+    const discountAmount = total * (discountPercent / 100);
+    return total - discountAmount;
+  }, [selectedTierId, selectedDuration, pricingTiers]);
 
   const handlePaymentSuccess = async () => {
     if (!pendingPostData) return;
@@ -377,20 +397,21 @@ export function CreatePostForm() {
                       <FormControl><RadioGroupItem value="free" /></FormControl>
                       <FormLabel className="font-normal">Tin miễn phí</FormLabel>
                     </FormItem>
-                    <FormItem className="flex items-center space-x-3 space-y-0 rounded-md border p-4 has-[:checked]:border-primary">
-                      <FormControl><RadioGroupItem value="urgent" /></FormControl>
-                      <FormLabel className="font-normal flex items-center gap-2"><Zap className="h-4 w-4 text-orange-500" /> Tin gấp (${pricing.urgent}/tháng)</FormLabel>
-                    </FormItem>
-                    <FormItem className="flex items-center space-x-3 space-y-0 rounded-md border p-4 has-[:checked]:border-primary">
-                      <FormControl><RadioGroupItem value="vip" /></FormControl>
-                      <FormLabel className="font-normal flex items-center gap-2"><Star className="h-4 w-4 text-yellow-500" /> Tin VIP (${pricing.vip}/tháng)</FormLabel>
-                    </FormItem>
+                    {pricingTiers.map(tier => (
+                      <FormItem key={tier.id} className="flex items-center space-x-3 space-y-0 rounded-md border p-4 has-[:checked]:border-primary">
+                        <FormControl><RadioGroupItem value={tier.tier_id} /></FormControl>
+                        <FormLabel className="font-normal flex items-center gap-2">
+                          {tier.name} (${tier.base_price_per_month}/tháng)
+                          <span className="text-xs text-muted-foreground">{tier.description}</span>
+                        </FormLabel>
+                      </FormItem>
+                    ))}
                   </RadioGroup>
                 </FormItem>
               )}
             />
 
-            {selectedTier !== 'free' && (
+            {selectedTierId !== 'free' && (
               <Card className="bg-muted/40">
                   <CardContent className="pt-6 space-y-4">
                       <RadioGroup onValueChange={(value) => setPaymentMethod(value as any)} defaultValue={paymentMethod} className="space-y-2">
@@ -428,7 +449,7 @@ export function CreatePostForm() {
                           />
                           <div className="text-center md:text-right">
                               <p className="text-sm text-muted-foreground">Tổng chi phí</p>
-                              <p className="text-3xl font-bold">${totalCost}</p>
+                              <p className="text-3xl font-bold">{formatCurrency(totalCost)}</p>
                           </div>
                       </div>
                   </CardContent>
@@ -449,7 +470,7 @@ export function CreatePostForm() {
             <DialogHeader>
               <DialogTitle>Hoàn tất thanh toán</DialogTitle>
               <DialogDescription>
-                Vui lòng nhập thông tin thanh toán để hoàn tất đăng tin. Tổng số tiền: ${totalCost}.
+                Vui lòng nhập thông tin thanh toán để hoàn tất đăng tin. Tổng số tiền: {formatCurrency(totalCost)}.
               </DialogDescription>
             </DialogHeader>
             <Elements stripe={stripePromise} options={{ clientSecret }}>

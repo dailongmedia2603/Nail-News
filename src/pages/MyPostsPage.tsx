@@ -11,7 +11,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MoreHorizontal, Trash2, Pencil, RefreshCw, Star, Zap, Loader2 } from "lucide-react";
+import { MoreHorizontal, Trash2, Pencil, RefreshCw, Loader2 } from "lucide-react";
 import { format, addMonths, isPast } from "date-fns";
 import { type Post } from "@/components/PostCard";
 import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
@@ -23,6 +23,17 @@ import { loadStripe, Stripe } from "@stripe/stripe-js";
 import { CheckoutForm } from "@/components/CheckoutForm";
 
 type Transaction = { id: number; post_id: string; amount: number; }
+type PricingTier = {
+  id: string;
+  name: string;
+  tier_id: string;
+  description: string | null;
+  base_price_per_month: number;
+  discount_3_months: number;
+  discount_6_months: number;
+  discount_9_months: number;
+  discount_12_months: number;
+};
 
 const STRIPE_PUBLISHABLE_KEY = "pk_test_51RoTWa1ayrvGWBb9qyTGEe7XHym0TKMTmZp4fG2ncHBw2kvJH5YT6ZgaOo2gaZs8jLXW9a353Fg9VgobnOe23jEE00RiTBJCoG";
 let stripePromise: Promise<Stripe | null>;
@@ -36,18 +47,31 @@ const MyPostsPage = () => {
   const [loading, setLoading] = useState(true);
   const [selectedPosts, setSelectedPosts] = useState<string[]>([]);
   const [dialogState, setDialogState] = useState<{ type: 'delete-single' | 'delete-bulk' | 'renew' | null, post?: Post | null }>({ type: null, post: null });
-  const [renewalTier, setRenewalTier] = useState<'urgent' | 'vip'>('urgent');
+  const [renewalTierId, setRenewalTierId] = useState<string>('');
   const [renewalDuration, setRenewalDuration] = useState<number>(3);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [renewalPaymentMethod, setRenewalPaymentMethod] = useState<'wallet' | 'stripe'>('wallet');
   const [userBalance, setUserBalance] = useState<number | null>(null);
-  const [pricing, setPricing] = useState({ urgent: 10, vip: 25 });
+  const [pricingTiers, setPricingTiers] = useState<PricingTier[]>([]);
   const navigate = useNavigate();
 
   const totalCost = useMemo(() => {
-    if (dialogState.type !== 'renew') return 0;
-    return pricing[renewalTier] * renewalDuration;
-  }, [dialogState.type, renewalTier, renewalDuration, pricing]);
+    if (dialogState.type !== 'renew' || !renewalTierId) return 0;
+    const selectedTierDetails = pricingTiers.find(p => p.tier_id === renewalTierId);
+    if (!selectedTierDetails) return 0;
+
+    let discountPercent = 0;
+    switch (renewalDuration) {
+        case 3: discountPercent = selectedTierDetails.discount_3_months; break;
+        case 6: discountPercent = selectedTierDetails.discount_6_months; break;
+        case 9: discountPercent = selectedTierDetails.discount_9_months; break;
+        case 12: discountPercent = selectedTierDetails.discount_12_months; break;
+    }
+
+    const total = selectedTierDetails.base_price_per_month * renewalDuration;
+    const discountAmount = total * (discountPercent / 100);
+    return total - discountAmount;
+  }, [dialogState.type, renewalTierId, renewalDuration, pricingTiers]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -77,10 +101,10 @@ const MyPostsPage = () => {
     const { data: profile } = await supabase.from('profiles').select('balance').eq('id', user.id).single();
     setUserBalance(profile?.balance ?? 0);
 
-    const { data: pricingData } = await supabase.from('system_settings').select('key, value').in('key', ['price_urgent', 'price_vip']);
-    if (pricingData) {
-      const newPricing = pricingData.reduce((acc, { key, value }) => ({ ...acc, [key.replace('price_', '')]: parseFloat(value) }), {} as { urgent: number, vip: number });
-      setPricing(newPricing);
+    const { data: tiersData } = await supabase.from('pricing_tiers').select('*').eq('is_active', true);
+    setPricingTiers(tiersData || []);
+    if (tiersData && tiersData.length > 0) {
+      setRenewalTierId(tiersData[0].tier_id);
     }
 
     setLoading(false);
@@ -162,7 +186,7 @@ const MyPostsPage = () => {
     const newExpiresAt = addMonths(new Date(), renewalDuration).toISOString();
     const { error: postUpdateError } = await supabase
       .from('posts')
-      .update({ tier: renewalTier, duration_months: renewalDuration, expires_at: newExpiresAt })
+      .update({ tier: renewalTierId, duration_months: renewalDuration, expires_at: newExpiresAt })
       .eq('id', dialogState.post.id);
 
     if (postUpdateError) {
@@ -179,7 +203,7 @@ const MyPostsPage = () => {
     await supabase.from('transactions').insert({
       user_id: user.id,
       amount: -totalCost,
-      description: `Gia hạn tin ${renewalTier.toUpperCase()} (${renewalDuration} tháng)`,
+      description: `Gia hạn tin ${renewalTierId.toUpperCase()} (${renewalDuration} tháng)`,
       post_id: dialogState.post.id,
     });
 
@@ -202,11 +226,8 @@ const MyPostsPage = () => {
 
   const getTierLabel = (post: Post) => {
     if (post.tier === 'free') return 'Miễn phí';
-    
-    let tierName = '';
-    if (post.tier === 'urgent') tierName = 'Tin gấp';
-    else if (post.tier === 'vip') tierName = 'Tin VIP';
-    else tierName = `Gói ${post.tier?.toUpperCase()}`;
+    const tierInfo = pricingTiers.find(t => t.tier_id === post.tier);
+    const tierName = tierInfo ? tierInfo.name : `Gói ${post.tier?.toUpperCase()}`;
 
     if (post.duration_months) {
         return `${tierName} - ${post.duration_months} tháng`;
@@ -327,16 +348,16 @@ const MyPostsPage = () => {
           {!clientSecret ? (
             <>
               <div className="grid gap-4 py-4">
-                <RadioGroup value={renewalTier} onValueChange={(v) => setRenewalTier(v as any)} className="space-y-2">
+                <RadioGroup value={renewalTierId} onValueChange={(v) => setRenewalTierId(v)} className="space-y-2">
                   <Label>Chọn gói mới</Label>
-                  <div className="flex items-center space-x-3 space-y-0 rounded-md border p-4 has-[:checked]:border-primary">
-                    <RadioGroupItem value="urgent" id="r-urgent" />
-                    <Label htmlFor="r-urgent" className="font-normal flex items-center gap-2"><Zap className="h-4 w-4 text-orange-500" /> Tin gấp (${pricing.urgent}/tháng)</Label>
-                  </div>
-                  <div className="flex items-center space-x-3 space-y-0 rounded-md border p-4 has-[:checked]:border-primary">
-                    <RadioGroupItem value="vip" id="r-vip" />
-                    <Label htmlFor="r-vip" className="font-normal flex items-center gap-2"><Star className="h-4 w-4 text-yellow-500" /> Tin VIP (${pricing.vip}/tháng)</Label>
-                  </div>
+                  {pricingTiers.map(tier => (
+                    <div key={tier.id} className="flex items-center space-x-3 space-y-0 rounded-md border p-4 has-[:checked]:border-primary">
+                      <RadioGroupItem value={tier.tier_id} id={`r-${tier.tier_id}`} />
+                      <Label htmlFor={`r-${tier.tier_id}`} className="font-normal flex items-center gap-2">
+                        {tier.name} (${tier.base_price_per_month}/tháng)
+                      </Label>
+                    </div>
+                  ))}
                 </RadioGroup>
                 <div className="grid grid-cols-2 items-center gap-4">
                   <Select value={renewalDuration.toString()} onValueChange={(v) => setRenewalDuration(parseInt(v))}>
