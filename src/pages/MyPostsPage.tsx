@@ -24,7 +24,6 @@ import { CheckoutForm } from "@/components/CheckoutForm";
 
 type Transaction = { id: number; post_id: string; amount: number; }
 
-const PRICING = { urgent: 10, vip: 25 };
 const STRIPE_PUBLISHABLE_KEY = "pk_test_51RoTWa1ayrvGWBb9qyTGEe7XHym0TKMTmZp4fG2ncHBw2kvJH5YT6ZgaOo2gaZs8jLXW9a353Fg9VgobnOe23jEE00RiTBJCoG";
 let stripePromise: Promise<Stripe | null>;
 if (STRIPE_PUBLISHABLE_KEY) {
@@ -42,12 +41,13 @@ const MyPostsPage = () => {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [renewalPaymentMethod, setRenewalPaymentMethod] = useState<'wallet' | 'stripe'>('wallet');
   const [userBalance, setUserBalance] = useState<number | null>(null);
+  const [pricing, setPricing] = useState({ urgent: 10, vip: 25 });
   const navigate = useNavigate();
 
   const totalCost = useMemo(() => {
     if (dialogState.type !== 'renew') return 0;
-    return PRICING[renewalTier] * renewalDuration;
-  }, [dialogState.type, renewalTier, renewalDuration]);
+    return pricing[renewalTier] * renewalDuration;
+  }, [dialogState.type, renewalTier, renewalDuration, pricing]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -76,6 +76,12 @@ const MyPostsPage = () => {
 
     const { data: profile } = await supabase.from('profiles').select('balance').eq('id', user.id).single();
     setUserBalance(profile?.balance ?? 0);
+
+    const { data: pricingData } = await supabase.from('system_settings').select('key, value').in('key', ['price_urgent', 'price_vip']);
+    if (pricingData) {
+      const newPricing = pricingData.reduce((acc, { key, value }) => ({ ...acc, [key.replace('price_', '')]: parseFloat(value) }), {} as { urgent: number, vip: number });
+      setPricing(newPricing);
+    }
 
     setLoading(false);
   };
@@ -325,11 +331,11 @@ const MyPostsPage = () => {
                   <Label>Chọn gói mới</Label>
                   <div className="flex items-center space-x-3 space-y-0 rounded-md border p-4 has-[:checked]:border-primary">
                     <RadioGroupItem value="urgent" id="r-urgent" />
-                    <Label htmlFor="r-urgent" className="font-normal flex items-center gap-2"><Zap className="h-4 w-4 text-orange-500" /> Tin gấp ($10/tháng)</Label>
+                    <Label htmlFor="r-urgent" className="font-normal flex items-center gap-2"><Zap className="h-4 w-4 text-orange-500" /> Tin gấp (${pricing.urgent}/tháng)</Label>
                   </div>
                   <div className="flex items-center space-x-3 space-y-0 rounded-md border p-4 has-[:checked]:border-primary">
                     <RadioGroupItem value="vip" id="r-vip" />
-                    <Label htmlFor="r-vip" className="font-normal flex items-center gap-2"><Star className="h-4 w-4 text-yellow-500" /> Tin VIP ($25/tháng)</Label>
+                    <Label htmlFor="r-vip" className="font-normal flex items-center gap-2"><Star className="h-4 w-4 text-yellow-500" /> Tin VIP (${pricing.vip}/tháng)</Label>
                   </div>
                 </RadioGroup>
                 <div className="grid grid-cols-2 items-center gap-4">

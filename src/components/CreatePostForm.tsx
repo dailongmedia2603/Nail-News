@@ -59,7 +59,6 @@ const createPostFormSchema = z.object({
 
 type CreatePostFormValues = z.infer<typeof createPostFormSchema>;
 
-const PRICING = { urgent: 10, vip: 25 };
 const STRIPE_PUBLISHABLE_KEY = "pk_test_51RoTWa1ayrvGWBb9qyTGEe7XHym0TKMTmZp4fG2ncHBw2kvJH5YT6ZgaOo2gaZs8jLXW9a353Fg9VgobnOe23jEE00RiTBJCoG";
 let stripePromise: Promise<Stripe | null>;
 if (STRIPE_PUBLISHABLE_KEY) {
@@ -83,6 +82,7 @@ export function CreatePostForm() {
   const [pendingPostData, setPendingPostData] = useState<CreatePostFormValues | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'wallet' | 'stripe'>('wallet');
   const [userBalance, setUserBalance] = useState<number | null>(null);
+  const [pricing, setPricing] = useState({ urgent: 10, vip: 25 });
 
   const formMethods = useForm<CreatePostFormValues>({
     resolver: zodResolver(createPostFormSchema),
@@ -110,6 +110,12 @@ export function CreatePostForm() {
         const { data: profile } = await supabase.from('profiles').select('balance').eq('id', user.id).single();
         setUserBalance(profile?.balance ?? 0);
       }
+
+      const { data: pricingData } = await supabase.from('system_settings').select('key, value').in('key', ['price_urgent', 'price_vip']);
+      if (pricingData) {
+        const newPricing = pricingData.reduce((acc, { key, value }) => ({ ...acc, [key.replace('price_', '')]: parseFloat(value) }), {} as { urgent: number, vip: number });
+        setPricing(newPricing);
+      }
     };
     fetchInitialData();
   }, []);
@@ -125,8 +131,8 @@ export function CreatePostForm() {
 
   const totalCost = useMemo(() => {
     if (selectedTier === 'free' || !selectedDuration) return 0;
-    return PRICING[selectedTier as 'urgent' | 'vip'] * selectedDuration;
-  }, [selectedTier, selectedDuration]);
+    return pricing[selectedTier as 'urgent' | 'vip'] * selectedDuration;
+  }, [selectedTier, selectedDuration, pricing]);
 
   const handlePaymentSuccess = async () => {
     if (!pendingPostData) return;
@@ -373,11 +379,11 @@ export function CreatePostForm() {
                     </FormItem>
                     <FormItem className="flex items-center space-x-3 space-y-0 rounded-md border p-4 has-[:checked]:border-primary">
                       <FormControl><RadioGroupItem value="urgent" /></FormControl>
-                      <FormLabel className="font-normal flex items-center gap-2"><Zap className="h-4 w-4 text-orange-500" /> Tin gấp ($10/tháng)</FormLabel>
+                      <FormLabel className="font-normal flex items-center gap-2"><Zap className="h-4 w-4 text-orange-500" /> Tin gấp (${pricing.urgent}/tháng)</FormLabel>
                     </FormItem>
                     <FormItem className="flex items-center space-x-3 space-y-0 rounded-md border p-4 has-[:checked]:border-primary">
                       <FormControl><RadioGroupItem value="vip" /></FormControl>
-                      <FormLabel className="font-normal flex items-center gap-2"><Star className="h-4 w-4 text-yellow-500" /> Tin VIP ($25/tháng)</FormLabel>
+                      <FormLabel className="font-normal flex items-center gap-2"><Star className="h-4 w-4 text-yellow-500" /> Tin VIP (${pricing.vip}/tháng)</FormLabel>
                     </FormItem>
                   </RadioGroup>
                 </FormItem>
