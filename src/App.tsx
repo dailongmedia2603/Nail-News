@@ -43,6 +43,7 @@ import AdminPhotoVideoPage from "./pages/admin/PhotoVideoPage";
 import AdminServicesPage from "./pages/admin/ServicesPage";
 import AdminRenewLicensePage from "./pages/admin/RenewLicensePage";
 import RenewLicensePage from "./pages/RenewLicensePage";
+import AdminTransactionsPage from "./pages/admin/TransactionsPage";
 
 const queryClient = new QueryClient();
 
@@ -105,6 +106,7 @@ const AppContent = () => {
             <Route path="photo-video" element={<AdminPhotoVideoPage />} />
             <Route path="services" element={<AdminServicesPage />} />
             <Route path="renew-license" element={<AdminRenewLicensePage />} />
+            <Route path="transactions" element={<AdminTransactionsPage />} />
           </Route>
         </Route>
       </Route>
