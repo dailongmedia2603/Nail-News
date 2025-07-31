@@ -33,6 +33,7 @@ const NavLinks = ({ isMobile = false }: { isMobile?: boolean }) => {
         <Link to="/tutorials" className="transition-colors hover:text-foreground/80 text-foreground">{t('header.learnNail')}</Link>
         <Link to="/contact" className="transition-colors hover:text-foreground/80 text-foreground">{t('supportMenu.contact')}</Link>
         <Link to="/faq" className="transition-colors hover:text-foreground/80 text-foreground">{t('supportMenu.faq')}</Link>
+        <Link to="/user-guide" className="transition-colors hover:text-foreground/80 text-foreground">{t('supportMenu.userGuide')}</Link>
       </>
     );
   }
@@ -52,6 +53,7 @@ const NavLinks = ({ isMobile = false }: { isMobile?: boolean }) => {
         <DropdownMenuContent align="start">
           <DropdownMenuItem asChild><Link to="/contact">{t('supportMenu.contact')}</Link></DropdownMenuItem>
           <DropdownMenuItem asChild><Link to="/faq">{t('supportMenu.faq')}</Link></DropdownMenuItem>
+          <DropdownMenuItem asChild><Link to="/user-guide">{t('supportMenu.userGuide')}</Link></DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </>
