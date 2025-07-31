@@ -48,6 +48,7 @@ import RevenueReportPage from "./pages/admin/RevenueReportPage";
 import ContactPage from "./pages/ContactPage";
 import FaqPage from "./pages/FaqPage";
 import UserGuidePage from "./pages/UserGuidePage";
+import AdminSupportPage from "./pages/admin/SupportPage";
 
 const queryClient = new QueryClient();
 
@@ -115,6 +116,7 @@ const AppContent = () => {
             <Route path="renew-license" element={<AdminRenewLicensePage />} />
             <Route path="transactions" element={<AdminTransactionsPage />} />
             <Route path="revenue-report" element={<RevenueReportPage />} />
+            <Route path="support" element={<AdminSupportPage />} />
           </Route>
         </Route>
       </Route>

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MoreHorizontal, UserCog, List, Newspaper, FolderKanban, Tags, Settings, BookUser, Image as ImageIcon, Briefcase, FileText, Receipt, LineChart } from "lucide-react";
+import { MoreHorizontal, UserCog, List, Newspaper, FolderKanban, Tags, Settings, BookUser, Image as ImageIcon, Briefcase, FileText, Receipt, LineChart, LifeBuoy } from "lucide-react";
 import { format } from "date-fns";
 import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
 import { Label } from "@/components/ui/label";
@@ -117,6 +117,10 @@ const AdminDashboardPage = () => {
         <Card className="cursor-pointer hover:bg-muted" onClick={() => navigate('/admin/tags')}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">{t('adminDashboardPage.manageTags')}</CardTitle><Tags className="h-4 w-4 text-muted-foreground" /></CardHeader>
             <CardContent><p className="text-xs text-muted-foreground">{t('adminDashboardPage.manageTagsDesc')}</p></CardContent>
+        </Card>
+        <Card className="cursor-pointer hover:bg-muted" onClick={() => navigate('/admin/support')}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Quản lý Hỗ trợ</CardTitle><LifeBuoy className="h-4 w-4 text-muted-foreground" /></CardHeader>
+            <CardContent><p className="text-xs text-muted-foreground">Chỉnh sửa nội dung các trang hỗ trợ.</p></CardContent>
         </Card>
         <Card className="cursor-pointer hover:bg-muted" onClick={() => navigate('/admin/settings')}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">{t('adminDashboardPage.systemConfig')}</CardTitle><Settings className="h-4 w-4 text-muted-foreground" /></CardHeader>
