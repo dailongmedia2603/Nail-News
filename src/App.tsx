@@ -45,6 +45,8 @@ import AdminRenewLicensePage from "./pages/admin/RenewLicensePage";
 import RenewLicensePage from "./pages/RenewLicensePage";
 import AdminTransactionsPage from "./pages/admin/TransactionsPage";
 import RevenueReportPage from "./pages/admin/RevenueReportPage";
+import ContactPage from "./pages/ContactPage";
+import FaqPage from "./pages/FaqPage";
 
 const queryClient = new QueryClient();
 
@@ -79,6 +81,8 @@ const AppContent = () => {
         <Route path="/photo-video" element={<PhotoGalleryPage />} />
         <Route path="/photo-video/:id" element={<AlbumDetailPage />} />
         <Route path="/renew-license" element={<RenewLicensePage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/faq" element={<FaqPage />} />
 
         {/* Protected Routes - Must be logged in */}
         <Route element={<ProtectedLayout />}>

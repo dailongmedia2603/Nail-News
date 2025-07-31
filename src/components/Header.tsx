@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, User, PlusCircle, Shield, Menu } from "lucide-react";
+import { LogOut, User, PlusCircle, Shield, Menu, ChevronDown, LifeBuoy } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { useTranslation } from 'react-i18next';
@@ -23,16 +23,37 @@ type Settings = {
   logo_url: string;
 };
 
-const NavLinks = () => {
+const NavLinks = ({ isMobile = false }: { isMobile?: boolean }) => {
   const { t } = useTranslation();
+
+  if (isMobile) {
+    return (
+      <>
+        <Link to="/blog" className="transition-colors hover:text-foreground/80 text-foreground">{t('header.blog')}</Link>
+        <Link to="/contact" className="transition-colors hover:text-foreground/80 text-foreground">{t('supportMenu.contact')}</Link>
+        <Link to="/faq" className="transition-colors hover:text-foreground/80 text-foreground">{t('supportMenu.faq')}</Link>
+        <Link to="/tutorials" className="transition-colors hover:text-foreground/80 text-foreground">{t('supportMenu.userGuide')}</Link>
+      </>
+    );
+  }
+
   return (
     <>
-      <Link to="/tutorials" className="transition-colors hover:text-foreground/80 text-foreground">
-        {t('header.tutorials')}
-      </Link>
-      <Link to="/blog" className="transition-colors hover:text-foreground/80 text-foreground">
-        {t('header.blog')}
-      </Link>
+      <Link to="/blog" className="transition-colors hover:text-foreground/80 text-foreground/60">{t('header.blog')}</Link>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="flex items-center gap-1 text-foreground/60 hover:text-foreground/80">
+            <LifeBuoy className="h-4 w-4" />
+            {t('supportMenu.title')}
+            <ChevronDown className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start">
+          <DropdownMenuItem asChild><Link to="/contact">{t('supportMenu.contact')}</Link></DropdownMenuItem>
+          <DropdownMenuItem asChild><Link to="/faq">{t('supportMenu.faq')}</Link></DropdownMenuItem>
+          <DropdownMenuItem asChild><Link to="/tutorials">{t('supportMenu.userGuide')}</Link></DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </>
   );
 };
@@ -171,7 +192,7 @@ export default function Header() {
               </SheetTrigger>
               <SheetContent>
                 <nav className="flex flex-col items-start space-y-4 pt-8 text-lg">
-                  <NavLinks />
+                  <NavLinks isMobile={true} />
                   {!session && (
                     <>
                       <Button variant="outline" onClick={() => navigate('/login')} className="w-full">{t('header.login')}</Button>
