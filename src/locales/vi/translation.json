@@ -1,7 +1,7 @@
 {
   "header": {
-    "tutorials": "Hướng dẫn",
     "blog": "Blog",
+    "learnNail": "Học Nail",
     "post_ad": "Đăng tin",
     "logged_in_as": "Đăng nhập với tài khoản",
     "admin_dashboard": "Trang quản trị",
@@ -10,18 +10,19 @@
     "login": "Đăng nhập",
     "signup": "Đăng ký"
   },
-  "homePage": {
-    "title": "Tìm kiếm tin tức ngành Nail",
-    "subtitle": "Khám phá các cơ hội bán tiệm, việc làm và đào tạo mới nhất.",
-    "noPosts": "Không tìm thấy tin đăng nào phù hợp.",
-    "featuredPosts": "Tin nổi bật",
-    "viewAll": "Xem tất cả",
-    "latestPosts": "Tin mới nhất"
+  "supportMenu": {
+    "title": "Hỗ trợ",
+    "contact": "Liên hệ",
+    "faq": "Hỏi & Đáp",
+    "userGuide": "Hướng dẫn sử dụng"
   },
-  "featuredPostsPage": {
-    "title": "Tin đăng nổi bật",
-    "subtitle": "Các tin đăng được ưu tiên hiển thị hàng đầu.",
-    "noPosts": "Hiện không có tin đăng nổi bật nào."
+  "homePage": {
+    "title": "Nền tảng Rao vặt Ngành Nail tại Mỹ",
+    "subtitle": "Tìm kiếm, mua bán tiệm nail, tuyển dụng thợ và nhiều hơn nữa.",
+    "featuredPosts": "Tin Nổi bật",
+    "latestPosts": "Tin Mới nhất",
+    "viewAll": "Xem tất cả",
+    "noPosts": "Không có tin đăng nào phù hợp."
   },
   "postCategories": {
     "all": "Tất cả",
@@ -38,8 +39,59 @@
     "chairs": "{{count}} ghế",
     "tables": "{{count}} bàn",
     "salary": "Lương: {{salaryInfo}}",
-    "hours": "Giờ: {{hours}}",
-    "status": "Tiệm: {{status}}"
+    "hours": "Giờ làm: {{hours}}",
+    "status": "Tình trạng: {{status}}"
+  },
+  "toasts": {
+    "linkCopied": "Đã sao chép liên kết!",
+    "adminSettingsLoadError": "Không thể tải cài đặt.",
+    "adminSavingSettings": "Đang lưu cài đặt...",
+    "adminLogoUploadError": "Tải logo thất bại: {{message}}",
+    "adminFaviconUploadError": "Tải favicon thất bại: {{message}}",
+    "adminSaveSettingsError": "Lưu cài đặt thất bại.",
+    "adminSaveSettingsSuccess": "Đã lưu cài đặt thành công!"
+  },
+  "adminSettingsPage": {
+    "title": "Cài đặt Hệ thống",
+    "websiteName": "Tên Website",
+    "browserTitle": "Tiêu đề Trình duyệt",
+    "contactInfo": "Thông tin Liên hệ",
+    "websiteLogo": "Logo Website",
+    "favicon": "Favicon",
+    "saveChanges": "Lưu thay đổi"
+  },
+  "adminDashboardPage": {
+    "title": "Bảng điều khiển Quản trị viên",
+    "managePosts": "Quản lý Tin đăng",
+    "managePostsDesc": "Duyệt và quản lý tất cả các tin đăng.",
+    "manageBlog": "Quản lý Blog",
+    "manageBlogDesc": "Tạo và chỉnh sửa các bài viết blog.",
+    "manageDirectory": "Quản lý Danh bạ",
+    "manageDirectoryDesc": "Quản lý các mục trong danh bạ.",
+    "managePhotoVideo": "Quản lý Ảnh & Video",
+    "managePhotoVideoDesc": "Quản lý album ảnh và video.",
+    "manageServices": "Quản lý Dịch vụ",
+    "manageServicesDesc": "Quản lý các bài đăng dịch vụ.",
+    "manageCategories": "Quản lý Danh mục",
+    "manageCategoriesDesc": "Quản lý tiểu bang và thành phố.",
+    "manageTags": "Quản lý Tag",
+    "manageTagsDesc": "Quản lý các tag và từ khóa.",
+    "systemConfig": "Cấu hình Hệ thống",
+    "systemConfigDesc": "Chỉnh sửa cài đặt toàn trang web.",
+    "userList": "Danh sách Người dùng"
+  },
+  "createPostPage": {
+    "title": "Tạo tin đăng mới",
+    "subtitle": "Điền thông tin chi tiết dưới đây để đăng tin của bạn."
+  },
+  "profilePage": {
+    "accountInfoTitle": "Thông tin tài khoản",
+    "accountInfoSubtitle": "Cập nhật thông tin tài khoản của bạn.",
+    "changePasswordTitle": "Đổi mật khẩu",
+    "changePasswordSubtitle": "Thay đổi mật khẩu đăng nhập của bạn.",
+    "changePasswordButton": "Đổi mật khẩu",
+    "dialogTitle": "Đổi mật khẩu",
+    "dialogDescription": "Nhập mật khẩu cũ và mới để hoàn tất thay đổi."
   },
   "postDetailPage": {
     "postedOn": "Đăng ngày {{date}}",
@@ -52,7 +104,7 @@
     "staff": "Nhân sự:",
     "scaleInfo": "Thông tin quy mô",
     "revenue": "Doanh thu:",
-    "hours": "Giờ làm việc:",
+    "hours": "Giờ hoạt động:",
     "jobInfo": "Thông tin công việc",
     "salary": "Lương:",
     "salonStatus": "Trạng thái tiệm:",
@@ -60,67 +112,19 @@
     "tagsKeywords": "Tags & Từ khóa",
     "location": "Vị trí",
     "address": "Địa chỉ: <strong>{{address}}</strong>",
-    "mapComingSoon": "Bản đồ sẽ sớm được tích hợp.<br/>(Cần API Key từ Google Maps Platform để hiển thị)",
-    "postNotFound": "Không tìm thấy tin đăng này."
-  },
-  "createPostPage": {
-    "title": "Tạo tin đăng mới",
-    "subtitle": "Điền thông tin chi tiết dưới đây để đăng tin của bạn."
-  },
-  "profilePage": {
-    "accountInfoTitle": "Thông tin tài khoản",
-    "accountInfoSubtitle": "Cập nhật thông tin tài khoản của bạn.",
-    "changePasswordTitle": "Đổi mật khẩu",
-    "changePasswordSubtitle": "Thay đổi mật khẩu của bạn tại đây.",
-    "changePasswordButton": "Đổi mật khẩu",
-    "dialogTitle": "Đổi mật khẩu",
-    "dialogDescription": "Sau khi đổi mật khẩu thành công, bạn sẽ được yêu cầu đăng nhập lại."
-  },
-  "adminDashboardPage": {
-    "title": "Bảng điều khiển Quản trị viên",
-    "managePosts": "Quản lý Tin đăng",
-    "managePostsDesc": "Xem, sửa, xóa tất cả tin đăng.",
-    "manageBlog": "Quản lý Blog",
-    "manageBlogDesc": "Tạo và quản lý bài viết blog.",
-    "manageCategories": "Quản lý Danh mục",
-    "manageCategoriesDesc": "Quản lý tiểu bang và thành phố.",
-    "manageTags": "Quản lý Tag",
-    "manageTagsDesc": "Quản lý các tag và từ khóa.",
-    "systemConfig": "Cấu hình Hệ thống",
-    "systemConfigDesc": "Thay đổi cài đặt toàn trang web.",
-    "userList": "Danh sách người dùng",
-    "manageDirectory": "Quản lý Danh bạ",
-    "manageDirectoryDesc": "Thêm, sửa, xóa các mục trong danh bạ.",
-    "managePhotoVideo": "Quản lý Ảnh & Video",
-    "managePhotoVideoDesc": "Thêm, sửa, xóa các album ảnh và video.",
-    "manageServices": "Quản lý Dịch vụ",
-    "manageServicesDesc": "Thêm, sửa, xóa các tin đăng dịch vụ."
-  },
-  "adminPostsPage": {
-    "title": "Quản lý Tin đăng",
-    "allPosts": "Tất cả tin đăng"
-  },
-  "adminSettingsPage": {
-    "title": "Cài đặt Hệ thống",
-    "cardTitle": "Cài đặt chung",
-    "cardDescription": "Quản lý các cài đặt cơ bản cho toàn bộ trang web.",
-    "websiteName": "Tên Website",
-    "browserTitle": "Tiêu đề Trình duyệt",
-    "contactInfo": "Thông tin Liên hệ",
-    "websiteLogo": "Logo Website",
-    "favicon": "Favicon",
-    "saveChanges": "Lưu thay đổi"
-  },
-  "toasts": {
-    "linkCopied": "Đã sao chép liên kết!",
-    "adminSettingsLoadError": "Không thể tải cài đặt.",
-    "adminSavingSettings": "Đang lưu cài đặt...",
-    "adminLogoUploadError": "Tải logo thất bại: {{message}}",
-    "adminFaviconUploadError": "Tải favicon thất bại: {{message}}",
-    "adminSaveSettingsError": "Lưu cài đặt thất bại.",
-    "adminSaveSettingsSuccess": "Đã lưu cài đặt thành công."
+    "mapComingSoon": "Bản đồ sẽ sớm được cập nhật.<br/>Vui lòng liên hệ trực tiếp để biết địa chỉ chính xác.",
+    "postNotFound": "Không tìm thấy tin đăng."
   },
   "common": {
     "na": "Chưa cập nhật"
+  },
+  "featuredPostsPage": {
+    "title": "Tin Nổi bật",
+    "subtitle": "Các tin đăng được ưu tiên hiển thị hàng đầu.",
+    "noPosts": "Hiện tại không có tin nổi bật nào."
+  },
+  "adminPostsPage": {
+    "title": "Quản lý Tin đăng",
+    "allPosts": "Tất cả Tin đăng"
   }
 }

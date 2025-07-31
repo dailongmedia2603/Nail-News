@@ -1,7 +1,7 @@
 {
   "header": {
-    "tutorials": "Tutorials",
     "blog": "Blog",
+    "learnNail": "Learn Nail",
     "post_ad": "Post Ad",
     "logged_in_as": "Logged in as",
     "admin_dashboard": "Admin Dashboard",
@@ -10,28 +10,29 @@
     "login": "Login",
     "signup": "Sign Up"
   },
-  "homePage": {
-    "title": "Search for Nail Industry News",
-    "subtitle": "Discover the latest opportunities for salon sales, jobs, and training.",
-    "noPosts": "No matching posts found.",
-    "featuredPosts": "Featured Posts",
-    "viewAll": "View All",
-    "latestPosts": "Latest Posts"
+  "supportMenu": {
+    "title": "Support",
+    "contact": "Contact",
+    "faq": "FAQ",
+    "userGuide": "User Guide"
   },
-  "featuredPostsPage": {
-    "title": "Featured Posts",
-    "subtitle": "Posts with top display priority.",
-    "noPosts": "There are currently no featured posts."
+  "homePage": {
+    "title": "Classifieds Platform for the Nail Industry in the US",
+    "subtitle": "Find, buy, sell nail salons, hire technicians, and more.",
+    "featuredPosts": "Featured Posts",
+    "latestPosts": "Latest Posts",
+    "viewAll": "View all",
+    "noPosts": "No matching posts found."
   },
   "postCategories": {
     "all": "All",
     "sellSalon": "Sell Salon",
-    "needTech": "Need Tech",
+    "needTech": "Need Technician",
     "services": "Services",
     "nailSalons": "Nail Salons",
     "nailSupply": "Nail Supply",
     "renewLicense": "Renew License",
-    "photoVideo": "Photo & Video",
+    "photoVideo": "Photo, Video",
     "beautySchool": "Beauty School"
   },
   "postCard": {
@@ -39,7 +40,58 @@
     "tables": "{{count}} tables",
     "salary": "Salary: {{salaryInfo}}",
     "hours": "Hours: {{hours}}",
-    "status": "Salon: {{status}}"
+    "status": "Status: {{status}}"
+  },
+  "toasts": {
+    "linkCopied": "Link copied to clipboard!",
+    "adminSettingsLoadError": "Could not load settings.",
+    "adminSavingSettings": "Saving settings...",
+    "adminLogoUploadError": "Logo upload failed: {{message}}",
+    "adminFaviconUploadError": "Favicon upload failed: {{message}}",
+    "adminSaveSettingsError": "Failed to save settings.",
+    "adminSaveSettingsSuccess": "Settings saved successfully!"
+  },
+  "adminSettingsPage": {
+    "title": "System Settings",
+    "websiteName": "Website Name",
+    "browserTitle": "Browser Title",
+    "contactInfo": "Contact Info",
+    "websiteLogo": "Website Logo",
+    "favicon": "Favicon",
+    "saveChanges": "Save Changes"
+  },
+  "adminDashboardPage": {
+    "title": "Admin Dashboard",
+    "managePosts": "Manage Posts",
+    "managePostsDesc": "Browse and manage all user posts.",
+    "manageBlog": "Manage Blog",
+    "manageBlogDesc": "Create and edit blog articles.",
+    "manageDirectory": "Manage Directory",
+    "manageDirectoryDesc": "Manage items in the directory.",
+    "managePhotoVideo": "Manage Photo & Video",
+    "managePhotoVideoDesc": "Manage photo and video albums.",
+    "manageServices": "Manage Services",
+    "manageServicesDesc": "Manage service-related posts.",
+    "manageCategories": "Manage Categories",
+    "manageCategoriesDesc": "Manage states and cities.",
+    "manageTags": "Manage Tags",
+    "manageTagsDesc": "Manage tags and keywords.",
+    "systemConfig": "System Configuration",
+    "systemConfigDesc": "Edit site-wide settings.",
+    "userList": "User List"
+  },
+  "createPostPage": {
+    "title": "Create a New Post",
+    "subtitle": "Fill in the details below to publish your ad."
+  },
+  "profilePage": {
+    "accountInfoTitle": "Account Information",
+    "accountInfoSubtitle": "Update your account details.",
+    "changePasswordTitle": "Change Password",
+    "changePasswordSubtitle": "Update your login password.",
+    "changePasswordButton": "Change Password",
+    "dialogTitle": "Change Password",
+    "dialogDescription": "Enter your old and new password to complete the change."
   },
   "postDetailPage": {
     "postedOn": "Posted on {{date}}",
@@ -60,67 +112,19 @@
     "tagsKeywords": "Tags & Keywords",
     "location": "Location",
     "address": "Address: <strong>{{address}}</strong>",
-    "mapComingSoon": "Map will be integrated soon.<br/>(Requires API Key from Google Maps Platform to display)",
-    "postNotFound": "This post could not be found."
+    "mapComingSoon": "Map will be updated soon.<br/>Please contact directly for the exact address.",
+    "postNotFound": "Post not found."
   },
-  "createPostPage": {
-    "title": "Create a New Post",
-    "subtitle": "Fill in the details below to post your ad."
+  "common": {
+    "na": "Not available"
   },
-  "profilePage": {
-    "accountInfoTitle": "Account Information",
-    "accountInfoSubtitle": "Update your account information.",
-    "changePasswordTitle": "Change Password",
-    "changePasswordSubtitle": "Change your password here.",
-    "changePasswordButton": "Change Password",
-    "dialogTitle": "Change Password",
-    "dialogDescription": "After a successful password change, you will be asked to log in again."
-  },
-  "adminDashboardPage": {
-    "title": "Admin Dashboard",
-    "managePosts": "Manage Posts",
-    "managePostsDesc": "View, edit, and delete all posts.",
-    "manageBlog": "Manage Blog",
-    "manageBlogDesc": "Create and manage blog articles.",
-    "manageCategories": "Manage Categories",
-    "manageCategoriesDesc": "Manage states and cities.",
-    "manageTags": "Manage Tags",
-    "manageTagsDesc": "Manage tags and keywords.",
-    "systemConfig": "System Configuration",
-    "systemConfigDesc": "Change site-wide settings.",
-    "userList": "User List",
-    "manageDirectory": "Manage Directory",
-    "manageDirectoryDesc": "Add, edit, and delete directory listings.",
-    "managePhotoVideo": "Manage Photos & Videos",
-    "managePhotoVideoDesc": "Add, edit, and delete photo and video albums.",
-    "manageServices": "Manage Services",
-    "manageServicesDesc": "Add, edit, and delete service listings."
+  "featuredPostsPage": {
+    "title": "Featured Posts",
+    "subtitle": "Posts with top display priority.",
+    "noPosts": "There are currently no featured posts."
   },
   "adminPostsPage": {
     "title": "Manage Posts",
     "allPosts": "All Posts"
-  },
-  "adminSettingsPage": {
-    "title": "System Settings",
-    "cardTitle": "General Settings",
-    "cardDescription": "Manage basic settings for the entire website.",
-    "websiteName": "Website Name",
-    "browserTitle": "Browser Title",
-    "contactInfo": "Contact Information",
-    "websiteLogo": "Website Logo",
-    "favicon": "Favicon",
-    "saveChanges": "Save Changes"
-  },
-  "toasts": {
-    "linkCopied": "Link copied!",
-    "adminSettingsLoadError": "Could not load settings.",
-    "adminSavingSettings": "Saving settings...",
-    "adminLogoUploadError": "Logo upload failed: {{message}}",
-    "adminFaviconUploadError": "Favicon upload failed: {{message}}",
-    "adminSaveSettingsError": "Failed to save settings.",
-    "adminSaveSettingsSuccess": "Settings saved successfully."
-  },
-  "common": {
-    "na": "N/A"
   }
 }
