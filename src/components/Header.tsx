@@ -30,9 +30,9 @@ const NavLinks = ({ isMobile = false }: { isMobile?: boolean }) => {
     return (
       <>
         <Link to="/blog" className="transition-colors hover:text-foreground/80 text-foreground">{t('header.blog')}</Link>
+        <Link to="/tutorials" className="transition-colors hover:text-foreground/80 text-foreground">{t('header.learnNail')}</Link>
         <Link to="/contact" className="transition-colors hover:text-foreground/80 text-foreground">{t('supportMenu.contact')}</Link>
         <Link to="/faq" className="transition-colors hover:text-foreground/80 text-foreground">{t('supportMenu.faq')}</Link>
-        <Link to="/tutorials" className="transition-colors hover:text-foreground/80 text-foreground">{t('supportMenu.userGuide')}</Link>
       </>
     );
   }
@@ -40,6 +40,7 @@ const NavLinks = ({ isMobile = false }: { isMobile?: boolean }) => {
   return (
     <>
       <Link to="/blog" className="transition-colors hover:text-foreground/80 text-foreground/60">{t('header.blog')}</Link>
+      <Link to="/tutorials" className="transition-colors hover:text-foreground/80 text-foreground/60">{t('header.learnNail')}</Link>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="flex items-center gap-1 text-foreground/60 hover:text-foreground/80">
@@ -51,7 +52,6 @@ const NavLinks = ({ isMobile = false }: { isMobile?: boolean }) => {
         <DropdownMenuContent align="start">
           <DropdownMenuItem asChild><Link to="/contact">{t('supportMenu.contact')}</Link></DropdownMenuItem>
           <DropdownMenuItem asChild><Link to="/faq">{t('supportMenu.faq')}</Link></DropdownMenuItem>
-          <DropdownMenuItem asChild><Link to="/tutorials">{t('supportMenu.userGuide')}</Link></DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </>
